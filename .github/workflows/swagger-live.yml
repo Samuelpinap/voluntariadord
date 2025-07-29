@@ -3,8 +3,8 @@ name: Live Swagger preview (PR)
 on: pull_request_target
 
 permissions:
-  contents: read        # sigue siendo necesario para checkout
-  pull-requests: write  # ahora sí funciona
+  contents: read        
+  pull-requests: write 
 
 jobs:
   preview:
