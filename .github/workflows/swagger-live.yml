@@ -16,6 +16,7 @@ jobs:
       JwtSettings__SecretKey: dummy-ci-key-change-me
       JwtSettings__Issuer: test-issuer
       JwtSettings__Audience: test-audience
+      JwtSettings__ExpirationMinutes: 60
 
     steps:
     # ── checkout & build ────────────────────────────────────────────────
