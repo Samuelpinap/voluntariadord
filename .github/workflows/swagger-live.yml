@@ -1,15 +1,25 @@
-# .github/workflows/swagger-live.yml
 name: Live Swagger preview (PR)
 
-on: pull_request
+on: pull_request_target
+
+permissions:
+  contents: read        # sigue siendo necesario para checkout
+  pull-requests: write  # ahora sí funciona
 
 jobs:
   preview:
     runs-on: ubuntu-latest
-    timeout-minutes: 45         
+    timeout-minutes: 45
+     
+    env:
+      PORT: 5000   
+      JwtSettings__SecretKey: dummy-ci-key-change-me
+      JwtSettings__Issuer: test-issuer
+      JwtSettings__Audience: test-audience
+      JwtSettings__ExpirationMinutes: 60
 
     steps:
-    
+    # ── checkout & build ────────────────────────────────────────────────
     - uses: actions/checkout@v4
     - uses: actions/setup-dotnet@v4
       with: { dotnet-version: '8.0.x' }
@@ -17,40 +27,66 @@ jobs:
     - run: dotnet restore
     - run: dotnet publish -c Release -o out
 
-
+    # ── launch the API in the background ───────────────────────────────
     - name: Launch API
       run: |
-        dotnet ./out/MyApi.dll --urls http://0.0.0.0:5000 &  echo $! >api.pid
+        touch api.log
+        dotnet ./out/VoluntariadoConectadoRD.dll --urls http://0.0.0.0:${PORT} >api.log 2>&1 &
+        echo $! >api.pid
 
-    - name: Install cloudflared
-      uses: AnimMouse/setup-cloudflared@v2     
-      
-    - name: Start tunnel & capture URL
-      id: tunnel
+    - name: Tail startup log while waiting
       run: |
-        cloudflared tunnel --url http://localhost:5000 --no-autoupdate 2>&1 | tee tunnel.log &
-        # wait for the random URL to appear:
         for i in {1..30}; do
-          URL=$(grep -o 'https://[-a-z0-9]*\.trycloudflare\.com' tunnel.log | head -n1 || true)
-          if [ -n "$URL" ]; then
-            echo "url=$URL" >> $GITHUB_OUTPUT
-            break
+          if grep -q "Now listening on" api.log; then exit 0; fi
+          if ! kill -0 $(cat api.pid) 2>/dev/null; then
+            echo "::group::API crash log"; cat api.log; echo "::endgroup::"
+            echo "::error::API process exited"; exit 1
           fi
           sleep 2
         done
-        [ -n "$URL" ] || (echo "Tunnel URL not found" && exit 1)
+        echo "::group::API startup log"; cat api.log; echo "::endgroup::"
+        echo "::error::API failed to become healthy"; exit 1
+    - name: Print API log on failure
+      if: failure()
+      run: cat api.log
+    # ── wait until it’s really up (curl Swagger JSON) ──────────────────
+    - name: Wait until API responds
+      run: |
+        for i in {1..30}; do
+          curl -sf http://localhost:${PORT}/swagger/v1/swagger.json && exit 0
+          sleep 2
+        done
+        echo "::error::API failed to start"; exit 1
+    - name: Print API log on failure
+      if: failure()
+      run: cat api.log
 
-  
-    - name: Comment preview link
-      uses: peter-evans/create-or-update-comment@v4
+    # ── now install cloudflared and open the tunnel ────────────────────
+    - uses: AnimMouse/setup-cloudflared@v2
+
+    - name: Start tunnel & capture URL
+      id: tunnel
+      run: |
+        cloudflared tunnel --url http://localhost:${PORT} --no-autoupdate 2>&1 | tee tunnel.log &
+        for i in {1..30}; do
+          URL=$(grep -o 'https://[-a-z0-9]*\.trycloudflare\.com' tunnel.log | head -n1 || true)
+          [ -n "$URL" ] && { echo "url=$URL" >> $GITHUB_OUTPUT; break; }
+          sleep 2
+        done
+        [ -n "$URL" ] || (echo "::error::Tunnel URL not captured"; exit 1)
+
+
+    # ── comment the live‑link on the PR ────────────────────────────────
+    - uses: peter-evans/create-or-update-comment@v4
       with:
         issue-number: ${{ github.event.number }}
         body: |
-          🚀 **Swagger en vivo de este pr**  
+          🚀 **SWAGGER EN VIVO DE ESTE PR**  
           ${{ steps.tunnel.outputs.url }}/swagger
 
+    # ── keep it up for reviewers, then clean up ────────────────────────
     - name: Keep tunnel open
-      run: sleep 1800
+      run: sleep 1800          # 30 min, adjust as needed
 
     - if: always()
       run: kill $(cat api.pid) || true
