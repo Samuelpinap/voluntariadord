@@ -42,7 +42,7 @@ jobs:
 
   
     - name: Comment preview link
-      uses: peter-evans/create-or-update-comment@v5
+      uses: peter-evans/create-or-update-comment@v4
       with:
         issue-number: ${{ github.event.number }}
         body: |
