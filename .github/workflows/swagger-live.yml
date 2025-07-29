@@ -1,10 +1,10 @@
 name: Live Swagger preview (PR)
 
-on: pull_request
+on: pull_request_target
 
 permissions:
-  contents: read
-  issues: write           # so the comment can be posted
+  contents: read        # sigue siendo necesario para checkout
+  pull-requests: write  # ahora sí funciona
 
 jobs:
   preview:
