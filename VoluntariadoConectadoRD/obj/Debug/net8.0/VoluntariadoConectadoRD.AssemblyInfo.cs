@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("VoluntariadoConectadoRD")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d005d8c1bffc0e913e2cad085cae41b61b901740")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+bdcc4b5b5aaa9ff7b815933ecbcad1d742150a9c")]
 [assembly: System.Reflection.AssemblyProductAttribute("VoluntariadoConectadoRD")]
 [assembly: System.Reflection.AssemblyTitleAttribute("VoluntariadoConectadoRD")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -1,5 +1,6 @@
 using BCrypt.Net;
 using System.Text.RegularExpressions;
+using VoluntariadoConectadoRD.Interfaces;
 
 namespace VoluntariadoConectadoRD.Services
 {

@@ -1,7 +1,7 @@
 using VoluntariadoConectadoRD.Models.DTOs;
 using VoluntariadoConectadoRD.Models;
 
-namespace VoluntariadoConectadoRD.Services
+namespace VoluntariadoConectadoRD.Interfaces
 {
     public interface IOpportunityService
     {

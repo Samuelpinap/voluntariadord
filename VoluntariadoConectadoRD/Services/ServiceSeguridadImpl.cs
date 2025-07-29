@@ -1,7 +1,8 @@
 ﻿using VoluntariadoConectadoRD.Data;
+using VoluntariadoConectadoRD.Interfaces;
 using VoluntariadoConectadoRD.Models;
 
-namespace VoluntariadoConectadoRD.Servicies
+namespace VoluntariadoConectadoRD.Services
 {
     public class ServiceSeguridadImpl : IServiceSeguridad
     {

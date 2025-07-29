@@ -1,6 +1,6 @@
 using VoluntariadoConectadoRD.Models;
 
-namespace VoluntariadoConectadoRD.Services
+namespace VoluntariadoConectadoRD.Interfaces
 {
     public interface IJwtService
     {
