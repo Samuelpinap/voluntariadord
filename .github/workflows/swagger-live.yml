@@ -13,7 +13,6 @@ jobs:
      
     env:
       PORT: 5000   
-      JwtSettings: dummy‑ci‑key‑change‑me # easy to reuse
       JwtSettings__SecretKey: dummy-ci-key-change-me
       JwtSettings__Issuer: test-issuer
       JwtSettings__Audience: test-audience
