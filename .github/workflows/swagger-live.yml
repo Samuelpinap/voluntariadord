@@ -30,7 +30,9 @@ jobs:
     # ── launch the API in the background ───────────────────────────────
     - name: Launch API
       run: |
-        dotnet ./out/VoluntariadoConectadoRD.dll --urls http://0.0.0.0:${PORT} &  echo $! >api.pid
+        touch api.log
+        dotnet ./out/VoluntariadoConectadoRD.dll --urls http://0.0.0.0:${PORT} >api.log 2>&1 &
+        echo $! >api.pid
 
     - name: Tail startup log while waiting
       run: |
