@@ -1,0 +1,56 @@
+# .github/workflows/swagger-live.yml
+name: Live Swagger preview (PR)
+
+on: pull_request
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45         
+
+    steps:
+    
+    - uses: actions/checkout@v4
+    - uses: actions/setup-dotnet@v4
+      with: { dotnet-version: '8.0.x' }
+
+    - run: dotnet restore
+    - run: dotnet publish -c Release -o out
+
+
+    - name: Launch API
+      run: |
+        dotnet ./out/MyApi.dll --urls http://0.0.0.0:5000 &  echo $! >api.pid
+
+    - name: Install cloudflared
+      uses: AnimMouse/setup-cloudflared@v2     
+      
+    - name: Start tunnel & capture URL
+      id: tunnel
+      run: |
+        cloudflared tunnel --url http://localhost:5000 --no-autoupdate 2>&1 | tee tunnel.log &
+        # wait for the random URL to appear:
+        for i in {1..30}; do
+          URL=$(grep -o 'https://[-a-z0-9]*\.trycloudflare\.com' tunnel.log | head -n1 || true)
+          if [ -n "$URL" ]; then
+            echo "url=$URL" >> $GITHUB_OUTPUT
+            break
+          fi
+          sleep 2
+        done
+        [ -n "$URL" ] || (echo "Tunnel URL not found" && exit 1)
+
+  
+    - name: Comment preview link
+      uses: peter-evans/create-or-update-comment@v5
+      with:
+        issue-number: ${{ github.event.number }}
+        body: |
+          🚀 **Swagger en vivo de este pr**  
+          ${{ steps.tunnel.outputs.url }}/swagger
+
+    - name: Keep tunnel open
+      run: sleep 1800
+
+    - if: always()
+      run: kill $(cat api.pid) || true
