@@ -1,15 +1,21 @@
-# .github/workflows/swagger-live.yml
 name: Live Swagger preview (PR)
 
 on: pull_request
 
+permissions:
+  contents: read
+  issues: write           # so the comment can be posted
+
 jobs:
   preview:
     runs-on: ubuntu-latest
-    timeout-minutes: 45         
+    timeout-minutes: 45
+
+    env:
+      PORT: 5000          # easy to reuse
 
     steps:
-    
+    # ── checkout & build ────────────────────────────────────────────────
     - uses: actions/checkout@v4
     - uses: actions/setup-dotnet@v4
       with: { dotnet-version: '8.0.x' }
@@ -17,48 +23,45 @@ jobs:
     - run: dotnet restore
     - run: dotnet publish -c Release -o out
 
-
+    # ── launch the API in the background ───────────────────────────────
     - name: Launch API
       run: |
-        dotnet ./out/MyApi.dll --urls http://0.0.0.0:5000 &  echo $! >api.pid
+        dotnet ./out/VoluntariadoConectadoRD.dll --urls http://0.0.0.0:${PORT} &  echo $! >api.pid
 
-    - name: Install cloudflared
-      uses: AnimMouse/setup-cloudflared@v2     
-      
+    # ── wait until it’s really up (curl Swagger JSON) ──────────────────
+    - name: Wait until API responds
+      run: |
+        for i in {1..30}; do
+          curl -sf http://localhost:${PORT}/swagger/v1/swagger.json && exit 0
+          sleep 2
+        done
+        echo "::error::API failed to start"; exit 1
+
+    # ── now install cloudflared and open the tunnel ────────────────────
+    - uses: AnimMouse/setup-cloudflared@v2
+
     - name: Start tunnel & capture URL
       id: tunnel
       run: |
-        cloudflared tunnel --url http://localhost:5000 --no-autoupdate 2>&1 | tee tunnel.log &
-        CF_PID=$!
-        sleep 20  # Wait for log to be created
-
+        cloudflared tunnel --url http://localhost:${PORT} --no-autoupdate 2>&1 | tee tunnel.log &
         for i in {1..30}; do
           URL=$(grep -o 'https://[-a-z0-9]*\.trycloudflare\.com' tunnel.log | head -n1 || true)
-          if [ -n "$URL" ]; then
-            echo "url=$URL" >> $GITHUB_OUTPUT
-            break
-          fi
+          [ -n "$URL" ] && { echo "url=$URL" >> $GITHUB_OUTPUT; break; }
           sleep 2
         done
+        [ -n "$URL" ] || (echo "::error::Tunnel URL not captured"; exit 1)
 
-        if [ -z "$URL" ]; then
-          echo "Tunnel URL not found"
-          cat tunnel.log  # Output log for debugging
-          kill $CF_PID || true
-          exit 1
-        fi
-
-  
-    - name: Comment preview link
-      uses: peter-evans/create-or-update-comment@v5
+    # ── comment the live‑link on the PR ────────────────────────────────
+    - uses: peter-evans/create-or-update-comment@v4
       with:
         issue-number: ${{ github.event.number }}
         body: |
-          🚀 **Swagger en vivo de este pr**  
+          🚀 **SWAGGER EN VIVO DE ESTE PR**  
           ${{ steps.tunnel.outputs.url }}/swagger
 
+    # ── keep it up for reviewers, then clean up ────────────────────────
     - name: Keep tunnel open
-      run: sleep 1800
+      run: sleep 1800          # 30 min, adjust as needed
 
     - if: always()
       run: kill $(cat api.pid) || true
