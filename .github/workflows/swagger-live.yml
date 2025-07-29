@@ -26,19 +26,27 @@ jobs:
       uses: AnimMouse/setup-cloudflared@v2     
       
     - name: Start tunnel & capture URL
-      id: tunnel
-      run: |
-        cloudflared tunnel --url http://localhost:5000 --no-autoupdate 2>&1 | tee tunnel.log &
-        # wait for the random URL to appear:
-        for i in {1..30}; do
-          URL=$(grep -o 'https://[-a-z0-9]*\.trycloudflare\.com' tunnel.log | head -n1 || true)
-          if [ -n "$URL" ]; then
-            echo "url=$URL" >> $GITHUB_OUTPUT
-            break
-          fi
-          sleep 2
-        done
-        [ -n "$URL" ] || (echo "Tunnel URL not found" && exit 1)
+     id: tunnel
+  run: |
+    cloudflared tunnel --url http://localhost:5000 --no-autoupdate 2>&1 | tee tunnel.log &
+    CF_PID=$!
+    sleep 5  # Wait for log to be created
+
+    for i in {1..30}; do
+      URL=$(grep -o 'https://[-a-z0-9]*\.trycloudflare\.com' tunnel.log | head -n1 || true)
+      if [ -n "$URL" ]; then
+        echo "url=$URL" >> $GITHUB_OUTPUT
+        break
+      fi
+      sleep 2
+    done
+
+    if [ -z "$URL" ]; then
+      echo "Tunnel URL not found"
+      cat tunnel.log  # Output log for debugging
+      kill $CF_PID || true
+      exit 1
+    fi
 
   
     - name: Comment preview link
