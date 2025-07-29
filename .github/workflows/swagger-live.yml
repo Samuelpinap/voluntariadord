@@ -30,7 +30,7 @@ jobs:
       run: |
         cloudflared tunnel --url http://localhost:5000 --no-autoupdate 2>&1 | tee tunnel.log &
         CF_PID=$!
-        sleep 5  # Wait for log to be created
+        sleep 20  # Wait for log to be created
 
         for i in {1..30}; do
           URL=$(grep -o 'https://[-a-z0-9]*\.trycloudflare\.com' tunnel.log | head -n1 || true)
