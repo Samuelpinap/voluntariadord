@@ -17,6 +17,7 @@ jobs:
       JwtSettings__Issuer: test-issuer
       JwtSettings__Audience: test-audience
       JwtSettings__ExpirationMinutes: 60
+      ConnectionStrings__Default: ${{ secrets.CONNECTION_STRING }}
 
     steps:
     # ── checkout & build ────────────────────────────────────────────────
