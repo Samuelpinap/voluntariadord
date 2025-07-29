@@ -32,6 +32,19 @@ jobs:
       run: |
         dotnet ./out/VoluntariadoConectadoRD.dll --urls http://0.0.0.0:${PORT} &  echo $! >api.pid
 
+    - name: Tail startup log while waiting
+      run: |
+        for i in {1..30}; do
+          if grep -q "Now listening on" api.log; then exit 0; fi
+          if ! kill -0 $(cat api.pid) 2>/dev/null; then
+            echo "::group::API crash log"; cat api.log; echo "::endgroup::"
+            echo "::error::API process exited"; exit 1
+          fi
+          sleep 2
+        done
+        echo "::group::API startup log"; cat api.log; echo "::endgroup::"
+        echo "::error::API failed to become healthy"; exit 1
+    
     # ── wait until it’s really up (curl Swagger JSON) ──────────────────
     - name: Wait until API responds
       run: |
