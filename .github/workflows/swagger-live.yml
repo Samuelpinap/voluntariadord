@@ -46,7 +46,9 @@ jobs:
         done
         echo "::group::API startup log"; cat api.log; echo "::endgroup::"
         echo "::error::API failed to become healthy"; exit 1
-    
+    - name: Print API log on failure
+      if: failure()
+      run: cat api.log
     # ── wait until it’s really up (curl Swagger JSON) ──────────────────
     - name: Wait until API responds
       run: |
@@ -55,6 +57,9 @@ jobs:
           sleep 2
         done
         echo "::error::API failed to start"; exit 1
+    - name: Print API log on failure
+      if: failure()
+      run: cat api.log
 
     # ── now install cloudflared and open the tunnel ────────────────────
     - uses: AnimMouse/setup-cloudflared@v2
