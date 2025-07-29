@@ -13,6 +13,7 @@ jobs:
      
     env:
       PORT: 5000   
+      ASPNETCORE_ENVIRONMENT: Development  
       JwtSettings__SecretKey: VoluntariadoConectadoRD-Super-Secret-Key-256-bits-long-for-security
       JwtSettings__Issuer: VoluntariadoConectadoRD
       JwtSettings__Audience: VoluntariadoConectadoRD-Users
