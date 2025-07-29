@@ -17,7 +17,7 @@ jobs:
       JwtSettings__Issuer: test-issuer
       JwtSettings__Audience: test-audience
       JwtSettings__ExpirationMinutes: 60
-      ConnectionStrings__Default: ${{ secrets.CONNECTION_STRING }}
+      ConnectionStrings__DefaultConnection: ${{ secrets.CONNECTION_STRING }}
 
     steps:
     # ── checkout & build ────────────────────────────────────────────────
@@ -83,7 +83,7 @@ jobs:
         issue-number: ${{ github.event.number }}
         body: |
           🚀 **SWAGGER EN VIVO DE ESTE PR**  
-          ${{ steps.tunnel.outputs.url }}/swagger
+          ${{ steps.tunnel.outputs.url }}
 
     # ── keep it up for reviewers, then clean up ────────────────────────
     - name: Keep tunnel open
