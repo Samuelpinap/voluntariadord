@@ -1,0 +1,6 @@
+@VoluntariadoConectadoRD_HostAddress = http://localhost:5161
+
+GET {{VoluntariadoConectadoRD_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
