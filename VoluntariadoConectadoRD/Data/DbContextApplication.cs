@@ -11,6 +11,7 @@ namespace VoluntariadoConectadoRD.Data
         public DbSet<Roles> Roles { get; set; }
         public DbSet<Organizacion> Organizaciones { get; set; }
         public DbSet<VolunteerOpportunity> VolunteerOpportunities { get; set; }
+
         public DbSet<VolunteerApplication> VolunteerApplications { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

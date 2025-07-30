@@ -1,9 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "lzOHbNi7/9s=",
+  "dgSpecHash": "O3Wrd53OuA8=",
   "success": true,
   "projectFilePath": "C:\\Users\\ismae\\Documents\\VoluntariadoRD\\VoluntariadoConectadoRD\\VoluntariadoConectadoRD.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\ismae\\.nuget\\packages\\automapper\\15.0.1\\automapper.15.0.1.nupkg.sha512",
     "C:\\Users\\ismae\\.nuget\\packages\\azure.core\\1.38.0\\azure.core.1.38.0.nupkg.sha512",
     "C:\\Users\\ismae\\.nuget\\packages\\azure.identity\\1.11.4\\azure.identity.1.11.4.nupkg.sha512",
     "C:\\Users\\ismae\\.nuget\\packages\\bcrypt.net-next\\4.0.3\\bcrypt.net-next.4.0.3.nupkg.sha512",

@@ -16,7 +16,7 @@ namespace VoluntariadoConectadoRD.Models
         [StringLength(2000)]
         public string Descripcion { get; set; } = string.Empty;
 
-        [StringLength(500)]
+        [StringLength(2500)]
         public string? Ubicacion { get; set; }
 
         [Required]
