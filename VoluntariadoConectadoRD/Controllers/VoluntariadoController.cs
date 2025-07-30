@@ -194,17 +194,38 @@ namespace VoluntariadoConectadoRD.Controllers
         /// </summary>
         [HttpGet("my-applications")]
         [VoluntarioOrAdmin]
-        public ActionResult<ApiResponseDto<object>> GetMyApplications()
+        public async Task<ActionResult<ApiResponseDto<IEnumerable<ApplicationDto>>>> GetMyApplications()
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
-            
-            return Ok(new ApiResponseDto<object>
+            try
             {
-                Success = true,
-                Message = "Mis aplicaciones",
-                Data = new { userId, userRole, message = "Lista de aplicaciones del usuario" }
-            });
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (!int.TryParse(userIdClaim, out int userId))
+                {
+                    return Unauthorized(new ApiResponseDto<IEnumerable<ApplicationDto>>
+                    {
+                        Success = false,
+                        Message = "Token inválido"
+                    });
+                }
+
+                var applications = await _opportunityService.GetUserApplicationsAsync(userId);
+
+                return Ok(new ApiResponseDto<IEnumerable<ApplicationDto>>
+                {
+                    Success = true,
+                    Message = "Lista de aplicaciones del usuario",
+                    Data = applications
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener aplicaciones del usuario");
+                return StatusCode(500, new ApiResponseDto<IEnumerable<ApplicationDto>>
+                {
+                    Success = false,
+                    Message = "Error interno del servidor"
+                });
+            }
         }
 
         /// <summary>
