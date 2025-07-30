@@ -29,11 +29,10 @@ namespace VoluntariadoApi.Controllers
                 _logger.LogInformation("Procesando solicitud para obtener todas las oportunidades");
 
                 var oportunidades = await _oportunidadService.GetAllOportunidadesAsync();
-                var oportunidadesList = oportunidades.ToList();
 
-                _logger.LogInformation($"Se encontraron {oportunidadesList.Count} oportunidades");
+                _logger.LogInformation($"Se encontraron {oportunidades.Count()} oportunidades");
 
-                return Ok(oportunidadesList);
+                return Ok(oportunidades);
             }
             catch (Exception ex)
             {
