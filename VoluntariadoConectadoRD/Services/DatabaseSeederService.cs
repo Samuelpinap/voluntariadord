@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using VoluntariadoConectadoRD.Data;
+using VoluntariadoConectadoRD.Interfaces;
 using VoluntariadoConectadoRD.Models;
 
 namespace VoluntariadoConectadoRD.Services

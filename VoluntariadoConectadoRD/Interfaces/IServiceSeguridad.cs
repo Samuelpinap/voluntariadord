@@ -1,6 +1,6 @@
 ﻿using VoluntariadoConectadoRD.Models;
 
-namespace VoluntariadoConectadoRD.Servicies
+namespace VoluntariadoConectadoRD.Interfaces
 {
     public interface IServiceSeguridad
     { 

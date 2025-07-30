@@ -1,7 +1,7 @@
 using VoluntariadoConectadoRD.Models;
 using VoluntariadoConectadoRD.Models.DTOs;
 
-namespace VoluntariadoConectadoRD.Services
+namespace VoluntariadoConectadoRD.Interfaces
 {
     public interface IAuthService
     {
