@@ -5,8 +5,8 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
 using VoluntariadoConectadoRD.Data;
-using VoluntariadoConectadoRD.Servicies;
 using VoluntariadoConectadoRD.Services;
+using VoluntariadoConectadoRD.Interfaces;
 
 namespace VoluntariadoConectadoRD
 {

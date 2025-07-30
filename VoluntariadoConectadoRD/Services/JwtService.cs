@@ -3,6 +3,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using VoluntariadoConectadoRD.Interfaces;
 using VoluntariadoConectadoRD.Models;
 
 namespace VoluntariadoConectadoRD.Services
