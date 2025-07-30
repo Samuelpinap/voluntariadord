@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using VoluntariadoConectadoRD.Attributes;
 using VoluntariadoConectadoRD.Models.DTOs;
-using VoluntariadoConectadoRD.Services;
 using VoluntariadoConectadoRD.Models;
+using VoluntariadoConectadoRD.Interfaces;
 
 namespace VoluntariadoConectadoRD.Controllers
 {
