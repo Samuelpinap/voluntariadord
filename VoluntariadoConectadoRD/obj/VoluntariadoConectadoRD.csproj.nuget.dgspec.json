@@ -1,25 +1,31 @@
 {
   "format": 1,
   "restore": {
-    "/Users/samuelpinapolanco/Development/Unibe/voluntariado/voluntariadord/VoluntariadoConectadoRD/VoluntariadoConectadoRD.csproj": {}
+    "C:\\Users\\LENOVO E 14\\Documents\\Diseño_Administracion_DB\\VoluntariadoConectadoRD\\Voluntariado_cloneRepo\\voluntariadord\\VoluntariadoConectadoRD\\VoluntariadoConectadoRD.csproj": {}
   },
   "projects": {
-    "/Users/samuelpinapolanco/Development/Unibe/voluntariado/voluntariadord/VoluntariadoConectadoRD/VoluntariadoConectadoRD.csproj": {
+    "C:\\Users\\LENOVO E 14\\Documents\\Diseño_Administracion_DB\\VoluntariadoConectadoRD\\Voluntariado_cloneRepo\\voluntariadord\\VoluntariadoConectadoRD\\VoluntariadoConectadoRD.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/samuelpinapolanco/Development/Unibe/voluntariado/voluntariadord/VoluntariadoConectadoRD/VoluntariadoConectadoRD.csproj",
+        "projectUniqueName": "C:\\Users\\LENOVO E 14\\Documents\\Diseño_Administracion_DB\\VoluntariadoConectadoRD\\Voluntariado_cloneRepo\\voluntariadord\\VoluntariadoConectadoRD\\VoluntariadoConectadoRD.csproj",
         "projectName": "VoluntariadoConectadoRD",
-        "projectPath": "/Users/samuelpinapolanco/Development/Unibe/voluntariado/voluntariadord/VoluntariadoConectadoRD/VoluntariadoConectadoRD.csproj",
-        "packagesPath": "/Users/samuelpinapolanco/.nuget/packages/",
-        "outputPath": "/Users/samuelpinapolanco/Development/Unibe/voluntariado/voluntariadord/VoluntariadoConectadoRD/obj/",
+        "projectPath": "C:\\Users\\LENOVO E 14\\Documents\\Diseño_Administracion_DB\\VoluntariadoConectadoRD\\Voluntariado_cloneRepo\\voluntariadord\\VoluntariadoConectadoRD\\VoluntariadoConectadoRD.csproj",
+        "packagesPath": "C:\\Users\\LENOVO E 14\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\LENOVO E 14\\Documents\\Diseño_Administracion_DB\\VoluntariadoConectadoRD\\Voluntariado_cloneRepo\\voluntariadord\\VoluntariadoConectadoRD\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "/Users/samuelpinapolanco/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\LENOVO E 14\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -37,7 +43,8 @@
           "enableAudit": "true",
           "auditLevel": "low",
           "auditMode": "direct"
-        }
+        },
+        "SdkAnalysisLevel": "9.0.300"
       },
       "frameworks": {
         "net8.0": {
@@ -93,7 +100,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.407/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.301/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

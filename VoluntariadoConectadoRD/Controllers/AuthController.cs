@@ -83,7 +83,7 @@ namespace VoluntariadoConectadoRD.Controllers
                     return BadRequest(result);
                 }
 
-                return CreatedAtAction(nameof(GetUserProfile), new { }, result);
+                return Created("", result);
             }
             catch (Exception ex)
             {
@@ -121,7 +121,7 @@ namespace VoluntariadoConectadoRD.Controllers
                     return BadRequest(result);
                 }
 
-                return CreatedAtAction(nameof(GetUserProfile), new { }, result);
+                return Created("", result);
             }
             catch (Exception ex)
             {

@@ -41,6 +41,30 @@ namespace VoluntariadoConectadoRD.Models
         
         public DateTime? FechaActualizacion { get; set; }
 
+        // Profile fields for Sprint 3
+        [StringLength(500)]
+        public string? Avatar { get; set; }
+        
+        [StringLength(1000)]
+        public string? Biografia { get; set; }
+        
+        [StringLength(2000)]
+        public string? Intereses { get; set; }
+        
+        [StringLength(1000)]
+        public string? Habilidades { get; set; }
+        
+        [StringLength(500)]
+        public string? Disponibilidad { get; set; }
+        
+        [StringLength(1000)]
+        public string? ExperienciaPrevia { get; set; }
+        
+        [StringLength(200)]
+        public string? Ubicacion { get; set; }
+        
+        public bool PerfilCompleto { get; set; } = false;
+
         // Navigation property
         public Organizacion? Organizacion { get; set; }
 

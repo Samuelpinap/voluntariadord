@@ -58,6 +58,10 @@ namespace VoluntariadoConectadoRD
             builder.Services.AddScoped<IPasswordService, PasswordService>();
             builder.Services.AddScoped<IDatabaseSeederService, DatabaseSeederService>();
             builder.Services.AddScoped<IOpportunityService, OpportunityService>();
+            
+            // Sprint 3: Profile and Image services
+            builder.Services.AddScoped<IProfileService, ProfileService>();
+            builder.Services.AddScoped<IImageUploadService, ImageUploadService>();
 
             builder.Services.AddControllers();
             
@@ -107,11 +111,14 @@ namespace VoluntariadoConectadoRD
                 app.UseSwaggerUI(c =>
                 {
                     c.SwaggerEndpoint("/swagger/v1/swagger.json", "Voluntariado Conectado RD API v1");
-                    c.RoutePrefix = string.Empty; // Swagger UI at root
+                    c.RoutePrefix = "swagger";// Swagger UI at root
                 });
             }
 
             app.UseHttpsRedirection();
+
+            // Enable static files serving for uploaded images
+            app.UseStaticFiles();
 
             // Important: Authentication must come before Authorization
             app.UseAuthentication();

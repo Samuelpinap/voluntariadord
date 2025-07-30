@@ -28,6 +28,15 @@ namespace VoluntariadoConectadoRD.Data
                 entity.Property(e => e.PasswordHash).IsRequired();
                 entity.Property(e => e.Telefono).HasMaxLength(20);
                 entity.Property(e => e.Direccion).HasMaxLength(200);
+                
+                // Profile fields configuration
+                entity.Property(e => e.Avatar).HasMaxLength(500);
+                entity.Property(e => e.Biografia).HasMaxLength(1000);
+                entity.Property(e => e.Intereses).HasMaxLength(2000);
+                entity.Property(e => e.Habilidades).HasMaxLength(1000);
+                entity.Property(e => e.Disponibilidad).HasMaxLength(500);
+                entity.Property(e => e.ExperienciaPrevia).HasMaxLength(1000);
+                entity.Property(e => e.PerfilCompleto).HasDefaultValue(false);
             });
 
             // Configuración para Organizacion
@@ -42,6 +51,16 @@ namespace VoluntariadoConectadoRD.Data
                 entity.Property(e => e.Direccion).HasMaxLength(300);
                 entity.Property(e => e.SitioWeb).HasMaxLength(200);
                 entity.Property(e => e.NumeroRegistro).HasMaxLength(50);
+                
+                // Profile fields configuration
+                entity.Property(e => e.Logo).HasMaxLength(500);
+                entity.Property(e => e.Mision).HasMaxLength(1000);
+                entity.Property(e => e.Vision).HasMaxLength(1000);
+                entity.Property(e => e.AreasEnfoque).HasMaxLength(1000);
+                entity.Property(e => e.PersonaContacto).HasMaxLength(200);
+                entity.Property(e => e.CargoContacto).HasMaxLength(100);
+                entity.Property(e => e.TelefonoContacto).HasMaxLength(20);
+                entity.Property(e => e.PerfilCompleto).HasDefaultValue(false);
 
                 // Relación con Usuario
                 entity.HasOne(e => e.Usuario)

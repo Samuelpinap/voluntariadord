@@ -1,11 +1,1 @@
-{
-  "Version": 1,
-  "Hash": "Ipa+R4UPi5rnCfIp3HQk9HZ4xIebOaR0wiNzsA8y7pY=",
-  "Source": "VoluntariadoConectadoRD",
-  "BasePath": "_content/VoluntariadoConectadoRD",
-  "Mode": "Default",
-  "ManifestType": "Build",
-  "ReferencedProjectsConfiguration": [],
-  "DiscoveryPatterns": [],
-  "Assets": []
-}
+{"Version":1,"Hash":"Yv/Zp2pmVohWr/PU92jEodjbY3KxCdkx09VZvlzztA8=","Source":"VoluntariadoConectadoRD","BasePath":"_content/VoluntariadoConectadoRD","Mode":"Default","ManifestType":"Build","ReferencedProjectsConfiguration":[],"DiscoveryPatterns":[{"Name":"VoluntariadoConectadoRD\\wwwroot","Source":"VoluntariadoConectadoRD","ContentRoot":"C:\\Users\\LENOVO E 14\\Documents\\Diseño_Administracion_DB\\VoluntariadoConectadoRD\\Voluntariado_cloneRepo\\voluntariadord\\VoluntariadoConectadoRD\\wwwroot\\","BasePath":"_content/VoluntariadoConectadoRD","Pattern":"**"}],"Assets":[],"Endpoints":[]}

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using VoluntariadoConectadoRD.Data;
 
@@ -11,9 +12,11 @@ using VoluntariadoConectadoRD.Data;
 namespace VoluntariadoConectadoRD.Migrations
 {
     [DbContext(typeof(DbContextApplication))]
-    partial class DbContextApplicationModelSnapshot : ModelSnapshot
+    [Migration("20250729221317_AddUserAndOrganizationProfileFields")]
+    partial class AddUserAndOrganizationProfileFields
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -219,10 +222,6 @@ namespace VoluntariadoConectadoRD.Migrations
                     b.Property<string>("Telefono")
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
-
-                    b.Property<string>("Ubicacion")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
 
                     b.HasKey("Id");
 
