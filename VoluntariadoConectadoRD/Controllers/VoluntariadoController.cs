@@ -190,21 +190,43 @@ namespace VoluntariadoConectadoRD.Controllers
         }
 
         /// <summary>
-        /// Endpoint para voluntarios y administradores
+        /// Endpoint para voluntarios y administradores - Obtener mis postulaciones
         /// </summary>
         [HttpGet("my-applications")]
         [VoluntarioOrAdmin]
-        public ActionResult<ApiResponseDto<object>> GetMyApplications()
+        public async Task<ActionResult<ApiResponseDto<IEnumerable<ApplicationDto>>>> GetMyApplications()
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             
-            return Ok(new ApiResponseDto<object>
+            try
             {
-                Success = true,
-                Message = "Mis aplicaciones",
-                Data = new { userId, userRole, message = "Lista de aplicaciones del usuario" }
-            });
+                if (!int.TryParse(userIdClaim, out int userId))
+                {
+                    return BadRequest(new ApiResponseDto<IEnumerable<ApplicationDto>>
+                    {
+                        Success = false,
+                        Message = "ID de usuario inválido"
+                    });
+                }
+
+                var applications = await _opportunityService.GetUserApplicationsAsync(userId);
+                
+                return Ok(new ApiResponseDto<IEnumerable<ApplicationDto>>
+                {
+                    Success = true,
+                    Message = "Lista de mis postulaciones",
+                    Data = applications
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving user applications for user {UserId}", userIdClaim);
+                return StatusCode(500, new ApiResponseDto<IEnumerable<ApplicationDto>>
+                {
+                    Success = false,
+                    Message = "Error interno del servidor"
+                });
+            }
         }
 
         /// <summary>

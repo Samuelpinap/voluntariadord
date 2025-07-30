@@ -1,11 +1,1 @@
-{
-  "Version": 1,
-  "Hash": "Ipa+R4UPi5rnCfIp3HQk9HZ4xIebOaR0wiNzsA8y7pY=",
-  "Source": "VoluntariadoConectadoRD",
-  "BasePath": "_content/VoluntariadoConectadoRD",
-  "Mode": "Default",
-  "ManifestType": "Build",
-  "ReferencedProjectsConfiguration": [],
-  "DiscoveryPatterns": [],
-  "Assets": []
-}
+{"Version":1,"Hash":"qVTZkCRxZ+6ilBVKLJUOEHRym5byvA52/2U0+ROTMmc=","Source":"VoluntariadoConectadoRD","BasePath":"_content/VoluntariadoConectadoRD","Mode":"Default","ManifestType":"Build","ReferencedProjectsConfiguration":[],"DiscoveryPatterns":[],"Assets":[],"Endpoints":[]}
