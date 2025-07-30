@@ -5,3 +5,85 @@
 /SEEDED_DATA.md
 /TEST_APIS.sh
 /TEST_SEEDED_USERS.md
+
+################################################################################
+# Build output & intermediate files
+################################################################################
+bin/
+obj/
+artifacts/
+
+# Native AOT extra output (when you publish with -p:PublishAot=true)
+*.native*
+*.ilc.rsp
+*.map
+*.ri
+*.ilk
+*.exp
+*.pdb
+
+################################################################################
+# IDE / tooling folders
+################################################################################
+.vs/                  # Visual Studio
+.idea/                # JetBrains Rider
+.vscode/              # VS Code settings that are machine‑local
+
+# User‑profile & workspace files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.rsuser
+*.DotSettings.user
+*.ncrunch*
+
+################################################################################
+# Test & benchmarking artefacts
+################################################################################
+TestResults/
+BenchmarkDotNet.Artifacts/
+coverage*/            # coverlet / reportgenerator
+
+################################################################################
+# Logs & diagnostics
+################################################################################
+*.log
+*.svclog
+*.log.*               # e.g. Serilog rolling files
+
+################################################################################
+# Configuration that **should** stay out of source‑control
+################################################################################
+# NOTE: leave Properties/launchSettings.json committed – the community settled
+# on keeping it because it only contains dev‑time profiles and no secrets :contentReference[oaicite:0]{index=0}
+# Instead, ignore *local* or *secret* variants of your settings files:
+
+appsettings.*.Local.json
+appsettings.*.Secrets.json
+*.env                 # dotenv files
+.env.*                # per‑environment dotenvs
+secrets.json          # dotnet‑user‑secrets fallback
+
+################################################################################
+# Client‑side / front‑end clutter (if you have a React/Angular/Blazor Wasm front)
+################################################################################
+node_modules/
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+
+wwwroot/lib/          # libman
+
+################################################################################
+# OS‑specific noise
+################################################################################
+.DS_Store
+Thumbs.db
+desktop.ini
+ehthumbs.db
+$RECYCLE.BIN/
+
+################################################################################
+# End of file
+################################################################################

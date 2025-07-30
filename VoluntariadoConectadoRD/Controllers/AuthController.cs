@@ -2,8 +2,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
+using VoluntariadoConectadoRD.Interfaces;
 using VoluntariadoConectadoRD.Models.DTOs;
-using VoluntariadoConectadoRD.Services;
 
 namespace VoluntariadoConectadoRD.Controllers
 {
