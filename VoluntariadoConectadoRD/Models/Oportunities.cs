@@ -28,5 +28,15 @@ namespace VoluntariadoApi.Models
         
         [Required]
         public DateTime FechaFin { get; set; }
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (FechaFin < FechaInicio)
+            {
+                yield return new ValidationResult(
+                    "FechaFin must be greater than or equal to FechaInicio.",
+                    new[] { nameof(FechaFin), nameof(FechaInicio) }
+                );
+            }
+        }
     }
 }
