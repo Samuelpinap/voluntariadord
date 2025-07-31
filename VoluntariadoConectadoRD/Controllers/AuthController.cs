@@ -281,6 +281,7 @@ namespace VoluntariadoConectadoRD.Controllers
                 });
             }
         }
+
     }
 
     public class ChangePasswordDto
