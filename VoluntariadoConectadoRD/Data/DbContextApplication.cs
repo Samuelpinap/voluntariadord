@@ -12,6 +12,9 @@ namespace VoluntariadoConectadoRD.Data
         public DbSet<Organizacion> Organizaciones { get; set; }
         public DbSet<VolunteerOpportunity> VolunteerOpportunities { get; set; }
         public DbSet<VolunteerApplication> VolunteerApplications { get; set; }
+        public DbSet<UsuarioResena> UsuarioResenas { get; set; }
+        public DbSet<Badge> Badges { get; set; }
+        public DbSet<UsuarioBadge> UsuarioBadges { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -28,6 +31,7 @@ namespace VoluntariadoConectadoRD.Data
                 entity.Property(e => e.PasswordHash).IsRequired();
                 entity.Property(e => e.Telefono).HasMaxLength(20);
                 entity.Property(e => e.Direccion).HasMaxLength(200);
+                entity.Property(e => e.CalificacionPromedio).HasPrecision(3, 2);
             });
 
             // Configuración para Organizacion
@@ -99,11 +103,70 @@ namespace VoluntariadoConectadoRD.Data
                 entity.HasIndex(e => new { e.UsuarioId, e.OpportunityId }).IsUnique();
             });
 
+            // Configuración para UsuarioResena
+            modelBuilder.Entity<UsuarioResena>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Comentario).HasMaxLength(1000);
+
+                // Relación con Usuario Reseñado
+                entity.HasOne(e => e.UsuarioResenado)
+                      .WithMany(u => u.ResenasRecibidas)
+                      .HasForeignKey(e => e.UsuarioResenadoId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                // Relación con Usuario Autor
+                entity.HasOne(e => e.UsuarioAutor)
+                      .WithMany()
+                      .HasForeignKey(e => e.UsuarioAutorId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                // Relación con Organizacion
+                entity.HasOne(e => e.Organizacion)
+                      .WithMany()
+                      .HasForeignKey(e => e.OrganizacionId)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // Configuración para Badge
+            modelBuilder.Entity<Badge>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Nombre).IsRequired().HasMaxLength(100);
+                entity.Property(e => e.Descripcion).HasMaxLength(500);
+                entity.Property(e => e.IconoUrl).HasMaxLength(200);
+                entity.Property(e => e.Color).HasMaxLength(20);
+            });
+
+            // Configuración para UsuarioBadge
+            modelBuilder.Entity<UsuarioBadge>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+
+                // Relación con Usuario
+                entity.HasOne(e => e.Usuario)
+                      .WithMany(u => u.Badges)
+                      .HasForeignKey(e => e.UsuarioId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                // Relación con Badge
+                entity.HasOne(e => e.Badge)
+                      .WithMany(b => b.UsuarioBadges)
+                      .HasForeignKey(e => e.BadgeId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                // Índice único para evitar badges duplicados
+                entity.HasIndex(e => new { e.UsuarioId, e.BadgeId }).IsUnique();
+            });
+
             // Mapeo de tablas para compatibilidad
             modelBuilder.Entity<Usuario>().ToTable("usuarios");
             modelBuilder.Entity<Organizacion>().ToTable("organizaciones");
             modelBuilder.Entity<VolunteerOpportunity>().ToTable("volunteer_opportunities");
             modelBuilder.Entity<VolunteerApplication>().ToTable("volunteer_applications");
+            modelBuilder.Entity<UsuarioResena>().ToTable("usuario_resenas");
+            modelBuilder.Entity<Badge>().ToTable("badges");
+            modelBuilder.Entity<UsuarioBadge>().ToTable("usuario_badges");
         }
     }
 }

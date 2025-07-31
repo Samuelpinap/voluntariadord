@@ -23,14 +23,18 @@ namespace VoluntariadoConectadoRD.Controllers
         }
 
         /// <summary>
-        /// Endpoint disponible para todos los usuarios autenticados
+        /// Endpoint disponible para todos los usuarios autenticados - GET opportunities with filters
         /// </summary>
         [HttpGet("opportunities")]
-        public async Task<ActionResult<ApiResponseDto<IEnumerable<OpportunityListDto>>>> GetVolunteerOpportunities()
+        public async Task<ActionResult<ApiResponseDto<IEnumerable<OpportunityListDto>>>> GetVolunteerOpportunities(
+            [FromQuery] string? searchTerm = null,
+            [FromQuery] string? areaInteres = null,
+            [FromQuery] string? ubicacion = null,
+            [FromQuery] OpportunityStatus? status = null)
         {
             try
             {
-                var opportunities = await _opportunityService.GetAllOpportunitiesAsync();
+                var opportunities = await _opportunityService.GetAllOpportunitiesAsync(searchTerm, areaInteres, ubicacion, status);
                 
                 return Ok(new ApiResponseDto<IEnumerable<OpportunityListDto>>
                 {
@@ -136,37 +140,102 @@ namespace VoluntariadoConectadoRD.Controllers
         }
 
         /// <summary>
-        /// Endpoint solo para organizaciones - Crear oportunidades
+        /// Create new opportunity (Organizations only) - COMPLETE IMPLEMENTATION
         /// </summary>
         [HttpPost("opportunities")]
         [OrganizacionOnly]
-        public ActionResult<ApiResponseDto<object>> CreateOpportunity([FromBody] object opportunityData)
+        public async Task<ActionResult<ApiResponseDto<OpportunityDetailDto>>> CreateOpportunity([FromBody] CreateOpportunityDto createDto)
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            
-            return Ok(new ApiResponseDto<object>
+            try
             {
-                Success = true,
-                Message = "Oportunidad creada exitosamente",
-                Data = new { userId, message = "La oportunidad ha sido creada" }
-            });
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (!int.TryParse(userIdClaim, out int userId))
+                {
+                    return BadRequest(new ApiResponseDto<OpportunityDetailDto>
+                    {
+                        Success = false,
+                        Message = "Usuario no válido"
+                    });
+                }
+
+                // Get organization ID from user
+                var organizacionId = await _opportunityService.GetOrganizacionIdByUserAsync(userId);
+                if (!organizacionId.HasValue)
+                {
+                    return BadRequest(new ApiResponseDto<OpportunityDetailDto>
+                    {
+                        Success = false,
+                        Message = "Usuario no asociado a ninguna organización"
+                    });
+                }
+
+                var result = await _opportunityService.CreateOpportunityAsync(createDto, organizacionId.Value);
+
+                if (!result.Success)
+                {
+                    return BadRequest(result);
+                }
+
+                return CreatedAtAction(nameof(GetOpportunityDetails), new { id = result.Data?.Id }, result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating opportunity");
+                return StatusCode(500, new ApiResponseDto<OpportunityDetailDto>
+                {
+                    Success = false,
+                    Message = "Error interno del servidor"
+                });
+            }
         }
 
         /// <summary>
-        /// Endpoint solo para organizaciones - Gestionar aplicaciones
+        /// Get organization applications - COMPLETE IMPLEMENTATION
         /// </summary>
         [HttpGet("applications")]
         [OrganizacionOnly]
-        public ActionResult<ApiResponseDto<object>> GetApplications()
+        public async Task<ActionResult<ApiResponseDto<IEnumerable<ApplicationDto>>>> GetApplications()
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            
-            return Ok(new ApiResponseDto<object>
+            try
             {
-                Success = true,
-                Message = "Lista de aplicaciones",
-                Data = new { userId, message = "Aquí estarían las aplicaciones a tus oportunidades" }
-            });
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (!int.TryParse(userIdClaim, out int userId))
+                {
+                    return BadRequest(new ApiResponseDto<IEnumerable<ApplicationDto>>
+                    {
+                        Success = false,
+                        Message = "Usuario no válido"
+                    });
+                }
+
+                var organizacionId = await _opportunityService.GetOrganizacionIdByUserAsync(userId);
+                if (!organizacionId.HasValue)
+                {
+                    return BadRequest(new ApiResponseDto<IEnumerable<ApplicationDto>>
+                    {
+                        Success = false,
+                        Message = "Usuario no asociado a ninguna organización"
+                    });
+                }
+
+                var applications = await _opportunityService.GetOrganizationApplicationsAsync(organizacionId.Value);
+
+                return Ok(new ApiResponseDto<IEnumerable<ApplicationDto>>
+                {
+                    Success = true,
+                    Message = "Lista de aplicaciones",
+                    Data = applications
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving applications");
+                return StatusCode(500, new ApiResponseDto<IEnumerable<ApplicationDto>>
+                {
+                    Success = false,
+                    Message = "Error interno del servidor"
+                });
+            }
         }
 
         /// <summary>
@@ -190,39 +259,134 @@ namespace VoluntariadoConectadoRD.Controllers
         }
 
         /// <summary>
-        /// Endpoint para voluntarios y administradores
+        /// Get volunteer applications - COMPLETE IMPLEMENTATION
         /// </summary>
         [HttpGet("my-applications")]
         [VoluntarioOrAdmin]
-        public ActionResult<ApiResponseDto<object>> GetMyApplications()
+        public async Task<ActionResult<ApiResponseDto<IEnumerable<ApplicationDto>>>> GetMyApplications()
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
-            
-            return Ok(new ApiResponseDto<object>
+            try
             {
-                Success = true,
-                Message = "Mis aplicaciones",
-                Data = new { userId, userRole, message = "Lista de aplicaciones del usuario" }
-            });
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (!int.TryParse(userIdClaim, out int userId))
+                {
+                    return BadRequest(new ApiResponseDto<IEnumerable<ApplicationDto>>
+                    {
+                        Success = false,
+                        Message = "Usuario no válido"
+                    });
+                }
+
+                var applications = await _opportunityService.GetVolunteerApplicationsAsync(userId);
+
+                return Ok(new ApiResponseDto<IEnumerable<ApplicationDto>>
+                {
+                    Success = true,
+                    Message = "Mis aplicaciones",
+                    Data = applications
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving user applications");
+                return StatusCode(500, new ApiResponseDto<IEnumerable<ApplicationDto>>
+                {
+                    Success = false,
+                    Message = "Error interno del servidor"
+                });
+            }
         }
 
         /// <summary>
-        /// Endpoint para organizaciones y administradores
+        /// Update opportunity - COMPLETE IMPLEMENTATION
         /// </summary>
         [HttpPut("opportunities/{opportunityId}")]
         [OrganizacionOrAdmin]
-        public ActionResult<ApiResponseDto<object>> UpdateOpportunity(int opportunityId, [FromBody] object opportunityData)
+        public async Task<ActionResult<ApiResponseDto<OpportunityDetailDto>>> UpdateOpportunity(int opportunityId, [FromBody] UpdateOpportunityDto updateDto)
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
-            
-            return Ok(new ApiResponseDto<object>
+            try
             {
-                Success = true,
-                Message = "Oportunidad actualizada",
-                Data = new { userId, userRole, opportunityId, message = "La oportunidad ha sido actualizada" }
-            });
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (!int.TryParse(userIdClaim, out int userId))
+                {
+                    return BadRequest(new ApiResponseDto<OpportunityDetailDto>
+                    {
+                        Success = false,
+                        Message = "Usuario no válido"
+                    });
+                }
+
+                var organizacionId = await _opportunityService.GetOrganizacionIdByUserAsync(userId);
+                if (!organizacionId.HasValue)
+                {
+                    return BadRequest(new ApiResponseDto<OpportunityDetailDto>
+                    {
+                        Success = false,
+                        Message = "Usuario no asociado a ninguna organización"
+                    });
+                }
+
+                var result = await _opportunityService.UpdateOpportunityAsync(opportunityId, updateDto, organizacionId.Value);
+
+                if (!result.Success)
+                {
+                    return BadRequest(result);
+                }
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating opportunity");
+                return StatusCode(500, new ApiResponseDto<OpportunityDetailDto>
+                {
+                    Success = false,
+                    Message = "Error interno del servidor"
+                });
+            }
+        }
+
+        /// <summary>
+        /// Update application status - NEW ENDPOINT
+        /// </summary>
+        [HttpPut("applications/{applicationId}/status")]
+        [OrganizacionOrAdmin]
+        public async Task<ActionResult<ApiResponseDto<bool>>> UpdateApplicationStatus(
+            int applicationId,
+            [FromBody] UpdateApplicationStatusDto statusDto)
+        {
+            try
+            {
+                var success = await _opportunityService.UpdateApplicationStatusAsync(
+                    applicationId,
+                    statusDto.Status,
+                    statusDto.Notes);
+
+                if (!success)
+                {
+                    return BadRequest(new ApiResponseDto<bool>
+                    {
+                        Success = false,
+                        Message = "No se pudo actualizar el estado de la aplicación"
+                    });
+                }
+
+                return Ok(new ApiResponseDto<bool>
+                {
+                    Success = true,
+                    Message = "Estado de aplicación actualizado exitosamente",
+                    Data = true
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating application status");
+                return StatusCode(500, new ApiResponseDto<bool>
+                {
+                    Success = false,
+                    Message = "Error interno del servidor"
+                });
+            }
         }
     }
 }

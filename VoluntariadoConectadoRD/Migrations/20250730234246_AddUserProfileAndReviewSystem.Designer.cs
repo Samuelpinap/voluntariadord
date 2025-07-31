@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using VoluntariadoConectadoRD.Data;
 
@@ -11,9 +12,11 @@ using VoluntariadoConectadoRD.Data;
 namespace VoluntariadoConectadoRD.Migrations
 {
     [DbContext(typeof(DbContextApplication))]
-    partial class DbContextApplicationModelSnapshot : ModelSnapshot
+    [Migration("20250730234246_AddUserProfileAndReviewSystem")]
+    partial class AddUserProfileAndReviewSystem
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -163,8 +166,7 @@ namespace VoluntariadoConectadoRD.Migrations
                         .HasColumnType("nvarchar(1000)");
 
                     b.Property<decimal>("CalificacionPromedio")
-                        .HasPrecision(3, 2)
-                        .HasColumnType("decimal(3,2)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Direccion")
                         .HasMaxLength(200)

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using VoluntariadoConectadoRD.Data;
 
@@ -11,9 +12,11 @@ using VoluntariadoConectadoRD.Data;
 namespace VoluntariadoConectadoRD.Migrations
 {
     [DbContext(typeof(DbContextApplication))]
-    partial class DbContextApplicationModelSnapshot : ModelSnapshot
+    [Migration("20250730230343_AddCoreVolunteerSystemTables")]
+    partial class AddCoreVolunteerSystemTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,43 +24,6 @@ namespace VoluntariadoConectadoRD.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("VoluntariadoConectadoRD.Models.Badge", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Color")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<string>("Descripcion")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("IconoUrl")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("Nombre")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<int>("RequisitoValor")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Tipo")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("badges", (string)null);
-                });
 
             modelBuilder.Entity("VoluntariadoConectadoRD.Models.Organizacion", b =>
                 {
@@ -158,21 +124,9 @@ namespace VoluntariadoConectadoRD.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<string>("Biografia")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<decimal>("CalificacionPromedio")
-                        .HasPrecision(3, 2)
-                        .HasColumnType("decimal(3,2)");
-
                     b.Property<string>("Direccion")
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("Disponibilidad")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -180,9 +134,6 @@ namespace VoluntariadoConectadoRD.Migrations
                         .HasColumnType("nvarchar(150)");
 
                     b.Property<int>("Estatus")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ExperienciaAnios")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("FechaActualizacion")
@@ -194,13 +145,6 @@ namespace VoluntariadoConectadoRD.Migrations
                     b.Property<DateTime>("FechaNacimiento")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Habilidades")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<int>("HorasVoluntariado")
-                        .HasColumnType("int");
-
                     b.Property<string>("Nombre")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -210,10 +154,6 @@ namespace VoluntariadoConectadoRD.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ProfileImageUrl")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
                     b.Property<int>("Rol")
                         .HasColumnType("int");
 
@@ -221,80 +161,12 @@ namespace VoluntariadoConectadoRD.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
-                    b.Property<int>("TotalResenas")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("Email")
                         .IsUnique();
 
                     b.ToTable("usuarios", (string)null);
-                });
-
-            modelBuilder.Entity("VoluntariadoConectadoRD.Models.UsuarioBadge", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("BadgeId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("FechaObtenido")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("UsuarioId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("BadgeId");
-
-                    b.HasIndex("UsuarioId", "BadgeId")
-                        .IsUnique();
-
-                    b.ToTable("usuario_badges", (string)null);
-                });
-
-            modelBuilder.Entity("VoluntariadoConectadoRD.Models.UsuarioResena", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("Calificacion")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Comentario")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<DateTime>("FechaCreacion")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("OrganizacionId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UsuarioAutorId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UsuarioResenadoId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("OrganizacionId");
-
-                    b.HasIndex("UsuarioAutorId");
-
-                    b.HasIndex("UsuarioResenadoId");
-
-                    b.ToTable("usuario_resenas", (string)null);
                 });
 
             modelBuilder.Entity("VoluntariadoConectadoRD.Models.VolunteerApplication", b =>
@@ -421,52 +293,6 @@ namespace VoluntariadoConectadoRD.Migrations
                     b.Navigation("Usuario");
                 });
 
-            modelBuilder.Entity("VoluntariadoConectadoRD.Models.UsuarioBadge", b =>
-                {
-                    b.HasOne("VoluntariadoConectadoRD.Models.Badge", "Badge")
-                        .WithMany("UsuarioBadges")
-                        .HasForeignKey("BadgeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("VoluntariadoConectadoRD.Models.Usuario", "Usuario")
-                        .WithMany("Badges")
-                        .HasForeignKey("UsuarioId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Badge");
-
-                    b.Navigation("Usuario");
-                });
-
-            modelBuilder.Entity("VoluntariadoConectadoRD.Models.UsuarioResena", b =>
-                {
-                    b.HasOne("VoluntariadoConectadoRD.Models.Organizacion", "Organizacion")
-                        .WithMany()
-                        .HasForeignKey("OrganizacionId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("VoluntariadoConectadoRD.Models.Usuario", "UsuarioAutor")
-                        .WithMany()
-                        .HasForeignKey("UsuarioAutorId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("VoluntariadoConectadoRD.Models.Usuario", "UsuarioResenado")
-                        .WithMany("ResenasRecibidas")
-                        .HasForeignKey("UsuarioResenadoId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Organizacion");
-
-                    b.Navigation("UsuarioAutor");
-
-                    b.Navigation("UsuarioResenado");
-                });
-
             modelBuilder.Entity("VoluntariadoConectadoRD.Models.VolunteerApplication", b =>
                 {
                     b.HasOne("VoluntariadoConectadoRD.Models.VolunteerOpportunity", "Opportunity")
@@ -497,18 +323,9 @@ namespace VoluntariadoConectadoRD.Migrations
                     b.Navigation("Organizacion");
                 });
 
-            modelBuilder.Entity("VoluntariadoConectadoRD.Models.Badge", b =>
-                {
-                    b.Navigation("UsuarioBadges");
-                });
-
             modelBuilder.Entity("VoluntariadoConectadoRD.Models.Usuario", b =>
                 {
-                    b.Navigation("Badges");
-
                     b.Navigation("Organizacion");
-
-                    b.Navigation("ResenasRecibidas");
                 });
 
             modelBuilder.Entity("VoluntariadoConectadoRD.Models.VolunteerOpportunity", b =>
