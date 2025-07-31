@@ -1,4 +1,4 @@
-using VoluntariadoApi.Models;
+using VoluntariadoConectadoRD.Models;
 using VoluntariadoConectadoRD.Models.DTOs;
 
 namespace VoluntariadoConectadoRD.Interfaces
