@@ -1,6 +1,6 @@
 using VoluntariadoApi.Models;
 
-namespace VoluntariadoApi.Interfaces.IServices
+namespace VoluntariadoConectadoRD.Services
 {
     public interface IOportunidadService
     {
