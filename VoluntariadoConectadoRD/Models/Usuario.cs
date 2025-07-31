@@ -29,7 +29,7 @@ namespace VoluntariadoConectadoRD.Models
         [StringLength(200)]
         public string? Direccion { get; set; }
         
-        public DateTime FechaNacimiento { get; set; }
+        public DateTime? FechaNacimiento { get; set; }
         
         [Required]
         public UserRole Rol { get; set; } = UserRole.Voluntario;
@@ -51,7 +51,7 @@ namespace VoluntariadoConectadoRD.Models
         [StringLength(500)]
         public string? Habilidades { get; set; } // JSON string of skills
         
-        public int ExperienciaAnios { get; set; } = 0;
+        public int? ExperienciaAnios { get; set; }
         
         [StringLength(50)]
         public string? Disponibilidad { get; set; } // "Matutino", "Vespertino", "Flexible"
@@ -61,6 +61,8 @@ namespace VoluntariadoConectadoRD.Models
         public decimal CalificacionPromedio { get; set; } = 0;
         
         public int TotalResenas { get; set; } = 0;
+        
+        public bool PerfilCompleto { get; set; } = false;
 
         // Navigation property
         public Organizacion? Organizacion { get; set; }
