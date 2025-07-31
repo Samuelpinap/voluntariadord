@@ -9,9 +9,9 @@ namespace VoluntariadoConectadoRD.Services
     public class OpportunityService : IOpportunityService
     {
         private readonly DbContextApplication _context;
-        private readonly ILogger<OpportunityService> _logger;
+        private readonly ILogger<OpportunitiesService> _logger;
 
-        public OpportunityService(DbContextApplication context, ILogger<OpportunityService> logger)
+        public OpportunityService(DbContextApplication context, ILogger<OpportunitiesService> logger)
         {
             _context = context;
             _logger = logger;

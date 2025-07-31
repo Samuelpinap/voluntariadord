@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using VoluntariadoApi.Models;
-using VoluntariadoConectadoRD.Services;
+using VoluntariadoConectadoRD.Interfaces;
 
 namespace VoluntariadoApi.Controllers
 {

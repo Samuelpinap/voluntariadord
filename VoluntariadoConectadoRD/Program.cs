@@ -57,7 +57,7 @@ namespace VoluntariadoConectadoRD
             builder.Services.AddScoped<IJwtService, JwtService>();
             builder.Services.AddScoped<IPasswordService, PasswordService>();
             builder.Services.AddScoped<IDatabaseSeederService, DatabaseSeederService>();
-            builder.Services.AddScoped<IOpportunityService, OpportunityService>();
+            builder.Services.AddScoped<IOpportunityService, OpportunitiesService>();
 
             builder.Services.AddControllers();
             

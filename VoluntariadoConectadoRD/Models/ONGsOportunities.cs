@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace VoluntariadoApi.Models
+namespace VoluntariadoConectadoRD.Models
 {
     public class Oportunidad
     {
