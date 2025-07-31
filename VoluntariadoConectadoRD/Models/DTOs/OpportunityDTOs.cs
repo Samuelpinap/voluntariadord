@@ -96,4 +96,23 @@ namespace VoluntariadoConectadoRD.Models.DTOs
         public DateTime? FechaRespuesta { get; set; }
         public string? NotasOrganizacion { get; set; }
     }
+
+    public class UpdateApplicationStatusDto
+    {
+        [Required]
+        public ApplicationStatus Status { get; set; }
+
+        [StringLength(500)]
+        public string? Notes { get; set; }
+    }
+
+    public class OpportunityFilterDto
+    {
+        public string? SearchTerm { get; set; }
+        public string? AreaInteres { get; set; }
+        public string? Ubicacion { get; set; }
+        public OpportunityStatus? Status { get; set; }
+        public int Page { get; set; } = 1;
+        public int PageSize { get; set; } = 10;
+    }
 }

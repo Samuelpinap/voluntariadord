@@ -101,9 +101,42 @@ namespace VoluntariadoConectadoRD.Models.DTOs
         public string Apellido { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public string? Telefono { get; set; }
+        public string? Direccion { get; set; }
         public UserRole Rol { get; set; }
         public UserStatus Estatus { get; set; }
         public OrganizacionInfoDto? Organizacion { get; set; }
+
+        // Extended Profile Fields
+        public string? ProfileImageUrl { get; set; }
+        public string? Biografia { get; set; }
+        public List<string>? Habilidades { get; set; }
+        public int ExperienciaAnios { get; set; }
+        public string? Disponibilidad { get; set; }
+        public int HorasVoluntariado { get; set; }
+        public decimal CalificacionPromedio { get; set; }
+        public int TotalResenas { get; set; }
+        public List<BadgeDto>? Badges { get; set; }
+        public List<ResenaDto>? UltimasResenas { get; set; }
+    }
+
+    public class BadgeDto
+    {
+        public int Id { get; set; }
+        public string Nombre { get; set; } = string.Empty;
+        public string? Descripcion { get; set; }
+        public string? IconoUrl { get; set; }
+        public string Color { get; set; } = "primary";
+        public DateTime FechaObtenido { get; set; }
+    }
+
+    public class ResenaDto
+    {
+        public int Id { get; set; }
+        public int Calificacion { get; set; }
+        public string? Comentario { get; set; }
+        public string UsuarioAutorNombre { get; set; } = string.Empty;
+        public string OrganizacionNombre { get; set; } = string.Empty;
+        public DateTime FechaCreacion { get; set; }
     }
 
     public class OrganizacionInfoDto

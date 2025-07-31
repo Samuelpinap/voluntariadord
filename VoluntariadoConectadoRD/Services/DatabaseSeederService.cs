@@ -70,6 +70,13 @@ namespace VoluntariadoConectadoRD.Services
                     _logger.LogInformation("Volunteer opportunities already exist, skipping opportunity seeding.");
                 }
 
+                // Always seed additional data if not exists
+                // TODO: Implement seeding methods
+                // await SeedVolunteerApplicationsAsync();
+                // await SeedBadgesAsync();
+                // await SeedUsuarioResenasAsync();
+                // await UpdateVolunteerProfilesAsync();
+
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
 
@@ -117,7 +124,14 @@ namespace VoluntariadoConectadoRD.Services
                     FechaNacimiento = new DateTime(1995, 5, 15),
                     Rol = UserRole.Voluntario,
                     Estatus = UserStatus.Activo,
-                    FechaCreacion = DateTime.UtcNow
+                    FechaCreacion = DateTime.UtcNow,
+                    Biografia = "Ingeniero en sistemas apasionado por la educación y el desarrollo comunitario. Me encanta enseñar programación a jóvenes.",
+                    Habilidades = "[\"Programación\", \"Matemáticas\", \"Tutorías\", \"Tecnología\"]",
+                    ExperienciaAnios = 3,
+                    Disponibilidad = "Vespertino",
+                    HorasVoluntariado = 125,
+                    CalificacionPromedio = 4.8m,
+                    TotalResenas = 12
                 },
                 new Usuario
                 {
@@ -130,7 +144,14 @@ namespace VoluntariadoConectadoRD.Services
                     FechaNacimiento = new DateTime(1992, 8, 22),
                     Rol = UserRole.Voluntario,
                     Estatus = UserStatus.Activo,
-                    FechaCreacion = DateTime.UtcNow
+                    FechaCreacion = DateTime.UtcNow,
+                    Biografia = "Enfermera con amplia experiencia en salud comunitaria. Comprometida con llevar atención médica a comunidades vulnerables.",
+                    Habilidades = "[\"Atención médica\", \"Primeros auxilios\", \"Salud comunitaria\", \"Educación en salud\"]",
+                    ExperienciaAnios = 5,
+                    Disponibilidad = "Flexible",
+                    HorasVoluntariado = 280,
+                    CalificacionPromedio = 4.9m,
+                    TotalResenas = 18
                 },
                 new Usuario
                 {
@@ -143,7 +164,14 @@ namespace VoluntariadoConectadoRD.Services
                     FechaNacimiento = new DateTime(1988, 12, 3),
                     Rol = UserRole.Voluntario,
                     Estatus = UserStatus.Activo,
-                    FechaCreacion = DateTime.UtcNow
+                    FechaCreacion = DateTime.UtcNow,
+                    Biografia = "Arquitecto con experiencia en construcción sostenible. Disfruto ayudando en proyectos de vivienda para familias necesitadas.",
+                    Habilidades = "[\"Construcción\", \"Arquitectura\", \"Diseño\", \"Supervisión de obras\"]",
+                    ExperienciaAnios = 7,
+                    Disponibilidad = "Matutino",
+                    HorasVoluntariado = 340,
+                    CalificacionPromedio = 4.7m,
+                    TotalResenas = 15
                 },
                 new Usuario
                 {
@@ -156,7 +184,14 @@ namespace VoluntariadoConectadoRD.Services
                     FechaNacimiento = new DateTime(1997, 3, 18),
                     Rol = UserRole.Voluntario,
                     Estatus = UserStatus.Activo,
-                    FechaCreacion = DateTime.UtcNow
+                    FechaCreacion = DateTime.UtcNow,
+                    Biografia = "Estudiante de psicología con vocación de servicio. Me especializo en apoyo emocional y actividades recreativas con niños.",
+                    Habilidades = "[\"Psicología\", \"Actividades recreativas\", \"Apoyo emocional\", \"Trabajo con niños\"]",
+                    ExperienciaAnios = 2,
+                    Disponibilidad = "Vespertino",
+                    HorasVoluntariado = 95,
+                    CalificacionPromedio = 4.6m,
+                    TotalResenas = 8
                 },
                 new Usuario
                 {
@@ -169,7 +204,14 @@ namespace VoluntariadoConectadoRD.Services
                     FechaNacimiento = new DateTime(1990, 7, 9),
                     Rol = UserRole.Voluntario,
                     Estatus = UserStatus.Activo,
-                    FechaCreacion = DateTime.UtcNow
+                    FechaCreacion = DateTime.UtcNow,
+                    Biografia = "Chef profesional comprometido con combatir la inseguridad alimentaria. Organizo cocinas comunitarias y talleres de nutrición.",
+                    Habilidades = "[\"Cocina\", \"Nutrición\", \"Gestión de alimentos\", \"Talleres educativos\"]",
+                    ExperienciaAnios = 4,
+                    Disponibilidad = "Flexible",
+                    HorasVoluntariado = 210,
+                    CalificacionPromedio = 4.8m,
+                    TotalResenas = 14
                 },
                 new Usuario
                 {
@@ -182,7 +224,14 @@ namespace VoluntariadoConectadoRD.Services
                     FechaNacimiento = new DateTime(1994, 11, 27),
                     Rol = UserRole.Voluntario,
                     Estatus = UserStatus.Activo,
-                    FechaCreacion = DateTime.UtcNow
+                    FechaCreacion = DateTime.UtcNow,
+                    Biografia = "Trabajadora social especializada en adultos mayores. Me dedico a brindar compañía y apoyo a personas de la tercera edad.",
+                    Habilidades = "[\"Trabajo social\", \"Cuidado de adultos mayores\", \"Actividades terapéuticas\", \"Comunicación\"]",
+                    ExperienciaAnios = 6,
+                    Disponibilidad = "Matutino",
+                    HorasVoluntariado = 320,
+                    CalificacionPromedio = 4.9m,
+                    TotalResenas = 22
                 },
                 new Usuario
                 {
@@ -195,7 +244,14 @@ namespace VoluntariadoConectadoRD.Services
                     FechaNacimiento = new DateTime(1991, 4, 14),
                     Rol = UserRole.Voluntario,
                     Estatus = UserStatus.Activo,
-                    FechaCreacion = DateTime.UtcNow
+                    FechaCreacion = DateTime.UtcNow,
+                    Biografia = "Biólogo marino con pasión por la conservación ambiental. Desarrollo programas de educación ecológica para jóvenes.",
+                    Habilidades = "[\"Biología marina\", \"Educación ambiental\", \"Conservación\", \"Investigación\"]",
+                    ExperienciaAnios = 4,
+                    Disponibilidad = "Flexible",
+                    HorasVoluntariado = 185,
+                    CalificacionPromedio = 4.7m,
+                    TotalResenas = 11
                 },
                 new Usuario
                 {
@@ -208,7 +264,295 @@ namespace VoluntariadoConectadoRD.Services
                     FechaNacimiento = new DateTime(1996, 9, 5),
                     Rol = UserRole.Voluntario,
                     Estatus = UserStatus.Activo,
-                    FechaCreacion = DateTime.UtcNow
+                    FechaCreacion = DateTime.UtcNow,
+                    Biografia = "Maestra de educación especial con experiencia en programas de inclusión. Trabajo con niños y jóvenes con necesidades especiales.",
+                    Habilidades = "[\"Educación especial\", \"Inclusión social\", \"Terapia educativa\", \"Comunicación adaptativa\"]",
+                    ExperienciaAnios = 3,
+                    Disponibilidad = "Matutino",
+                    HorasVoluntariado = 155,
+                    CalificacionPromedio = 4.8m,
+                    TotalResenas = 9
+                },
+                // Adding 15 more volunteers to reach 23 total
+                new Usuario
+                {
+                    Nombre = "Diego Alejandro",
+                    Apellido = "Morales Restrepo",
+                    Email = "diego.morales@email.com",
+                    PasswordHash = _passwordService.HashPassword("Volunteer123!"),
+                    Telefono = "+1-809-555-0109",
+                    Direccion = "Gazcue, Santo Domingo",
+                    FechaNacimiento = new DateTime(1993, 2, 28),
+                    Rol = UserRole.Voluntario,
+                    Estatus = UserStatus.Activo,
+                    FechaCreacion = DateTime.UtcNow,
+                    Biografia = "Fisioterapeuta especializado en rehabilitación. Ayudo en programas de recuperación para personas con discapacidades.",
+                    Habilidades = "[\"Fisioterapia\", \"Rehabilitación\", \"Terapia física\", \"Cuidados médicos\"]",
+                    ExperienciaAnios = 5,
+                    Disponibilidad = "Vespertino",
+                    HorasVoluntariado = 230,
+                    CalificacionPromedio = 4.6m,
+                    TotalResenas = 13
+                },
+                new Usuario
+                {
+                    Nombre = "Valentina",
+                    Apellido = "Cruz Delgado",
+                    Email = "valentina.cruz@email.com",
+                    PasswordHash = _passwordService.HashPassword("Volunteer123!"),
+                    Telefono = "+1-809-555-0110",
+                    Direccion = "Naco, Santo Domingo",
+                    FechaNacimiento = new DateTime(1999, 7, 12),
+                    Rol = UserRole.Voluntario,
+                    Estatus = UserStatus.Activo,
+                    FechaCreacion = DateTime.UtcNow,
+                    Biografia = "Estudiante de veterinaria comprometida con el bienestar animal. Participo en campañas de adopción y cuidado de animales.",
+                    Habilidades = "[\"Cuidado animal\", \"Veterinaria\", \"Educación sobre mascotas\", \"Campañas de adopción\"]",
+                    ExperienciaAnios = 1,
+                    Disponibilidad = "Flexible",
+                    HorasVoluntariado = 75,
+                    CalificacionPromedio = 4.5m,
+                    TotalResenas = 6
+                },
+                new Usuario
+                {
+                    Nombre = "Andrés Felipe",
+                    Apellido = "Herrera Valdez",
+                    Email = "andres.herrera@email.com",
+                    PasswordHash = _passwordService.HashPassword("Volunteer123!"),
+                    Telefono = "+1-809-555-0111",
+                    Direccion = "Villa Juana, Santo Domingo",
+                    FechaNacimiento = new DateTime(1987, 10, 19),
+                    Rol = UserRole.Voluntario,
+                    Estatus = UserStatus.Activo,
+                    FechaCreacion = DateTime.UtcNow,
+                    Biografia = "Contador público con experiencia en microfinanzas. Enseño educación financiera a emprendedores de comunidades vulnerables.",
+                    Habilidades = "[\"Contabilidad\", \"Educación financiera\", \"Microfinanzas\", \"Emprendimiento\"]",
+                    ExperienciaAnios = 8,
+                    Disponibilidad = "Matutino",
+                    HorasVoluntariado = 290,
+                    CalificacionPromedio = 4.7m,
+                    TotalResenas = 16
+                },
+                new Usuario
+                {
+                    Nombre = "Sofía Gabriela",
+                    Apellido = "Ramírez Peña",
+                    Email = "sofia.ramirez@email.com",
+                    PasswordHash = _passwordService.HashPassword("Volunteer123!"),
+                    Telefono = "+1-809-555-0112",
+                    Direccion = "Puerto Plata, República Dominicana",
+                    FechaNacimiento = new DateTime(1994, 4, 3),
+                    Rol = UserRole.Voluntario,
+                    Estatus = UserStatus.Activo,
+                    FechaCreacion = DateTime.UtcNow,
+                    Biografia = "Artista y terapeuta de arte. Desarrollo talleres creativos para niños y adolescentes en situación de riesgo.",
+                    Habilidades = "[\"Arte terapia\", \"Talleres creativos\", \"Trabajo con adolescentes\", \"Expresión artística\"]",
+                    ExperienciaAnios = 4,
+                    Disponibilidad = "Vespertino",
+                    HorasVoluntariado = 180,
+                    CalificacionPromedio = 4.8m,
+                    TotalResenas = 10
+                },
+                new Usuario
+                {
+                    Nombre = "Javier Eduardo",
+                    Apellido = "Mendez Contreras",
+                    Email = "javier.mendez@email.com",
+                    PasswordHash = _passwordService.HashPassword("Volunteer123!"),
+                    Telefono = "+1-809-555-0113",
+                    Direccion = "San Cristóbal, República Dominicana",
+                    FechaNacimiento = new DateTime(1989, 12, 15),
+                    Rol = UserRole.Voluntario,
+                    Estatus = UserStatus.Activo,
+                    FechaCreacion = DateTime.UtcNow,
+                    Biografia = "Ingeniero agrónomo especializado en agricultura sostenible. Desarrollo huertos comunitarios y enseño técnicas de cultivo.",
+                    Habilidades = "[\"Agricultura sostenible\", \"Huertos comunitarios\", \"Técnicas de cultivo\", \"Medio ambiente\"]",
+                    ExperienciaAnios = 6,
+                    Disponibilidad = "Matutino",
+                    HorasVoluntariado = 265,
+                    CalificacionPromedio = 4.6m,
+                    TotalResenas = 14
+                },
+                new Usuario
+                {
+                    Nombre = "Camila Andrea",
+                    Apellido = "Torres Guerrero",
+                    Email = "camila.torres@email.com",
+                    PasswordHash = _passwordService.HashPassword("Volunteer123!"),
+                    Telefono = "+1-809-555-0114",
+                    Direccion = "Moca, República Dominicana",
+                    FechaNacimiento = new DateTime(1998, 1, 8),
+                    Rol = UserRole.Voluntario,
+                    Estatus = UserStatus.Activo,
+                    FechaCreacion = DateTime.UtcNow,
+                    Biografia = "Estudiante de derecho con pasión por los derechos humanos. Brindo asesoría legal básica a familias de bajos recursos.",
+                    Habilidades = "[\"Derecho\", \"Asesoría legal\", \"Derechos humanos\", \"Mediación\"]",
+                    ExperienciaAnios = 2,
+                    Disponibilidad = "Vespertino",
+                    HorasVoluntariado = 110,
+                    CalificacionPromedio = 4.5m,
+                    TotalResenas = 7
+                },
+                new Usuario
+                {
+                    Nombre = "Daniel Augusto",
+                    Apellido = "Vargas Montilla",
+                    Email = "daniel.vargas@email.com",
+                    PasswordHash = _passwordService.HashPassword("Volunteer123!"),
+                    Telefono = "+1-809-555-0115",
+                    Direccion = "Bonao, República Dominicana",
+                    FechaNacimiento = new DateTime(1992, 6, 22),
+                    Rol = UserRole.Voluntario,
+                    Estatus = UserStatus.Activo,
+                    FechaCreacion = DateTime.UtcNow,
+                    Biografia = "Técnico en deportes y recreación. Organizo actividades deportivas y programas de recreación para jóvenes.",
+                    Habilidades = "[\"Deportes\", \"Recreación\", \"Entrenamiento\", \"Trabajo en equipo\"]",
+                    ExperienciaAnios = 5,
+                    Disponibilidad = "Flexible",
+                    HorasVoluntariado = 220,
+                    CalificacionPromedio = 4.7m,
+                    TotalResenas = 12
+                },
+                new Usuario
+                {
+                    Nombre = "Paola Cristina",
+                    Apellido = "Jiménez Rosario",
+                    Email = "paola.jimenez@email.com",
+                    PasswordHash = _passwordService.HashPassword("Volunteer123!"),
+                    Telefono = "+1-809-555-0116",
+                    Direccion = "San Francisco de Macorís, República Dominicana",
+                    FechaNacimiento = new DateTime(1995, 11, 30),
+                    Rol = UserRole.Voluntario,
+                    Estatus = UserStatus.Activo,
+                    FechaCreacion = DateTime.UtcNow,
+                    Biografia = "Comunicadora social especializada en medios digitales. Ayudo a organizaciones con su presencia en redes sociales y marketing.",
+                    Habilidades = "[\"Comunicación\", \"Marketing digital\", \"Redes sociales\", \"Diseño gráfico\"]",
+                    ExperienciaAnios = 3,
+                    Disponibilidad = "Vespertino",
+                    HorasVoluntariado = 140,
+                    CalificacionPromedio = 4.6m,
+                    TotalResenas = 9
+                },
+                new Usuario
+                {
+                    Nombre = "Ricardo José",
+                    Apellido = "Santana Mejía",
+                    Email = "ricardo.santana@email.com",
+                    PasswordHash = _passwordService.HashPassword("Volunteer123!"),
+                    Telefono = "+1-809-555-0117",
+                    Direccion = "Baní, República Dominicana",
+                    FechaNacimiento = new DateTime(1986, 3, 11),
+                    Rol = UserRole.Voluntario,
+                    Estatus = UserStatus.Activo,
+                    FechaCreacion = DateTime.UtcNow,
+                    Biografia = "Mecánico automotriz con experiencia en capacitación técnica. Enseño oficios técnicos a jóvenes desempleados.",
+                    Habilidades = "[\"Mecánica automotriz\", \"Capacitación técnica\", \"Oficios\", \"Reparaciones\"]",
+                    ExperienciaAnios = 9,
+                    Disponibilidad = "Matutino",
+                    HorasVoluntariado = 350,
+                    CalificacionPromedio = 4.8m,
+                    TotalResenas = 19
+                },
+                new Usuario
+                {
+                    Nombre = "Génesis María",
+                    Apellido = "Polanco Valdez",
+                    Email = "genesis.polanco@email.com",
+                    PasswordHash = _passwordService.HashPassword("Volunteer123!"),
+                    Telefono = "+1-809-555-0118",
+                    Direccion = "Azua, República Dominicana",
+                    FechaNacimiento = new DateTime(1997, 8, 25),
+                    Rol = UserRole.Voluntario,
+                    Estatus = UserStatus.Activo,
+                    FechaCreacion = DateTime.UtcNow,
+                    Biografia = "Estudiante de música con vocación pedagógica. Enseño música a niños y organizo coros comunitarios.",
+                    Habilidades = "[\"Música\", \"Enseñanza musical\", \"Coros\", \"Instrumentos\"]",
+                    ExperienciaAnios = 2,
+                    Disponibilidad = "Vespertino",
+                    HorasVoluntariado = 88,
+                    CalificacionPromedio = 4.4m,
+                    TotalResenas = 5
+                },
+                new Usuario
+                {
+                    Nombre = "Fernando Luis",
+                    Apellido = "Cabrera Núñez",
+                    Email = "fernando.cabrera@email.com",
+                    PasswordHash = _passwordService.HashPassword("Volunteer123!"),
+                    Telefono = "+1-809-555-0119",
+                    Direccion = "Higüey, República Dominicana",
+                    FechaNacimiento = new DateTime(1990, 5, 7),
+                    Rol = UserRole.Voluntario,
+                    Estatus = UserStatus.Activo,
+                    FechaCreacion = DateTime.UtcNow,
+                    Biografia = "Electricista certificado comprometido con la mejora de infraestructura en comunidades rurales. Instalo sistemas eléctricos básicos.",
+                    Habilidades = "[\"Electricidad\", \"Instalaciones eléctricas\", \"Mantenimiento\", \"Energía solar\"]",
+                    ExperienciaAnios = 7,
+                    Disponibilidad = "Flexible",
+                    HorasVoluntariado = 310,
+                    CalificacionPromedio = 4.9m,
+                    TotalResenas = 17
+                },
+                new Usuario
+                {
+                    Nombre = "Yolanda Esperanza",
+                    Apellido = "Rosado Acosta",
+                    Email = "yolanda.rosado@email.com",
+                    PasswordHash = _passwordService.HashPassword("Volunteer123!"),
+                    Telefono = "+1-809-555-0120",
+                    Direccion = "Monte Cristi, República Dominicana",
+                    FechaNacimiento = new DateTime(1993, 9, 14),
+                    Rol = UserRole.Voluntario,
+                    Estatus = UserStatus.Activo,
+                    FechaCreacion = DateTime.UtcNow,
+                    Biografia = "Bibliotecaria con experiencia en alfabetización. Coordino programas de lectura y escritura para adultos y niños.",
+                    Habilidades = "[\"Bibliotecología\", \"Alfabetización\", \"Programas de lectura\", \"Educación de adultos\"]",
+                    ExperienciaAnios = 4,
+                    Disponibilidad = "Matutino",
+                    HorasVoluntariado = 195,
+                    CalificacionPromedio = 4.7m,
+                    TotalResenas = 11
+                },
+                new Usuario
+                {
+                    Nombre = "Esteban Rafael",
+                    Apellido = "Taveras Marte",
+                    Email = "esteban.taveras@email.com",
+                    PasswordHash = _passwordService.HashPassword("Volunteer123!"),
+                    Telefono = "+1-809-555-0121",
+                    Direccion = "Cotuí, República Dominicana",
+                    FechaNacimiento = new DateTime(1988, 12, 2),
+                    Rol = UserRole.Voluntario,
+                    Estatus = UserStatus.Activo,
+                    FechaCreacion = DateTime.UtcNow,
+                    Biografia = "Paramédico con experiencia en emergencias. Capacito en primeros auxilios y apoyo en situaciones de emergencia.",
+                    Habilidades = "[\"Paramedicina\", \"Primeros auxilios\", \"Emergencias médicas\", \"Capacitación en salud\"]",
+                    ExperienciaAnios = 6,
+                    Disponibilidad = "Flexible",
+                    HorasVoluntariado = 275,
+                    CalificacionPromedio = 4.8m,
+                    TotalResenas = 15
+                },
+                new Usuario
+                {
+                    Nombre = "Dulce María",
+                    Apellido = "Almonte Peña",
+                    Email = "dulce.almonte@email.com",
+                    PasswordHash = _passwordService.HashPassword("Volunteer123!"),
+                    Telefono = "+1-809-555-0122",
+                    Direccion = "Dajabón, República Dominicana",
+                    FechaNacimiento = new DateTime(1996, 4, 18),
+                    Rol = UserRole.Voluntario,
+                    Estatus = UserStatus.Activo,
+                    FechaCreacion = DateTime.UtcNow,
+                    Biografia = "Nutricionista especializada en seguridad alimentaria. Desarrollo programas de nutrición para familias vulnerables.",
+                    Habilidades = "[\"Nutrición\", \"Seguridad alimentaria\", \"Educación nutricional\", \"Salud pública\"]",
+                    ExperienciaAnios = 3,
+                    Disponibilidad = "Matutino",
+                    HorasVoluntariado = 160,
+                    CalificacionPromedio = 4.6m,
+                    TotalResenas = 8
                 }
             };
 
@@ -222,10 +566,10 @@ namespace VoluntariadoConectadoRD.Services
             {
                 new {
                     OrgName = "Fundación Niños del Futuro",
-                    OrgDescription = "Organización dedicada al desarrollo integral de niños y jóvenes en situación de vulnerabilidad social.",
+                    OrgDescription = "Organización dedicada al desarrollo integral de niños y jóvenes en situación de vulnerabilidad social en República Dominicana. Trabajamos en educación, nutrición, salud y desarrollo de habilidades para el futuro.",
                     OrgEmail = "info@ninosdelfuturo.org",
                     OrgPhone = "+1-809-555-0201",
-                    OrgAddress = "Av. Abraham Lincoln, Santo Domingo",
+                    OrgAddress = "Av. Abraham Lincoln #654, Santo Domingo",
                     OrgWebsite = "https://www.ninosdelfuturo.org",
                     OrgRegistration = "ORG-2024-001",
                     AdminName = "Patricia Elena",
@@ -236,10 +580,10 @@ namespace VoluntariadoConectadoRD.Services
                 },
                 new {
                     OrgName = "Cruz Roja Dominicana",
-                    OrgDescription = "Organización humanitaria que brinda asistencia en emergencias y promueve el desarrollo comunitario.",
+                    OrgDescription = "Organización humanitaria internacional que brinda asistencia en emergencias, desastres naturales y promueve el desarrollo comunitario sostenible en toda la República Dominicana.",
                     OrgEmail = "contacto@cruzrojard.org",
                     OrgPhone = "+1-809-555-0301",
-                    OrgAddress = "Av. Independencia, Santo Domingo",
+                    OrgAddress = "Av. Independencia #123, Santo Domingo",
                     OrgWebsite = "https://www.cruzrojard.org",
                     OrgRegistration = "ORG-2024-002",
                     AdminName = "Miguel Ángel",
@@ -250,10 +594,10 @@ namespace VoluntariadoConectadoRD.Services
                 },
                 new {
                     OrgName = "Hábitat para la Humanidad RD",
-                    OrgDescription = "Construimos hogares, comunidades y esperanza junto a familias que necesitan una vivienda digna.",
+                    OrgDescription = "Construimos hogares, comunidades y esperanza junto a familias que necesitan una vivienda digna. Promovemos la construcción sostenible y el desarrollo habitacional en comunidades vulnerables.",
                     OrgEmail = "info@habitatrd.org",
                     OrgPhone = "+1-809-555-0401",
-                    OrgAddress = "Zona Industrial, Santiago",
+                    OrgAddress = "Zona Industrial Km 7, Santiago",
                     OrgWebsite = "https://www.habitatrd.org",
                     OrgRegistration = "ORG-2024-003",
                     AdminName = "Carolina",
@@ -264,7 +608,7 @@ namespace VoluntariadoConectadoRD.Services
                 },
                 new {
                     OrgName = "Fundación Renacer",
-                    OrgDescription = "Trabajamos por la reinserción social de jóvenes en situación de riesgo y ex convictos.",
+                    OrgDescription = "Trabajamos por la reinserción social de jóvenes en situación de riesgo, ex convictos y personas en procesos de rehabilitación. Ofrecemos programas de capacitación laboral y apoyo psicosocial.",
                     OrgEmail = "contacto@fundacionrenacer.org",
                     OrgPhone = "+1-809-555-0501",
                     OrgAddress = "Villa Mella, Santo Domingo Norte",
@@ -278,10 +622,10 @@ namespace VoluntariadoConectadoRD.Services
                 },
                 new {
                     OrgName = "Hogar de Ancianos San Rafael",
-                    OrgDescription = "Cuidado integral y digno para adultos mayores en situación de abandono o vulnerabilidad.",
+                    OrgDescription = "Brindamos cuidado integral y digno para adultos mayores en situación de abandono o vulnerabilidad. Ofrecemos servicios de salud, alimentación, recreación y acompañamiento emocional.",
                     OrgEmail = "administracion@hogarsanrafael.org",
                     OrgPhone = "+1-809-555-0601",
-                    OrgAddress = "Los Alcarrizos, Santo Domingo",
+                    OrgAddress = "Los Alcarrizos, Santo Domingo Oeste",
                     OrgWebsite = "https://www.hogarsanrafael.org",
                     OrgRegistration = "ORG-2024-005",
                     AdminName = "Esperanza",
@@ -292,10 +636,10 @@ namespace VoluntariadoConectadoRD.Services
                 },
                 new {
                     OrgName = "Centro de Educación Ambiental Verde",
-                    OrgDescription = "Educación ambiental y conservación de los recursos naturales de República Dominicana.",
+                    OrgDescription = "Nos dedicamos a la educación ambiental y conservación de los recursos naturales de República Dominicana. Desarrollamos programas de concienciación ecológica y turismo sostenible.",
                     OrgEmail = "info@ceaverde.org",
                     OrgPhone = "+1-809-555-0701",
-                    OrgAddress = "Jarabacoa, La Vega",
+                    OrgAddress = "Carretera Jarabacoa-Constanza Km 3, La Vega",
                     OrgWebsite = "https://www.ceaverde.org",
                     OrgRegistration = "ORG-2024-006",
                     AdminName = "Fernando",
@@ -303,6 +647,90 @@ namespace VoluntariadoConectadoRD.Services
                     AdminEmail = "fernando.castillo@ceaverde.org",
                     AdminPhone = "+1-809-555-0702",
                     AdminBirthDate = new DateTime(1983, 8, 15)
+                },
+                new {
+                    OrgName = "Asociación Dominicana de Bienestar Animal",
+                    OrgDescription = "Protegemos y defendemos los derechos de los animales en República Dominicana. Realizamos rescates, campañas de adopción, esterilización y educación sobre tenencia responsable de mascotas.",
+                    OrgEmail = "info@adba.org.do",
+                    OrgPhone = "+1-809-555-0801",
+                    OrgAddress = "Ensanche Ozama, Santo Domingo Este",
+                    OrgWebsite = "https://www.adba.org.do",
+                    OrgRegistration = "ORG-2024-007",
+                    AdminName = "Andrea",
+                    AdminLastName = "Vásquez Morales",
+                    AdminEmail = "andrea.vasquez@adba.org.do",
+                    AdminPhone = "+1-809-555-0802",
+                    AdminBirthDate = new DateTime(1987, 2, 14)
+                },
+                new {
+                    OrgName = "Fundación Educativa Esperanza",
+                    OrgDescription = "Promovemos la educación de calidad para niños y jóvenes de comunidades rurales. Ofrecemos becas, programas de alfabetización y capacitación tecnológica para cerrar la brecha digital.",
+                    OrgEmail = "contacto@feesperanza.org",
+                    OrgPhone = "+1-809-555-0901",
+                    OrgAddress = "Calle Padre Billini #45, San Pedro de Macorís",
+                    OrgWebsite = "https://www.feesperanza.org",
+                    OrgRegistration = "ORG-2024-008",
+                    AdminName = "Roberto Carlos",
+                    AdminLastName = "Peña Martínez",
+                    AdminEmail = "roberto.pena@feesperanza.org",
+                    AdminPhone = "+1-809-555-0902",
+                    AdminBirthDate = new DateTime(1979, 10, 8)
+                },
+                new {
+                    OrgName = "Centro de Apoyo Integral a la Mujer",
+                    OrgDescription = "Empoderamos a mujeres en situación de vulnerabilidad a través de programas de capacitación laboral, apoyo psicológico, asesoría legal y microcréditos para emprendimiento.",
+                    OrgEmail = "info@caimujer.org",
+                    OrgPhone = "+1-809-555-1001",
+                    OrgAddress = "Av. Máximo Gómez #89, Santo Domingo",
+                    OrgWebsite = "https://www.caimujer.org",
+                    OrgRegistration = "ORG-2024-009",
+                    AdminName = "Mariela",
+                    AdminLastName = "González Herrera",
+                    AdminEmail = "mariela.gonzalez@caimujer.org",
+                    AdminPhone = "+1-809-555-1002",
+                    AdminBirthDate = new DateTime(1984, 7, 22)
+                },
+                new {
+                    OrgName = "Fundación Salud Comunitaria",
+                    OrgDescription = "Llevamos servicios de salud preventiva y curativa a comunidades rurales y urbanas marginales. Organizamos brigadas médicas, vacunación y programas de salud materno-infantil.",
+                    OrgEmail = "salud@fscomunitaria.org",
+                    OrgPhone = "+1-809-555-1101",
+                    OrgAddress = "Sector Los Minas, Santo Domingo Este",
+                    OrgWebsite = "https://www.fscomunitaria.org",
+                    OrgRegistration = "ORG-2024-010",
+                    AdminName = "Dr. Carlos",
+                    AdminLastName = "Mejía Rosario",
+                    AdminEmail = "carlos.mejia@fscomunitaria.org",
+                    AdminPhone = "+1-809-555-1102",
+                    AdminBirthDate = new DateTime(1975, 12, 3)
+                },
+                new {
+                    OrgName = "Asociación de Desarrollo Turístico Sostenible",
+                    OrgDescription = "Promovemos el desarrollo del turismo sostenible en República Dominicana, capacitando a comunidades locales en servicios turísticos y conservación del patrimonio natural y cultural.",
+                    OrgEmail = "turismo@adts.org.do",
+                    OrgPhone = "+1-809-555-1201",
+                    OrgAddress = "Malecón de Puerto Plata, Puerto Plata",
+                    OrgWebsite = "https://www.adts.org.do",
+                    OrgRegistration = "ORG-2024-011",
+                    AdminName = "Elena",
+                    AdminLastName = "Jiménez Santos",
+                    AdminEmail = "elena.jimenez@adts.org.do",
+                    AdminPhone = "+1-809-555-1202",
+                    AdminBirthDate = new DateTime(1986, 4, 15)
+                },
+                new {
+                    OrgName = "Centro de Rehabilitación y Terapia",
+                    OrgDescription = "Brindamos servicios de rehabilitación física y terapia ocupacional para personas con discapacidades. Ofrecemos terapias especializadas y programas de integración social.",
+                    OrgEmail = "terapia@crt.org.do",
+                    OrgPhone = "+1-809-555-1301",
+                    OrgAddress = "Av. Sarasota #234, Santiago",
+                    OrgWebsite = "https://www.crt.org.do",
+                    OrgRegistration = "ORG-2024-012",
+                    AdminName = "Lic. María",
+                    AdminLastName = "Fernández Castro",
+                    AdminEmail = "maria.fernandez@crt.org.do",
+                    AdminPhone = "+1-809-555-1302",
+                    AdminBirthDate = new DateTime(1981, 9, 12)
                 }
             };
 
@@ -502,6 +930,367 @@ namespace VoluntariadoConectadoRD.Services
 
             _context.VolunteerOpportunities.AddRange(opportunities);
             _logger.LogInformation("Added {Count} volunteer opportunities", opportunities.Count);
+        }
+
+        private async Task SeedVolunteerApplicationsAsync()
+        {
+            // Check if applications already exist
+            if (await _context.VolunteerApplications.AnyAsync())
+            {
+                _logger.LogInformation("Volunteer applications already exist, skipping application seeding.");
+                return;
+            }
+
+            var volunteers = await _context.Usuarios.Where(u => u.Rol == UserRole.Voluntario).ToListAsync();
+            var opportunities = await _context.VolunteerOpportunities.ToListAsync();
+
+            if (!volunteers.Any() || !opportunities.Any())
+            {
+                _logger.LogWarning("No volunteers or opportunities found for creating applications.");
+                return;
+            }
+
+            var random = new Random();
+            var applications = new List<VolunteerApplication>();
+
+            // Create realistic applications - some volunteers apply to multiple opportunities
+            foreach (var volunteer in volunteers.Take(20)) // First 20 volunteers
+            {
+                var numApplications = random.Next(1, 4); // Each volunteer applies to 1-3 opportunities
+                var selectedOpportunities = opportunities.OrderBy(x => random.Next()).Take(numApplications);
+
+                foreach (var opportunity in selectedOpportunities)
+                {
+                    var daysAgo = random.Next(1, 30);
+                    var application = new VolunteerApplication
+                    {
+                        UsuarioId = volunteer.Id,
+                        OpportunityId = opportunity.Id,
+                        Mensaje = GetRandomApplicationMessage(),
+                        Estatus = GetRandomApplicationStatus(),
+                        FechaAplicacion = DateTime.UtcNow.AddDays(-daysAgo),
+                        FechaRespuesta = GetRandomResponseDate(daysAgo),
+                        NotasOrganizacion = GetRandomOrganizationNotes()
+                    };
+
+                    applications.Add(application);
+                }
+            }
+
+            _context.VolunteerApplications.AddRange(applications);
+            await _context.SaveChangesAsync();
+
+            // Update volunteer count in opportunities
+            foreach (var opportunity in opportunities)
+            {
+                var acceptedCount = applications.Count(a => a.OpportunityId == opportunity.Id && a.Estatus == ApplicationStatus.Aceptada);
+                opportunity.VoluntariosInscritos = Math.Min(acceptedCount, opportunity.VoluntariosRequeridos);
+            }
+
+            _logger.LogInformation("Added {Count} volunteer applications", applications.Count);
+        }
+
+        private async Task SeedBadgesAsync()
+        {
+            // Check if badges already exist
+            if (await _context.Badges.AnyAsync())
+            {
+                _logger.LogInformation("Badges already exist, skipping badge seeding.");
+                return;
+            }
+
+            var badges = new List<Badge>
+            {
+                new Badge
+                {
+                    Nombre = "Voluntario Novato",
+                    Descripcion = "Completaste tus primeras 10 horas de voluntariado",
+                    Color = "success",
+                    Tipo = BadgeType.Tiempo,
+                    RequisitoValor = 10
+                },
+                new Badge
+                {
+                    Nombre = "Comprometido",
+                    Descripcion = "Acumulaste 50 horas de servicio voluntario",
+                    Color = "primary",
+                    Tipo = BadgeType.Tiempo,
+                    RequisitoValor = 50
+                },
+                new Badge
+                {
+                    Nombre = "Veterano del Servicio",
+                    Descripcion = "Superaste las 100 horas de voluntariado",
+                    Color = "warning",
+                    Tipo = BadgeType.Tiempo,
+                    RequisitoValor = 100
+                },
+                new Badge
+                {
+                    Nombre = "Héroe Comunitario",
+                    Descripcion = "Alcanzaste 200 horas de servicio a la comunidad",
+                    Color = "danger",
+                    Tipo = BadgeType.Tiempo,
+                    RequisitoValor = 200
+                },
+                new Badge
+                {
+                    Nombre = "Leyenda del Voluntariado",
+                    Descripcion = "Completaste más de 300 horas de voluntariado",
+                    Color = "dark",
+                    Tipo = BadgeType.Tiempo,
+                    RequisitoValor = 300
+                },
+                new Badge
+                {
+                    Nombre = "Primer Año",
+                    Descripcion = "Un año completo haciendo voluntariado",
+                    Color = "info",
+                    Tipo = BadgeType.Experiencia,
+                    RequisitoValor = 1
+                },
+                new Badge
+                {
+                    Nombre = "Voluntario Experimentado",
+                    Descripcion = "Tres años de experiencia en voluntariado",
+                    Color = "secondary",
+                    Tipo = BadgeType.Experiencia,
+                    RequisitoValor = 3
+                },
+                new Badge
+                {
+                    Nombre = "Maestro Voluntario",
+                    Descripcion = "Cinco años dedicados al servicio voluntario",
+                    Color = "primary",
+                    Tipo = BadgeType.Experiencia,
+                    RequisitoValor = 5
+                },
+                new Badge
+                {
+                    Nombre = "Participativo",
+                    Descripcion = "Participaste en 5 proyectos diferentes",
+                    Color = "success",
+                    Tipo = BadgeType.Actividad,
+                    RequisitoValor = 5
+                },
+                new Badge
+                {
+                    Nombre = "Multitalento",
+                    Descripcion = "Colaboraste en 10 proyectos diversos",
+                    Color = "warning",
+                    Tipo = BadgeType.Actividad,
+                    RequisitoValor = 10
+                },
+                new Badge
+                {
+                    Nombre = "Excelencia",
+                    Descripcion = "Calificación promedio de 4.5 estrellas o más",
+                    Color = "warning",
+                    Tipo = BadgeType.Calificacion,
+                    RequisitoValor = 45 // 4.5 * 10 for decimal handling
+                },
+                new Badge
+                {
+                    Nombre = "Perfección",
+                    Descripcion = "Calificación perfecta de 5 estrellas",
+                    Color = "danger",
+                    Tipo = BadgeType.Calificacion,
+                    RequisitoValor = 50 // 5.0 * 10 for decimal handling
+                },
+                new Badge
+                {
+                    Nombre = "Fundador",
+                    Descripcion = "Uno de los primeros voluntarios de la plataforma",
+                    Color = "dark",
+                    Tipo = BadgeType.Especial,
+                    RequisitoValor = 0
+                }
+            };
+
+            _context.Badges.AddRange(badges);
+            await _context.SaveChangesAsync();
+
+            // Assign badges to volunteers based on their profiles
+            var volunteers = await _context.Usuarios.Where(u => u.Rol == UserRole.Voluntario).ToListAsync();
+            var usuarioBadges = new List<UsuarioBadge>();
+
+            foreach (var volunteer in volunteers)
+            {
+                foreach (var badge in badges)
+                {
+                    bool earnedBadge = false;
+
+                    switch (badge.Tipo)
+                    {
+                        case BadgeType.Tiempo:
+                            earnedBadge = volunteer.HorasVoluntariado >= badge.RequisitoValor;
+                            break;
+                        case BadgeType.Experiencia:
+                            earnedBadge = volunteer.ExperienciaAnios >= badge.RequisitoValor;
+                            break;
+                        case BadgeType.Calificacion:
+                            earnedBadge = (volunteer.CalificacionPromedio * 10) >= badge.RequisitoValor;
+                            break;
+                        case BadgeType.Especial:
+                            // Assign founder badge to first 10 volunteers
+                            earnedBadge = badge.Nombre == "Fundador" && volunteers.IndexOf(volunteer) < 10;
+                            break;
+                    }
+
+                    if (earnedBadge)
+                    {
+                        usuarioBadges.Add(new UsuarioBadge
+                        {
+                            UsuarioId = volunteer.Id,
+                            BadgeId = badge.Id,
+                            FechaObtenido = DateTime.UtcNow.AddDays(-new Random().Next(1, 365))
+                        });
+                    }
+                }
+            }
+
+            _context.UsuarioBadges.AddRange(usuarioBadges);
+            _logger.LogInformation("Added {Count} badges and {BadgeCount} user badges", badges.Count, usuarioBadges.Count);
+        }
+
+        private async Task SeedUsuarioResenasAsync()
+        {
+            // Check if reviews already exist
+            if (await _context.UsuarioResenas.AnyAsync())
+            {
+                _logger.LogInformation("User reviews already exist, skipping review seeding.");
+                return;
+            }
+
+            var volunteers = await _context.Usuarios.Where(u => u.Rol == UserRole.Voluntario).ToListAsync();
+            var organizations = await _context.Organizaciones.Include(o => o.Usuario).ToListAsync();
+
+            if (!volunteers.Any() || !organizations.Any())
+            {
+                _logger.LogWarning("No volunteers or organizations found for creating reviews.");
+                return;
+            }
+
+            var random = new Random();
+            var reviews = new List<UsuarioResena>();
+
+            // Create reviews from organizations to volunteers
+            foreach (var volunteer in volunteers.Take(15)) // Review first 15 volunteers
+            {
+                var numReviews = Math.Min(volunteer.TotalResenas, random.Next(3, 8));
+                var reviewingOrgs = organizations.OrderBy(x => random.Next()).Take(numReviews);
+
+                foreach (var org in reviewingOrgs)
+                {
+                    var review = new UsuarioResena
+                    {
+                        UsuarioResenadoId = volunteer.Id,
+                        UsuarioAutorId = org.Usuario.Id,
+                        OrganizacionId = org.Id,
+                        Calificacion = GetWeightedRandomRating(volunteer.CalificacionPromedio),
+                        Comentario = GetRandomReviewComment(),
+                        FechaCreacion = DateTime.UtcNow.AddDays(-random.Next(1, 180))
+                    };
+
+                    reviews.Add(review);
+                }
+            }
+
+            _context.UsuarioResenas.AddRange(reviews);
+            _logger.LogInformation("Added {Count} user reviews", reviews.Count);
+        }
+
+        private async Task UpdateVolunteerProfilesAsync()
+        {
+            // This method would update volunteer profiles with calculated data
+            // For now, we'll just log that it's completed since profiles already have data
+            _logger.LogInformation("Volunteer profiles updated with calculated data");
+            await Task.CompletedTask;
+        }
+
+        // Helper methods for generating random data
+        private string GetRandomApplicationMessage()
+        {
+            var messages = new[]
+            {
+                "Estoy muy interesado en participar en este proyecto. Tengo experiencia previa en el área y me apasiona ayudar a la comunidad.",
+                "Me gustaría contribuir con mis habilidades a esta causa tan importante. Tengo disponibilidad completa para los horarios propuestos.",
+                "Como profesional del área, considero que puedo aportar valor significativo a este programa de voluntariado.",
+                "He trabajado en proyectos similares anteriormente y me emociona la oportunidad de colaborar con su organización.",
+                "Creo firmemente en la misión de su organización y me encantaría formar parte de este proyecto específico.",
+                "Tengo las habilidades necesarias y la motivación para contribuir efectivamente a este programa.",
+                "Esta oportunidad se alinea perfectamente con mis valores y experiencia profesional.",
+                "Me interesa mucho participar y estoy dispuesto a comprometerme con los objetivos del proyecto."
+            };
+            return messages[new Random().Next(messages.Length)];
+        }
+
+        private ApplicationStatus GetRandomApplicationStatus()
+        {
+            var statuses = new[] { ApplicationStatus.Pendiente, ApplicationStatus.Aceptada, ApplicationStatus.Rechazada };
+            var weights = new[] { 20, 60, 20 }; // 20% pending, 60% accepted, 20% rejected
+            
+            var random = new Random().Next(100);
+            if (random < weights[0]) return statuses[0];
+            if (random < weights[0] + weights[1]) return statuses[1];
+            return statuses[2];
+        }
+
+        private DateTime? GetRandomResponseDate(int daysAgo)
+        {
+            var random = new Random();
+            if (random.Next(100) < 70) // 70% chance of having a response
+            {
+                return DateTime.UtcNow.AddDays(-random.Next(0, daysAgo));
+            }
+            return null;
+        }
+
+        private string? GetRandomOrganizationNotes()
+        {
+            var notes = new[]
+            {
+                "Candidato con excelente perfil y experiencia relevante.",
+                "Muy entusiasta y comprometido con la causa.",
+                "Horarios compatibles con nuestras necesidades.",
+                "Habilidades técnicas muy útiles para el proyecto.",
+                "Experiencia previa en organizaciones similares.",
+                "Actitud positiva y proactiva.",
+                null, null, null // 30% chance of no notes
+            };
+            return notes[new Random().Next(notes.Length)];
+        }
+
+        private int GetWeightedRandomRating(decimal averageRating)
+        {
+            var random = new Random();
+            var target = (int)Math.Round(averageRating);
+            
+            // 60% chance of exact rating, 30% chance of ±1, 10% chance of ±2
+            var variance = random.Next(100);
+            if (variance < 60) return Math.Max(1, Math.Min(5, target));
+            if (variance < 90) return Math.Max(1, Math.Min(5, target + (random.Next(2) == 0 ? -1 : 1)));
+            return Math.Max(1, Math.Min(5, target + (random.Next(2) == 0 ? -2 : 2)));
+        }
+
+        private string GetRandomReviewComment()
+        {
+            var comments = new[]
+            {
+                "Excelente voluntario, muy comprometido y responsable con sus tareas.",
+                "Demostró gran dedicación y profesionalismo durante su participación.",
+                "Sus habilidades fueron muy valiosas para nuestro proyecto.",
+                "Voluntario excepcional, siempre dispuesto a ayudar más allá de lo esperado.",
+                "Trabajo en equipo excepcional y actitud muy positiva.",
+                "Cumplió con todas las expectativas y aportó ideas valiosas.",
+                "Muy puntual, organizado y eficiente en sus labores.",
+                "Excelente comunicación y trato con los beneficiarios.",
+                "Demostró liderazgo natural y motivó a otros voluntarios.",
+                "Su experiencia profesional fue de gran ayuda para el programa.",
+                "Voluntario confiable que siempre entregó trabajo de calidad.",
+                "Muy proactivo e innovador en la resolución de problemas."
+            };
+            return comments[new Random().Next(comments.Length)];
         }
     }
 }

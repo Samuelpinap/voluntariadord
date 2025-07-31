@@ -25,6 +25,12 @@ namespace VoluntariadoConectadoRD.Services
             {
                 var user = await _context.Usuarios
                     .Include(u => u.Organizacion)
+                    .Include(u => u.Badges)
+                        .ThenInclude(b => b.Badge)
+                    .Include(u => u.ResenasRecibidas)
+                        .ThenInclude(r => r.UsuarioAutor)
+                    .Include(u => u.ResenasRecibidas)
+                        .ThenInclude(r => r.Organizacion)
                     .FirstOrDefaultAsync(u => u.Email.ToLower() == loginRequest.Email.ToLower());
 
                 if (user == null)
@@ -258,6 +264,12 @@ namespace VoluntariadoConectadoRD.Services
             {
                 var user = await _context.Usuarios
                     .Include(u => u.Organizacion)
+                    .Include(u => u.Badges)
+                        .ThenInclude(b => b.Badge)
+                    .Include(u => u.ResenasRecibidas)
+                        .ThenInclude(r => r.UsuarioAutor)
+                    .Include(u => u.ResenasRecibidas)
+                        .ThenInclude(r => r.Organizacion)
                     .FirstOrDefaultAsync(u => u.Id == userId);
 
                 if (user == null)
@@ -375,8 +387,45 @@ namespace VoluntariadoConectadoRD.Services
                 Apellido = user.Apellido,
                 Email = user.Email,
                 Telefono = user.Telefono,
+                Direccion = user.Direccion,
                 Rol = user.Rol,
-                Estatus = user.Estatus
+                Estatus = user.Estatus,
+                
+                // Extended Profile Fields
+                ProfileImageUrl = user.ProfileImageUrl,
+                Biografia = user.Biografia,
+                Habilidades = !string.IsNullOrEmpty(user.Habilidades) 
+                    ? System.Text.Json.JsonSerializer.Deserialize<List<string>>(user.Habilidades) 
+                    : new List<string>(),
+                ExperienciaAnios = user.ExperienciaAnios,
+                Disponibilidad = user.Disponibilidad,
+                HorasVoluntariado = user.HorasVoluntariado,
+                CalificacionPromedio = user.CalificacionPromedio,
+                TotalResenas = user.TotalResenas,
+                
+                // Map Badges
+                Badges = user.Badges?.Select(ub => new BadgeDto
+                {
+                    Id = ub.Badge.Id,
+                    Nombre = ub.Badge.Nombre,
+                    Descripcion = ub.Badge.Descripcion,
+                    IconoUrl = ub.Badge.IconoUrl,
+                    Color = ub.Badge.Color,
+                    FechaObtenido = ub.FechaObtenido
+                }).ToList() ?? new List<BadgeDto>(),
+                
+                // Map Recent Reviews
+                UltimasResenas = user.ResenasRecibidas?.OrderByDescending(r => r.FechaCreacion)
+                    .Take(5)
+                    .Select(r => new ResenaDto
+                    {
+                        Id = r.Id,
+                        Calificacion = r.Calificacion,
+                        Comentario = r.Comentario,
+                        UsuarioAutorNombre = $"{r.UsuarioAutor.Nombre} {r.UsuarioAutor.Apellido}",
+                        OrganizacionNombre = r.Organizacion.Nombre,
+                        FechaCreacion = r.FechaCreacion
+                    }).ToList() ?? new List<ResenaDto>()
             };
 
             if (user.Organizacion != null)

@@ -17,11 +17,41 @@ namespace VoluntariadoConectadoRD.Services
             _logger = logger;
         }
 
-        public async Task<IEnumerable<OpportunityListDto>> GetAllOpportunitiesAsync()
+        public async Task<IEnumerable<OpportunityListDto>> GetAllOpportunitiesAsync(
+            string? searchTerm = null,
+            string? areaInteres = null,
+            string? ubicacion = null,
+            OpportunityStatus? status = null)
         {
-            return await _context.VolunteerOpportunities
+            var query = _context.VolunteerOpportunities
                 .Include(o => o.Organizacion)
-                .Where(o => o.Estatus == OpportunityStatus.Activa)
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                query = query.Where(o => o.Titulo.Contains(searchTerm) || o.Descripcion.Contains(searchTerm));
+            }
+
+            if (!string.IsNullOrEmpty(areaInteres))
+            {
+                query = query.Where(o => o.AreaInteres == areaInteres);
+            }
+
+            if (!string.IsNullOrEmpty(ubicacion))
+            {
+                query = query.Where(o => o.Ubicacion != null && o.Ubicacion.Contains(ubicacion));
+            }
+
+            if (status.HasValue)
+            {
+                query = query.Where(o => o.Estatus == status.Value);
+            }
+            else
+            {
+                query = query.Where(o => o.Estatus == OpportunityStatus.Activa);
+            }
+
+            return await query
                 .OrderByDescending(o => o.FechaCreacion)
                 .Select(o => new OpportunityListDto
                 {
@@ -79,11 +109,11 @@ namespace VoluntariadoConectadoRD.Services
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<IEnumerable<OpportunityListDto>> GetOpportunitiesByOrganizationAsync(int organizationId)
+        public async Task<IEnumerable<OpportunityListDto>> GetOrganizationOpportunitiesAsync(int organizacionId)
         {
             return await _context.VolunteerOpportunities
                 .Include(o => o.Organizacion)
-                .Where(o => o.OrganizacionId == organizationId)
+                .Where(o => o.OrganizacionId == organizacionId)
                 .OrderByDescending(o => o.FechaCreacion)
                 .Select(o => new OpportunityListDto
                 {
@@ -109,59 +139,103 @@ namespace VoluntariadoConectadoRD.Services
                 .ToListAsync();
         }
 
-        public async Task<OpportunityDetailDto> CreateOpportunityAsync(CreateOpportunityDto createDto, int organizationId)
+        public async Task<ApiResponseDto<OpportunityDetailDto>> CreateOpportunityAsync(CreateOpportunityDto dto, int organizacionId)
         {
-            var opportunity = new VolunteerOpportunity
+            try
             {
-                Titulo = createDto.Titulo,
-                Descripcion = createDto.Descripcion,
-                Ubicacion = createDto.Ubicacion,
-                FechaInicio = createDto.FechaInicio,
-                FechaFin = createDto.FechaFin,
-                DuracionHoras = createDto.DuracionHoras,
-                VoluntariosRequeridos = createDto.VoluntariosRequeridos,
-                AreaInteres = createDto.AreaInteres,
-                NivelExperiencia = createDto.NivelExperiencia,
-                Requisitos = createDto.Requisitos,
-                Beneficios = createDto.Beneficios,
-                OrganizacionId = organizationId,
-                Estatus = OpportunityStatus.Activa,
-                FechaCreacion = DateTime.UtcNow
-            };
+                var opportunity = new VolunteerOpportunity
+                {
+                    Titulo = dto.Titulo,
+                    Descripcion = dto.Descripcion,
+                    Ubicacion = dto.Ubicacion,
+                    FechaInicio = dto.FechaInicio,
+                    FechaFin = dto.FechaFin,
+                    DuracionHoras = dto.DuracionHoras,
+                    VoluntariosRequeridos = dto.VoluntariosRequeridos,
+                    AreaInteres = dto.AreaInteres,
+                    NivelExperiencia = dto.NivelExperiencia,
+                    Requisitos = dto.Requisitos,
+                    Beneficios = dto.Beneficios,
+                    OrganizacionId = organizacionId,
+                    Estatus = OpportunityStatus.Activa,
+                    FechaCreacion = DateTime.UtcNow
+                };
 
-            _context.VolunteerOpportunities.Add(opportunity);
-            await _context.SaveChangesAsync();
+                _context.VolunteerOpportunities.Add(opportunity);
+                await _context.SaveChangesAsync();
 
-            return await GetOpportunityByIdAsync(opportunity.Id) ?? throw new InvalidOperationException("Failed to create opportunity");
+                var createdOpportunity = await GetOpportunityByIdAsync(opportunity.Id);
+                
+                return new ApiResponseDto<OpportunityDetailDto>
+                {
+                    Success = true,
+                    Message = "Oportunidad creada exitosamente",
+                    Data = createdOpportunity
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating opportunity");
+                return new ApiResponseDto<OpportunityDetailDto>
+                {
+                    Success = false,
+                    Message = "Error al crear la oportunidad"
+                };
+            }
         }
 
-        public async Task<OpportunityDetailDto?> UpdateOpportunityAsync(int id, UpdateOpportunityDto updateDto, int organizationId)
+        public async Task<ApiResponseDto<OpportunityDetailDto>> UpdateOpportunityAsync(int id, UpdateOpportunityDto dto, int organizacionId)
         {
-            var opportunity = await _context.VolunteerOpportunities
-                .FirstOrDefaultAsync(o => o.Id == id && o.OrganizacionId == organizationId);
+            try
+            {
+                var opportunity = await _context.VolunteerOpportunities
+                    .FirstOrDefaultAsync(o => o.Id == id && o.OrganizacionId == organizacionId);
 
-            if (opportunity == null)
-                return null;
+                if (opportunity == null)
+                {
+                    return new ApiResponseDto<OpportunityDetailDto>
+                    {
+                        Success = false,
+                        Message = "Oportunidad no encontrada o no pertenece a la organización"
+                    };
+                }
 
-            opportunity.Titulo = updateDto.Titulo;
-            opportunity.Descripcion = updateDto.Descripcion;
-            opportunity.Ubicacion = updateDto.Ubicacion;
-            opportunity.FechaInicio = updateDto.FechaInicio;
-            opportunity.FechaFin = updateDto.FechaFin;
-            opportunity.DuracionHoras = updateDto.DuracionHoras;
-            opportunity.VoluntariosRequeridos = updateDto.VoluntariosRequeridos;
-            opportunity.AreaInteres = updateDto.AreaInteres;
-            opportunity.NivelExperiencia = updateDto.NivelExperiencia;
-            opportunity.Requisitos = updateDto.Requisitos;
-            opportunity.Beneficios = updateDto.Beneficios;
-            opportunity.FechaActualizacion = DateTime.UtcNow;
+                opportunity.Titulo = dto.Titulo;
+                opportunity.Descripcion = dto.Descripcion;
+                opportunity.Ubicacion = dto.Ubicacion;
+                opportunity.FechaInicio = dto.FechaInicio;
+                opportunity.FechaFin = dto.FechaFin;
+                opportunity.DuracionHoras = dto.DuracionHoras;
+                opportunity.VoluntariosRequeridos = dto.VoluntariosRequeridos;
+                opportunity.AreaInteres = dto.AreaInteres;
+                opportunity.NivelExperiencia = dto.NivelExperiencia;
+                opportunity.Requisitos = dto.Requisitos;
+                opportunity.Beneficios = dto.Beneficios;
+                opportunity.FechaActualizacion = DateTime.UtcNow;
 
-            if (updateDto.Estatus.HasValue)
-                opportunity.Estatus = updateDto.Estatus.Value;
+                if (dto.Estatus.HasValue)
+                    opportunity.Estatus = dto.Estatus.Value;
 
-            await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync();
 
-            return await GetOpportunityByIdAsync(id);
+                var updatedOpportunity = await GetOpportunityByIdAsync(id);
+                
+                return new ApiResponseDto<OpportunityDetailDto>
+                {
+                    Success = true,
+                    Message = "Oportunidad actualizada exitosamente",
+                    Data = updatedOpportunity
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating opportunity {Id}", id);
+                return new ApiResponseDto<OpportunityDetailDto>
+                {
+                    Success = false,
+                    Message = "Error al actualizar la oportunidad"
+                };
+            }
         }
 
         public async Task<bool> DeleteOpportunityAsync(int id, int organizationId)
@@ -178,7 +252,7 @@ namespace VoluntariadoConectadoRD.Services
             return true;
         }
 
-        public async Task<bool> ApplyToOpportunityAsync(int opportunityId, int userId, ApplyToOpportunityDto? applyDto = null)
+        public async Task<bool> ApplyToOpportunityAsync(int opportunityId, int volunteerId, ApplyToOpportunityDto? applicationDto = null)
         {
             var opportunity = await _context.VolunteerOpportunities
                 .FirstOrDefaultAsync(o => o.Id == opportunityId && o.Estatus == OpportunityStatus.Activa);
@@ -187,16 +261,16 @@ namespace VoluntariadoConectadoRD.Services
                 return false;
 
             var existingApplication = await _context.VolunteerApplications
-                .FirstOrDefaultAsync(a => a.OpportunityId == opportunityId && a.UsuarioId == userId);
+                .FirstOrDefaultAsync(a => a.OpportunityId == opportunityId && a.UsuarioId == volunteerId);
 
             if (existingApplication != null)
                 return false; // User already applied
 
             var application = new VolunteerApplication
             {
-                UsuarioId = userId,
+                UsuarioId = volunteerId,
                 OpportunityId = opportunityId,
-                Mensaje = applyDto?.Mensaje,
+                Mensaje = applicationDto?.Mensaje,
                 Estatus = ApplicationStatus.Pendiente,
                 FechaAplicacion = DateTime.UtcNow
             };
@@ -233,12 +307,12 @@ namespace VoluntariadoConectadoRD.Services
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<ApplicationDto>> GetUserApplicationsAsync(int userId)
+        public async Task<IEnumerable<ApplicationDto>> GetVolunteerApplicationsAsync(int volunteerId)
         {
             return await _context.VolunteerApplications
                 .Include(a => a.Usuario)
                 .Include(a => a.Opportunity)
-                .Where(a => a.UsuarioId == userId)
+                .Where(a => a.UsuarioId == volunteerId)
                 .Select(a => new ApplicationDto
                 {
                     Id = a.Id,
@@ -255,11 +329,32 @@ namespace VoluntariadoConectadoRD.Services
                 .ToListAsync();
         }
 
-        public async Task<bool> UpdateApplicationStatusAsync(int applicationId, ApplicationStatus status, int organizationId, string? notes = null)
+        public async Task<IEnumerable<ApplicationDto>> GetOrganizationApplicationsAsync(int organizacionId)
+        {
+            return await _context.VolunteerApplications
+                .Include(a => a.Usuario)
+                .Include(a => a.Opportunity)
+                .Where(a => a.Opportunity.OrganizacionId == organizacionId)
+                .Select(a => new ApplicationDto
+                {
+                    Id = a.Id,
+                    OpportunityId = a.OpportunityId,
+                    OpportunityTitulo = a.Opportunity.Titulo,
+                    UsuarioNombre = $"{a.Usuario.Nombre} {a.Usuario.Apellido}",
+                    UsuarioEmail = a.Usuario.Email,
+                    Mensaje = a.Mensaje,
+                    Estatus = a.Estatus,
+                    FechaAplicacion = a.FechaAplicacion,
+                    FechaRespuesta = a.FechaRespuesta,
+                    NotasOrganizacion = a.NotasOrganizacion
+                })
+                .ToListAsync();
+        }
+
+        public async Task<bool> UpdateApplicationStatusAsync(int applicationId, ApplicationStatus status, string? notes = null)
         {
             var application = await _context.VolunteerApplications
-                .Include(a => a.Opportunity)
-                .FirstOrDefaultAsync(a => a.Id == applicationId && a.Opportunity.OrganizacionId == organizationId);
+                .FirstOrDefaultAsync(a => a.Id == applicationId);
 
             if (application == null)
                 return false;
@@ -271,6 +366,16 @@ namespace VoluntariadoConectadoRD.Services
             await _context.SaveChangesAsync();
 
             return true;
+        }
+
+        public async Task<int?> GetOrganizacionIdByUserAsync(int userId)
+        {
+            var organizacion = await _context.Organizaciones
+                .Where(o => o.UsuarioId == userId)
+                .Select(o => o.Id)
+                .FirstOrDefaultAsync();
+
+            return organizacion == 0 ? null : organizacion;
         }
     }
 }
