@@ -20,7 +20,7 @@ namespace VoluntariadoConectadoRD.Controllers
         }
 
         [HttpPost("upload/avatar")]
-        public async Task<ActionResult<ApiResponseDto<ImageUploadResponseDto>>> UploadAvatar([FromForm] IFormFile file)
+        public async Task<ActionResult<ApiResponseDto<ImageUploadResponseDto>>> UploadAvatar(IFormFile file)
         {
             try
             {
@@ -76,7 +76,7 @@ namespace VoluntariadoConectadoRD.Controllers
         }
 
         [HttpPost("upload/logo")]
-        public async Task<ActionResult<ApiResponseDto<ImageUploadResponseDto>>> UploadLogo([FromForm] IFormFile file)
+        public async Task<ActionResult<ApiResponseDto<ImageUploadResponseDto>>> UploadLogo(IFormFile file)
         {
             try
             {

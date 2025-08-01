@@ -57,7 +57,7 @@ namespace VoluntariadoConectadoRD
             builder.Services.AddScoped<IJwtService, JwtService>();
             builder.Services.AddScoped<IPasswordService, PasswordService>();
             builder.Services.AddScoped<IDatabaseSeederService, DatabaseSeederService>();
-            builder.Services.AddScoped<IOportunidadService, OportunidadService>();
+            builder.Services.AddScoped<IOportunidadService, OpportunitiesService>();
             builder.Services.AddScoped<IOpportunityService, OpportunityService>();
             builder.Services.AddScoped<IProfileService, VoluntariadoConectadoRd.Services.ProfileService>();
             builder.Services.AddScoped<IImageUploadService, VoluntariadoConectadoRd.Services.ImageUploadService>();
@@ -99,6 +99,7 @@ namespace VoluntariadoConectadoRD
                         new string[] {}
                     }
                 });
+
             });
 
             var app = builder.Build();
