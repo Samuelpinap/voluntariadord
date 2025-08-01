@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
-using VoluntariadoApi.Interfaces.IServices;
-using VoluntariadoApi.Models;
+using VoluntariadoConectadoRD.Models;
+using VoluntariadoConectadoRD.Interfaces;
 
-namespace VoluntariadoApi.Controllers
+namespace VoluntariadoConectadoRD.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
@@ -61,7 +61,7 @@ namespace VoluntariadoApi.Controllers
                 }
 
                 // Buscar la oportunidad por ID
-                var oportunidad = await _oportunidadService.GetOportunidadByIdAsync(id);
+                var oportunidad = await _oportunidadService.GetOpportunidadByIdAsync(id);
 
                 // Verificar si la oportunidad existe
                 if (oportunidad == null)
