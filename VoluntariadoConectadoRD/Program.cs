@@ -59,6 +59,8 @@ namespace VoluntariadoConectadoRD
             builder.Services.AddScoped<IDatabaseSeederService, DatabaseSeederService>();
             builder.Services.AddScoped<IOportunidadService, OportunidadService>();
             builder.Services.AddScoped<IOpportunityService, OpportunityService>();
+            builder.Services.AddScoped<IProfileService, VoluntariadoConectadoRd.Services.ProfileService>();
+            builder.Services.AddScoped<IImageUploadService, VoluntariadoConectadoRd.Services.ImageUploadService>();
 
             builder.Services.AddControllers();
             
@@ -113,6 +115,9 @@ namespace VoluntariadoConectadoRD
             // }
 
             app.UseHttpsRedirection();
+            
+            // Enable static files for image uploads
+            app.UseStaticFiles();
 
             // Important: Authentication must come before Authorization
             app.UseAuthentication();

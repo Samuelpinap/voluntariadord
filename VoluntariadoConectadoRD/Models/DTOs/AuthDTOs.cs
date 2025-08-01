@@ -155,4 +155,94 @@ namespace VoluntariadoConectadoRD.Models.DTOs
         public T? Data { get; set; }
         public List<string>? Errors { get; set; }
     }
+
+    // Profile DTOs
+    public class UserProfileDto
+    {
+        public int Id { get; set; }
+        public string Nombre { get; set; } = string.Empty;
+        public string Apellido { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string? Telefono { get; set; }
+        public DateTime? FechaNacimiento { get; set; }
+        public string? Biografia { get; set; }
+        public List<string> Habilidades { get; set; } = new List<string>();
+        public int ExperienciaAnios { get; set; }
+        public string? Disponibilidad { get; set; }
+        public string? ProfileImageUrl { get; set; }
+        public bool PerfilCompleto { get; set; }
+        public int TotalResenas { get; set; }
+        public double CalificacionPromedio { get; set; }
+        public List<UserReviewDto> UltimasResenas { get; set; } = new List<UserReviewDto>();
+        public List<BadgeDto> Badges { get; set; } = new List<BadgeDto>();
+    }
+
+    public class OrganizationProfileDto
+    {
+        public int Id { get; set; }
+        public string Nombre { get; set; } = string.Empty;
+        public string? Descripcion { get; set; }
+        public string? Direccion { get; set; }
+        public string? Telefono { get; set; }
+        public string Email { get; set; } = string.Empty;
+        public string? SitioWeb { get; set; }
+        public string? TipoOrganizacion { get; set; }
+        public string? NumeroRegistro { get; set; }
+        public DateTime? FechaFundacion { get; set; }
+        public string? Mision { get; set; }
+        public string? Vision { get; set; }
+        public List<string> AreasInteres { get; set; } = new List<string>();
+        public string? LogoUrl { get; set; }
+        public bool PerfilCompleto { get; set; }
+    }
+
+    public class UpdateUserProfileDto
+    {
+        public string? Nombre { get; set; }
+        public string? Apellido { get; set; }
+        public string? Telefono { get; set; }
+        public DateTime? FechaNacimiento { get; set; }
+        public string? Biografia { get; set; }
+        public List<string>? Habilidades { get; set; }
+        public int? ExperienciaAnios { get; set; }
+        public string? Disponibilidad { get; set; }
+    }
+
+    public class UpdateOrganizationProfileDto
+    {
+        public string? Nombre { get; set; }
+        public string? Descripcion { get; set; }
+        public string? Direccion { get; set; }
+        public string? Telefono { get; set; }
+        public string? SitioWeb { get; set; }
+        public string? TipoOrganizacion { get; set; }
+        public DateTime? FechaFundacion { get; set; }
+        public string? Mision { get; set; }
+        public string? Vision { get; set; }
+        public List<string>? AreasInteres { get; set; }
+    }
+
+    public class UserReviewDto
+    {
+        public string OrganizacionNombre { get; set; } = string.Empty;
+        public int Calificacion { get; set; }
+        public string? Comentario { get; set; }
+        public DateTime FechaCreacion { get; set; }
+    }
+
+    public class ProfileCompletionDto
+    {
+        public int Percentage { get; set; }
+        public bool IsComplete { get; set; }
+        public int CompletedFields { get; set; }
+        public int TotalFields { get; set; }
+        public List<string> MissingFields { get; set; } = new List<string>();
+    }
+
+    public class ImageUploadResponseDto
+    {
+        public string FileName { get; set; } = string.Empty;
+        public string Url { get; set; } = string.Empty;
+        public long Size { get; set; }
+    }
 }

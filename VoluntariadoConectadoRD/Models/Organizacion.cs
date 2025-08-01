@@ -41,6 +41,26 @@ namespace VoluntariadoConectadoRD.Models
         
         public DateTime? FechaVerificacion { get; set; }
         
+        // Extended Organization Profile Fields
+        [StringLength(100)]
+        public string? TipoOrganizacion { get; set; }
+        
+        public DateTime? FechaFundacion { get; set; }
+        
+        [StringLength(1000)]
+        public string? Mision { get; set; }
+        
+        [StringLength(1000)]
+        public string? Vision { get; set; }
+        
+        [StringLength(500)]
+        public string? AreasInteres { get; set; } // JSON string of interest areas
+        
+        [StringLength(500)]
+        public string? LogoUrl { get; set; }
+        
+        public bool PerfilCompleto { get; set; } = false;
+        
         // Usuario administrador de la organización
         public int UsuarioId { get; set; }
         public Usuario Usuario { get; set; } = null!;

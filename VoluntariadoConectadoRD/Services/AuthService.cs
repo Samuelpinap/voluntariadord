@@ -397,7 +397,7 @@ namespace VoluntariadoConectadoRD.Services
                 Habilidades = !string.IsNullOrEmpty(user.Habilidades) 
                     ? System.Text.Json.JsonSerializer.Deserialize<List<string>>(user.Habilidades) 
                     : new List<string>(),
-                ExperienciaAnios = user.ExperienciaAnios,
+                ExperienciaAnios = user.ExperienciaAnios ?? 0,
                 Disponibilidad = user.Disponibilidad,
                 HorasVoluntariado = user.HorasVoluntariado,
                 CalificacionPromedio = user.CalificacionPromedio,
