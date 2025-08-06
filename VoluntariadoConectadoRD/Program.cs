@@ -18,6 +18,17 @@ namespace VoluntariadoConectadoRD
 
             // Add services to the container.
             
+            // Configure CORS
+            builder.Services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(builder =>
+                {
+                    builder.AllowAnyOrigin()
+                           .AllowAnyMethod()
+                           .AllowAnyHeader();
+                });
+            });
+            
             // Configure Entity Framework
             builder.Services.AddDbContext<DbContextApplication>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -57,10 +68,12 @@ namespace VoluntariadoConectadoRD
             builder.Services.AddScoped<IJwtService, JwtService>();
             builder.Services.AddScoped<IPasswordService, PasswordService>();
             builder.Services.AddScoped<IDatabaseSeederService, DatabaseSeederService>();
-            builder.Services.AddScoped<IOportunidadService, OportunidadService>();
+            builder.Services.AddScoped<IOportunidadService, OpportunitiesService>();
             builder.Services.AddScoped<IOpportunityService, OpportunityService>();
             builder.Services.AddScoped<IProfileService, VoluntariadoConectadoRd.Services.ProfileService>();
             builder.Services.AddScoped<IImageUploadService, VoluntariadoConectadoRd.Services.ImageUploadService>();
+            builder.Services.AddScoped<IVolunteerService, VolunteerService>();
+            builder.Services.AddScoped<IDashboardService, DashboardService>();
 
             builder.Services.AddControllers();
             
@@ -115,6 +128,9 @@ namespace VoluntariadoConectadoRD
             // }
 
             app.UseHttpsRedirection();
+            
+            // Enable CORS
+            app.UseCors();
             
             // Enable static files for image uploads
             app.UseStaticFiles();

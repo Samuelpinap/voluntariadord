@@ -16,6 +16,10 @@ namespace VoluntariadoConectadoRD.Data
         public DbSet<UsuarioResena> UsuarioResenas { get; set; }
         public DbSet<Badge> Badges { get; set; }
         public DbSet<UsuarioBadge> UsuarioBadges { get; set; }
+        public DbSet<Skill> Skills { get; set; }
+        public DbSet<UsuarioSkill> UsuarioSkills { get; set; }
+        public DbSet<VolunteerActivity> VolunteerActivities { get; set; }
+        public DbSet<PlatformStats> PlatformStats { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -137,12 +141,14 @@ namespace VoluntariadoConectadoRD.Data
                 entity.Property(e => e.Descripcion).HasMaxLength(500);
                 entity.Property(e => e.IconoUrl).HasMaxLength(200);
                 entity.Property(e => e.Color).HasMaxLength(20);
+                entity.Property(e => e.Categoria).HasMaxLength(50);
             });
 
             // Configuración para UsuarioBadge
             modelBuilder.Entity<UsuarioBadge>(entity =>
             {
                 entity.HasKey(e => e.Id);
+                entity.Property(e => e.NotasObtencion).HasMaxLength(500);
 
                 // Relación con Usuario
                 entity.HasOne(e => e.Usuario)
@@ -160,6 +166,67 @@ namespace VoluntariadoConectadoRD.Data
                 entity.HasIndex(e => new { e.UsuarioId, e.BadgeId }).IsUnique();
             });
 
+            // Configuración para Skill
+            modelBuilder.Entity<Skill>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Nombre).IsRequired().HasMaxLength(100);
+                entity.Property(e => e.Descripcion).HasMaxLength(500);
+                entity.Property(e => e.Categoria).HasMaxLength(100);
+            });
+
+            // Configuración para UsuarioSkill
+            modelBuilder.Entity<UsuarioSkill>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+
+                // Relación con Usuario
+                entity.HasOne(e => e.Usuario)
+                      .WithMany()
+                      .HasForeignKey(e => e.UsuarioId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                // Relación con Skill
+                entity.HasOne(e => e.Skill)
+                      .WithMany(s => s.UsuarioSkills)
+                      .HasForeignKey(e => e.SkillId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                // Índice único para evitar skills duplicadas por usuario
+                entity.HasIndex(e => new { e.UsuarioId, e.SkillId }).IsUnique();
+            });
+
+            // Configuración para VolunteerActivity
+            modelBuilder.Entity<VolunteerActivity>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Titulo).IsRequired().HasMaxLength(200);
+                entity.Property(e => e.Descripcion).HasMaxLength(1000);
+                entity.Property(e => e.Notas).HasMaxLength(500);
+                entity.Property(e => e.ComentarioVoluntario).HasMaxLength(1000);
+                entity.Property(e => e.ComentarioOrganizacion).HasMaxLength(1000);
+
+                // Relación con Usuario
+                entity.HasOne(e => e.Usuario)
+                      .WithMany()
+                      .HasForeignKey(e => e.UsuarioId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                // Relación con VolunteerOpportunity
+                entity.HasOne(e => e.Opportunity)
+                      .WithMany()
+                      .HasForeignKey(e => e.OpportunityId)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // Configuración para PlatformStats
+            modelBuilder.Entity<PlatformStats>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.FondosRecaudados).HasPrecision(18, 2);
+                entity.Property(e => e.NotasEstadisticas).HasMaxLength(500);
+            });
+
             // Mapeo de tablas para compatibilidad
             modelBuilder.Entity<Usuario>().ToTable("usuarios");
             modelBuilder.Entity<Organizacion>().ToTable("organizaciones");
@@ -168,6 +235,10 @@ namespace VoluntariadoConectadoRD.Data
             modelBuilder.Entity<UsuarioResena>().ToTable("usuario_resenas");
             modelBuilder.Entity<Badge>().ToTable("badges");
             modelBuilder.Entity<UsuarioBadge>().ToTable("usuario_badges");
+            modelBuilder.Entity<Skill>().ToTable("skills");
+            modelBuilder.Entity<UsuarioSkill>().ToTable("usuario_skills");
+            modelBuilder.Entity<VolunteerActivity>().ToTable("volunteer_activities");
+            modelBuilder.Entity<PlatformStats>().ToTable("platform_stats");
         }
     }
 }

@@ -1,31 +1,25 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\ismae\\Documents\\VoluntariadoRD\\VoluntariadoConectadoRD\\VoluntariadoConectadoRD.csproj": {}
+    "/Users/samuelpinapolanco/Development/Unibe/voluntariado/backend/VoluntariadoConectadoRD/VoluntariadoConectadoRD.csproj": {}
   },
   "projects": {
-    "C:\\Users\\ismae\\Documents\\VoluntariadoRD\\VoluntariadoConectadoRD\\VoluntariadoConectadoRD.csproj": {
+    "/Users/samuelpinapolanco/Development/Unibe/voluntariado/backend/VoluntariadoConectadoRD/VoluntariadoConectadoRD.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\ismae\\Documents\\VoluntariadoRD\\VoluntariadoConectadoRD\\VoluntariadoConectadoRD.csproj",
+        "projectUniqueName": "/Users/samuelpinapolanco/Development/Unibe/voluntariado/backend/VoluntariadoConectadoRD/VoluntariadoConectadoRD.csproj",
         "projectName": "VoluntariadoConectadoRD",
-        "projectPath": "C:\\Users\\ismae\\Documents\\VoluntariadoRD\\VoluntariadoConectadoRD\\VoluntariadoConectadoRD.csproj",
-        "packagesPath": "C:\\Users\\ismae\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\ismae\\Documents\\VoluntariadoRD\\VoluntariadoConectadoRD\\obj\\",
+        "projectPath": "/Users/samuelpinapolanco/Development/Unibe/voluntariado/backend/VoluntariadoConectadoRD/VoluntariadoConectadoRD.csproj",
+        "packagesPath": "/Users/samuelpinapolanco/.nuget/packages/",
+        "outputPath": "/Users/samuelpinapolanco/Development/Unibe/voluntariado/backend/VoluntariadoConectadoRD/obj/",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\ismae\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "/Users/samuelpinapolanco/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -43,8 +37,7 @@
           "enableAudit": "true",
           "auditLevel": "low",
           "auditMode": "direct"
-        },
-        "SdkAnalysisLevel": "9.0.300"
+        }
       },
       "frameworks": {
         "net8.0": {
@@ -104,7 +97,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.301/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.407/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

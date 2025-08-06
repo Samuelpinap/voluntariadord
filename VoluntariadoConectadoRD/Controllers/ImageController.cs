@@ -20,7 +20,7 @@ namespace VoluntariadoConectadoRD.Controllers
         }
 
         [HttpPost("upload/avatar")]
-        public async Task<ActionResult<ApiResponseDto<ImageUploadResponseDto>>> UploadAvatar([FromForm] IFormFile file)
+        public async Task<ActionResult<ApiResponseDto<ImageUploadResponseDto>>> UploadAvatar(IFormFile file)
         {
             try
             {
@@ -34,7 +34,7 @@ namespace VoluntariadoConectadoRD.Controllers
                     });
                 }
 
-                var userId = int.Parse(User.FindFirst("UserId")?.Value ?? "0");
+                var userId = int.Parse(User.FindFirst("nameid")?.Value ?? "0");
                 if (userId == 0)
                 {
                     return Unauthorized(new ApiResponseDto<ImageUploadResponseDto>
@@ -76,7 +76,7 @@ namespace VoluntariadoConectadoRD.Controllers
         }
 
         [HttpPost("upload/logo")]
-        public async Task<ActionResult<ApiResponseDto<ImageUploadResponseDto>>> UploadLogo([FromForm] IFormFile file)
+        public async Task<ActionResult<ApiResponseDto<ImageUploadResponseDto>>> UploadLogo(IFormFile file)
         {
             try
             {
@@ -90,7 +90,7 @@ namespace VoluntariadoConectadoRD.Controllers
                     });
                 }
 
-                var userId = int.Parse(User.FindFirst("UserId")?.Value ?? "0");
+                var userId = int.Parse(User.FindFirst("nameid")?.Value ?? "0");
                 if (userId == 0)
                 {
                     return Unauthorized(new ApiResponseDto<ImageUploadResponseDto>
@@ -136,7 +136,7 @@ namespace VoluntariadoConectadoRD.Controllers
         {
             try
             {
-                var userId = int.Parse(User.FindFirst("UserId")?.Value ?? "0");
+                var userId = int.Parse(User.FindFirst("nameid")?.Value ?? "0");
                 if (userId == 0)
                 {
                     return Unauthorized(new ApiResponseDto<object>
@@ -173,7 +173,7 @@ namespace VoluntariadoConectadoRD.Controllers
         {
             try
             {
-                var userId = int.Parse(User.FindFirst("UserId")?.Value ?? "0");
+                var userId = int.Parse(User.FindFirst("nameid")?.Value ?? "0");
                 if (userId == 0)
                 {
                     return Unauthorized(new ApiResponseDto<object>

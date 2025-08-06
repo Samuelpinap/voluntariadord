@@ -46,9 +46,16 @@ namespace VoluntariadoConectadoRD.Models
         [StringLength(20)]
         public string Color { get; set; } = "primary"; // Bootstrap color classes
         
+        [StringLength(50)]
+        public string? Categoria { get; set; }
+        
         public BadgeType Tipo { get; set; }
         
         public int RequisitoValor { get; set; } = 0; // Hours, years, count, etc.
+
+        public bool EsActivo { get; set; } = true;
+
+        public DateTime FechaCreacion { get; set; } = DateTime.UtcNow;
 
         // Navigation properties
         public ICollection<UsuarioBadge> UsuarioBadges { get; set; } = new List<UsuarioBadge>();
@@ -65,6 +72,9 @@ namespace VoluntariadoConectadoRD.Models
         public int BadgeId { get; set; }
         
         public DateTime FechaObtenido { get; set; } = DateTime.UtcNow;
+
+        [StringLength(500)]
+        public string? NotasObtencion { get; set; }
 
         // Navigation properties
         public Usuario Usuario { get; set; } = null!;
