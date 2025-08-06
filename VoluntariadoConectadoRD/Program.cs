@@ -63,7 +63,6 @@ namespace VoluntariadoConectadoRD
             builder.Services.AddAuthorization();
 
             // Register services
-            builder.Services.AddScoped<IServiceSeguridad, ServiceSeguridadImpl>();
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IJwtService, JwtService>();
             builder.Services.AddScoped<IPasswordService, PasswordService>();
