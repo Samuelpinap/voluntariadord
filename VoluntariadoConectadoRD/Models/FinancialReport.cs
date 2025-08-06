@@ -6,17 +6,17 @@ namespace VoluntariadoConectadoRD.Models
     public class FinancialReport
     {
         [Key]
-        public Guid Id { get; set; }
+        public int Id { get; set; }
 
         [Required]
-        public Guid OrganizacionId { get; set; }
+        public int OrganizacionId { get; set; }
 
         [ForeignKey("OrganizacionId")]
-        public virtual Organizacion Organizacion { get; set; }
+        public virtual Organizacion Organizacion { get; set; } = null!;
 
         [Required]
         [StringLength(100)]
-        public string Titulo { get; set; }
+        public string Titulo { get; set; } = string.Empty;
 
         [Required]
         public int Año { get; set; }
@@ -47,7 +47,7 @@ namespace VoluntariadoConectadoRD.Models
         public DateTime FechaCreacion { get; set; }
         public DateTime? FechaActualizacion { get; set; }
 
-        public virtual ICollection<Expense> Gastos { get; set; }
-        public virtual ICollection<Donation> Donaciones { get; set; }
+        public virtual ICollection<Expense> Gastos { get; set; } = new List<Expense>();
+        public virtual ICollection<Donation> Donaciones { get; set; } = new List<Donation>();
     }
 }

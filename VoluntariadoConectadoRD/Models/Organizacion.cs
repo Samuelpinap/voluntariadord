@@ -61,9 +61,14 @@ namespace VoluntariadoConectadoRD.Models
         
         public bool PerfilCompleto { get; set; } = false;
         
+        public bool Verificada { get; set; } = false;
+        
         // Usuario administrador de la organización
         public int UsuarioId { get; set; }
         public Usuario Usuario { get; set; } = null!;
+        
+        // Navigation properties
+        public virtual ICollection<VolunteerOpportunity> Opportunities { get; set; } = new List<VolunteerOpportunity>();
 
         public Organizacion()
         {

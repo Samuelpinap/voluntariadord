@@ -79,6 +79,9 @@ namespace VoluntariadoConectadoRD.Services
                 await SeedPlatformStatsAsync();
                 await UpdateVolunteerProfilesAsync();
                 await SeedEnhancedDataForFundacionAsync();
+                await SeedSeasonalOpportunitiesAsync();
+                await SeedEmergencyResponseOpportunitiesAsync();
+                await SeedSkillDevelopmentWorkshopsAsync();
 
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
@@ -1753,6 +1756,251 @@ namespace VoluntariadoConectadoRD.Services
 
             _logger.LogInformation("Enhanced data seeded for Fundación Niños del Futuro: {Apps} applications, {Activities} activities", 
                 applications.Count, activities.Count);
+        }
+
+        private async Task SeedSeasonalOpportunitiesAsync()
+        {
+            // Check if seasonal opportunities already exist
+            var existingSeasonalOpps = await _context.VolunteerOpportunities
+                .Where(o => o.Titulo.Contains("Navidad") || o.Titulo.Contains("Verano") || o.Titulo.Contains("Pascua"))
+                .AnyAsync();
+
+            if (existingSeasonalOpps)
+            {
+                _logger.LogInformation("Seasonal opportunities already exist, skipping seasonal seeding.");
+                return;
+            }
+
+            _logger.LogInformation("Seeding seasonal volunteer opportunities...");
+
+            var organizations = await _context.Organizaciones.ToListAsync();
+            if (!organizations.Any()) return;
+
+            var random = new Random();
+            var seasonalOpportunities = new List<VolunteerOpportunity>
+            {
+                new VolunteerOpportunity
+                {
+                    Titulo = "Campaña Navideña - Regalos para Niños Vulnerables",
+                    Descripcion = "Únete a nuestra campaña navideña para recolectar, envolver y entregar regalos a niños de comunidades vulnerables. Incluye organización de eventos navideños, decoración de espacios y actividades recreativas para las familias.",
+                    Ubicacion = "Santo Domingo y comunidades aledañas",
+                    FechaInicio = DateTime.UtcNow.AddDays(60), // 2 months from now
+                    FechaFin = DateTime.UtcNow.AddDays(90), // 3 months from now
+                    DuracionHoras = 24,
+                    VoluntariosRequeridos = 25,
+                    VoluntariosInscritos = 0,
+                    AreaInteres = "Eventos Especiales",
+                    NivelExperiencia = "Principiante",
+                    Requisitos = "Disponibilidad durante diciembre, actitud alegre y festiva, capacidad para trabajar con niños.",
+                    Beneficios = "Certificado especial navideño, experiencia organizando eventos comunitarios, refrigerios navideños.",
+                    Estatus = OpportunityStatus.Activa,
+                    OrganizacionId = organizations[0].Id,
+                    FechaCreacion = DateTime.UtcNow
+                },
+                new VolunteerOpportunity
+                {
+                    Titulo = "Campamento de Verano para Jóvenes",
+                    Descripcion = "Apoya nuestro campamento de verano dirigido a jóvenes de 12-17 años de comunidades de bajos recursos. Actividades incluyen deportes, arte, talleres educativos, excursiones y actividades de liderazgo juvenil.",
+                    Ubicacion = "Centro Recreativo La Vega",
+                    FechaInicio = DateTime.UtcNow.AddDays(180), // 6 months from now (summer)
+                    FechaFin = DateTime.UtcNow.AddDays(210), // 7 months from now
+                    DuracionHoras = 80,
+                    VoluntariosRequeridos = 15,
+                    VoluntariosInscritos = 0,
+                    AreaInteres = "Educación",
+                    NivelExperiencia = "Intermedio",
+                    Requisitos = "Experiencia trabajando con jóvenes, habilidades deportivas o artísticas, disponibilidad tiempo completo durante el campamento.",
+                    Beneficios = "Experiencia intensiva en educación juvenil, alojamiento y comidas incluidas, certificado de coordinador de campamento.",
+                    Estatus = OpportunityStatus.Activa,
+                    OrganizacionId = organizations[random.Next(organizations.Count)].Id,
+                    FechaCreacion = DateTime.UtcNow
+                },
+                new VolunteerOpportunity
+                {
+                    Titulo = "Celebración de Pascua con Adultos Mayores",
+                    Descripcion = "Organiza y participa en la celebración de Semana Santa y Pascua con nuestros adultos mayores. Incluye preparación de actividades religiosas, comida tradicional, presentaciones musicales y tiempo de convivencia familiar.",
+                    Ubicacion = "Hogar San Rafael, Los Alcarrizos",
+                    FechaInicio = DateTime.UtcNow.AddDays(120), // 4 months from now
+                    FechaFin = DateTime.UtcNow.AddDays(127), // Week of Easter
+                    DuracionHoras = 20,
+                    VoluntariosRequeridos = 12,
+                    VoluntariosInscritos = 0,
+                    AreaInteres = "Cuidado de Adultos Mayores",
+                    NivelExperiencia = "Principiante",
+                    Requisitos = "Respeto por tradiciones religiosas, paciencia con adultos mayores, disponibilidad durante Semana Santa.",
+                    Beneficios = "Experiencia intergeneracional única, certificado de voluntariado especial, comida tradicional incluida.",
+                    Estatus = OpportunityStatus.Activa,
+                    OrganizacionId = organizations[4].Id, // Hogar de Ancianos
+                    FechaCreacion = DateTime.UtcNow
+                }
+            };
+
+            _context.VolunteerOpportunities.AddRange(seasonalOpportunities);
+            await _context.SaveChangesAsync();
+            _logger.LogInformation("Seeded {Count} seasonal opportunities", seasonalOpportunities.Count);
+        }
+
+        private async Task SeedEmergencyResponseOpportunitiesAsync()
+        {
+            // Check if emergency response opportunities already exist
+            var existingEmergencyOpps = await _context.VolunteerOpportunities
+                .Where(o => o.Titulo.Contains("Emergencia") || o.Titulo.Contains("Desastre") || o.Titulo.Contains("Huracán"))
+                .AnyAsync();
+
+            if (existingEmergencyOpps)
+            {
+                _logger.LogInformation("Emergency response opportunities already exist, skipping emergency seeding.");
+                return;
+            }
+
+            _logger.LogInformation("Seeding emergency response volunteer opportunities...");
+
+            var organizations = await _context.Organizaciones.ToListAsync();
+            if (!organizations.Any()) return;
+
+            var emergencyOpportunities = new List<VolunteerOpportunity>
+            {
+                new VolunteerOpportunity
+                {
+                    Titulo = "Respuesta a Emergencias - Equipo de Respuesta Rápida",
+                    Descripcion = "Forma parte de nuestro equipo de respuesta rápida para desastres naturales. Recibirás entrenamiento en primeros auxilios, logística de emergencia, distribución de ayuda humanitaria y apoyo psicológico básico.",
+                    Ubicacion = "A nivel nacional - movilización según necesidad",
+                    FechaInicio = DateTime.UtcNow.AddDays(1),
+                    FechaFin = DateTime.UtcNow.AddDays(365), // Year-round availability
+                    DuracionHoras = 50,
+                    VoluntariosRequeridos = 30,
+                    VoluntariosInscritos = 0,
+                    AreaInteres = "Emergencias",
+                    NivelExperiencia = "Intermedio",
+                    Requisitos = "Disponibilidad inmediata, condición física adecuada, certificado de primeros auxilios (se puede obtener en el entrenamiento).",
+                    Beneficios = "Entrenamiento certificado en emergencias, equipos de seguridad incluidos, reconocimiento oficial de Cruz Roja.",
+                    Estatus = OpportunityStatus.Activa,
+                    OrganizacionId = organizations[1].Id, // Cruz Roja
+                    FechaCreacion = DateTime.UtcNow
+                },
+                new VolunteerOpportunity
+                {
+                    Titulo = "Preparación Comunitaria ante Huracanes",
+                    Descripcion = "Ayuda a preparar comunidades vulnerables para la temporada de huracanes. Actividades incluyen educación en prevención, distribución de kits de emergencia, identificación de refugios y capacitación en evacuación.",
+                    Ubicacion = "Zonas costeras - Samaná, Puerto Plata, Barahona",
+                    FechaInicio = DateTime.UtcNow.AddDays(30),
+                    FechaFin = DateTime.UtcNow.AddDays(150), // Before hurricane season
+                    DuracionHoras = 35,
+                    VoluntariosRequeridos = 20,
+                    VoluntariosInscritos = 0,
+                    AreaInteres = "Prevención",
+                    NivelExperiencia = "Principiante",
+                    Requisitos = "Disponibilidad para viajar a zonas costeras, habilidades de comunicación, interés en prevención de desastres.",
+                    Beneficios = "Entrenamiento en gestión de riesgos, transporte y alojamiento incluido, certificado en preparación ante desastres.",
+                    Estatus = OpportunityStatus.Activa,
+                    OrganizacionId = organizations[1].Id, // Cruz Roja
+                    FechaCreacion = DateTime.UtcNow
+                }
+            };
+
+            _context.VolunteerOpportunities.AddRange(emergencyOpportunities);
+            await _context.SaveChangesAsync();
+            _logger.LogInformation("Seeded {Count} emergency response opportunities", emergencyOpportunities.Count);
+        }
+
+        private async Task SeedSkillDevelopmentWorkshopsAsync()
+        {
+            // Check if skill development workshops already exist
+            var existingWorkshops = await _context.VolunteerOpportunities
+                .Where(o => o.Titulo.Contains("Taller") || o.Titulo.Contains("Capacitación") || o.Titulo.Contains("Curso"))
+                .AnyAsync();
+
+            if (existingWorkshops)
+            {
+                _logger.LogInformation("Skill development workshops already exist, skipping workshop seeding.");
+                return;
+            }
+
+            _logger.LogInformation("Seeding skill development workshops...");
+
+            var organizations = await _context.Organizaciones.ToListAsync();
+            if (!organizations.Any()) return;
+
+            var random = new Random();
+            var workshops = new List<VolunteerOpportunity>
+            {
+                new VolunteerOpportunity
+                {
+                    Titulo = "Taller de Habilidades Digitales para Jóvenes",
+                    Descripcion = "Enseña habilidades digitales básicas a jóvenes de comunidades vulnerables. Incluye uso de computadoras, internet seguro, herramientas de oficina, redes sociales responsables y oportunidades de empleo digital.",
+                    Ubicacion = "Centros comunitarios en Santo Domingo",
+                    FechaInicio = DateTime.UtcNow.AddDays(15),
+                    FechaFin = DateTime.UtcNow.AddDays(45), // 1 month
+                    DuracionHoras = 32,
+                    VoluntariosRequeridos = 8,
+                    VoluntariosInscritos = 0,
+                    AreaInteres = "Educación",
+                    NivelExperiencia = "Intermedio",
+                    Requisitos = "Conocimientos sólidos en informática, paciencia para enseñar, disponibilidad tardes entre semana.",
+                    Beneficios = "Experiencia en educación digital, certificado de instructor voluntario, acceso a recursos tecnológicos.",
+                    Estatus = OpportunityStatus.Activa,
+                    OrganizacionId = organizations[0].Id, // Fundación Niños del Futuro
+                    FechaCreacion = DateTime.UtcNow
+                },
+                new VolunteerOpportunity
+                {
+                    Titulo = "Capacitación en Emprendimiento para Mujeres",
+                    Descripcion = "Facilita talleres de emprendimiento dirigidos a mujeres cabeza de familia. Temas incluyen plan de negocios, finanzas básicas, marketing digital, liderazgo femenino y redes de apoyo empresarial.",
+                    Ubicacion = "Villa Mella y comunidades cercanas",
+                    FechaInicio = DateTime.UtcNow.AddDays(25),
+                    FechaFin = DateTime.UtcNow.AddDays(75), // 2 months
+                    DuracionHoras = 40,
+                    VoluntariosRequeridos = 6,
+                    VoluntariosInscritos = 0,
+                    AreaInteres = "Desarrollo Social",
+                    NivelExperiencia = "Avanzado",
+                    Requisitos = "Experiencia en negocios o emprendimiento, habilidades de facilitación, sensibilidad hacia temas de género.",
+                    Beneficios = "Red de emprendedoras sociales, certificado en facilitación empresarial, seguimiento post-capacitación.",
+                    Estatus = OpportunityStatus.Activa,
+                    OrganizacionId = organizations[3].Id, // Fundación Renacer
+                    FechaCreacion = DateTime.UtcNow
+                },
+                new VolunteerOpportunity
+                {
+                    Titulo = "Curso de Oficios Técnicos para Jóvenes",
+                    Descripcion = "Enseña oficios técnicos básicos como electricidad, plomería, carpintería y mecánica a jóvenes en riesgo social. Proporciona herramientas prácticas para generación de ingresos y inserción laboral.",
+                    Ubicacion = "Centro de Formación Técnica, Santiago",
+                    FechaInicio = DateTime.UtcNow.AddDays(40),
+                    FechaFin = DateTime.UtcNow.AddDays(130), // 3 months
+                    DuracionHoras = 72,
+                    VoluntariosRequeridos = 10,
+                    VoluntariosInscritos = 0,
+                    AreaInteres = "Capacitación Técnica",
+                    NivelExperiencia = "Avanzado",
+                    Requisitos = "Experiencia comprobada en oficios técnicos, herramientas propias, disponibilidad fines de semana.",
+                    Beneficios = "Impacto directo en inserción laboral juvenil, herramientas y materiales incluidos, certificado de instructor técnico.",
+                    Estatus = OpportunityStatus.Activa,
+                    OrganizacionId = organizations[random.Next(organizations.Count)].Id,
+                    FechaCreacion = DateTime.UtcNow
+                },
+                new VolunteerOpportunity
+                {
+                    Titulo = "Taller de Agricultura Sostenible",
+                    Descripcion = "Capacita a familias rurales en técnicas de agricultura sostenible, huertos orgánicos, compostaje, conservación de suelos y cultivos resistentes al cambio climático. Incluye componente práctico en fincas demostrativas.",
+                    Ubicacion = "Zona rural de Jarabacoa y comunidades montañosas",
+                    FechaInicio = DateTime.UtcNow.AddDays(50),
+                    FechaFin = DateTime.UtcNow.AddDays(110), // 2 months
+                    DuracionHoras = 48,
+                    VoluntariosRequeridos = 5,
+                    VoluntariosInscritos = 0,
+                    AreaInteres = "Medio Ambiente",
+                    NivelExperiencia = "Intermedio",
+                    Requisitos = "Conocimientos en agricultura o agronomía, disponibilidad para trabajo de campo, resistencia física para trabajo rural.",
+                    Beneficios = "Experiencia en desarrollo rural sostenible, alojamiento rural incluido, productos orgánicos del proyecto.",
+                    Estatus = OpportunityStatus.Activa,
+                    OrganizacionId = organizations[5].Id, // Centro de Educación Ambiental Verde
+                    FechaCreacion = DateTime.UtcNow
+                }
+            };
+
+            _context.VolunteerOpportunities.AddRange(workshops);
+            await _context.SaveChangesAsync();
+            _logger.LogInformation("Seeded {Count} skill development workshops", workshops.Count);
         }
     }
 }

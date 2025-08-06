@@ -787,7 +787,7 @@ namespace VoluntariadoConectadoRD.Services
             try
             {
                 var query = _context.Organizaciones
-                    .Include(o => o.AdminUser)
+                    .Include(o => o.Usuario)
                     .AsQueryable();
 
                 if (!string.IsNullOrEmpty(search))
@@ -814,20 +814,20 @@ namespace VoluntariadoConectadoRD.Services
                         SitioWeb = o.SitioWeb,
                         NumeroRegistro = o.NumeroRegistro,
                         Verificada = o.Verificada,
-                        Estado = o.AdminUser != null ? o.AdminUser.Estatus : UserStatus.Inactivo,
-                        FechaRegistro = o.FechaRegistro,
+                        Estado = o.Usuario != null ? o.Usuario.Estatus : UserStatus.Inactivo,
+                        FechaRegistro = o.FechaCreacion,
                         FechaVerificacion = o.FechaVerificacion,
                         LogoUrl = o.LogoUrl,
                         TipoOrganizacion = o.TipoOrganizacion,
                         TotalOportunidades = o.Opportunities.Count(),
-                        OportunidadesActivas = o.Opportunities.Count(op => op.Estado == OpportunityStatus.Activa),
+                        OportunidadesActivas = o.Opportunities.Count(op => op.Estatus == OpportunityStatus.Activa),
                         TotalVoluntarios = o.Opportunities
-                            .SelectMany(op => op.Applications)
-                            .Where(app => app.Estado == ApplicationStatus.Aprobada)
+                            .SelectMany(op => op.Aplicaciones)
+                            .Where(app => app.Estatus == ApplicationStatus.Aceptada)
                             .Select(app => app.UsuarioId)
                             .Distinct()
                             .Count(),
-                        UltimaActividad = o.Opportunities.Any() ? o.Opportunities.Max(op => op.FechaCreacion) : o.FechaRegistro
+                        UltimaActividad = o.Opportunities.Any() ? o.Opportunities.Max(op => op.FechaCreacion) : o.FechaCreacion
                     })
                     .ToListAsync();
 
@@ -857,7 +857,7 @@ namespace VoluntariadoConectadoRD.Services
             try
             {
                 var organizacion = await _context.Organizaciones
-                    .Include(o => o.AdminUser)
+                    .Include(o => o.Usuario)
                     .FirstOrDefaultAsync(o => o.Id == orgId);
                     
                 if (organizacion == null) return false;
@@ -868,9 +868,9 @@ namespace VoluntariadoConectadoRD.Services
                     organizacion.FechaVerificacion = DateTime.UtcNow;
                 }
 
-                if (organizacion.AdminUser != null)
+                if (organizacion.Usuario != null)
                 {
-                    organizacion.AdminUser.Estatus = status;
+                    organizacion.Usuario.Estatus = status;
                 }
 
                 await _context.SaveChangesAsync();
@@ -888,7 +888,7 @@ namespace VoluntariadoConectadoRD.Services
             try
             {
                 var organizacion = await _context.Organizaciones
-                    .Include(o => o.AdminUser)
+                    .Include(o => o.Usuario)
                     .FirstOrDefaultAsync(o => o.Id == orgId);
                     
                 if (organizacion == null) return false;
@@ -903,9 +903,9 @@ namespace VoluntariadoConectadoRD.Services
                 organizacion.TipoOrganizacion = editDto.TipoOrganizacion;
                 organizacion.Verificada = editDto.Verificada;
 
-                if (organizacion.AdminUser != null)
+                if (organizacion.Usuario != null)
                 {
-                    organizacion.AdminUser.Estatus = editDto.Status;
+                    organizacion.Usuario.Estatus = editDto.Status;
                 }
 
                 await _context.SaveChangesAsync();
@@ -923,15 +923,15 @@ namespace VoluntariadoConectadoRD.Services
             try
             {
                 var organizacion = await _context.Organizaciones
-                    .Include(o => o.AdminUser)
+                    .Include(o => o.Usuario)
                     .FirstOrDefaultAsync(o => o.Id == orgId);
                     
                 if (organizacion == null) return false;
 
                 // Soft delete by setting admin user status to inactive
-                if (organizacion.AdminUser != null)
+                if (organizacion.Usuario != null)
                 {
-                    organizacion.AdminUser.Estatus = UserStatus.Inactivo;
+                    organizacion.Usuario.Estatus = UserStatus.Inactivo;
                 }
 
                 await _context.SaveChangesAsync();

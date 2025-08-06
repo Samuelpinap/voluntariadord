@@ -398,7 +398,7 @@ namespace VoluntariadoConectadoRD.Controllers
                 });
             }
 
-            if (application.Status == ApplicationStatus.Aceptada)
+            if (application.Estatus == ApplicationStatus.Aceptada)
             {
                 return BadRequest(new ApiResponseDto<object>
                 {

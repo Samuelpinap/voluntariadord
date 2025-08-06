@@ -20,6 +20,9 @@ namespace VoluntariadoConectadoRD.Data
         public DbSet<UsuarioSkill> UsuarioSkills { get; set; }
         public DbSet<VolunteerActivity> VolunteerActivities { get; set; }
         public DbSet<PlatformStats> PlatformStats { get; set; }
+        public DbSet<FinancialReport> FinancialReports { get; set; }
+        public DbSet<Expense> Expenses { get; set; }
+        public DbSet<Donation> Donations { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -80,7 +83,7 @@ namespace VoluntariadoConectadoRD.Data
 
                 // Relación con Organizacion
                 entity.HasOne(e => e.Organizacion)
-                      .WithMany()
+                      .WithMany(o => o.Opportunities)
                       .HasForeignKey(e => e.OrganizacionId)
                       .OnDelete(DeleteBehavior.Restrict);
             });
@@ -227,6 +230,58 @@ namespace VoluntariadoConectadoRD.Data
                 entity.Property(e => e.NotasEstadisticas).HasMaxLength(500);
             });
 
+            // Configuración para FinancialReport
+            modelBuilder.Entity<FinancialReport>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Titulo).IsRequired().HasMaxLength(100);
+                entity.Property(e => e.TotalIngresos).HasPrecision(18, 2);
+                entity.Property(e => e.TotalGastos).HasPrecision(18, 2);
+                entity.Property(e => e.Balance).HasPrecision(18, 2);
+                entity.Property(e => e.Resumen).HasMaxLength(1000);
+                entity.Property(e => e.DocumentoUrl).HasMaxLength(500);
+
+                // Relación con Organizacion
+                entity.HasOne<Organizacion>(e => e.Organizacion)
+                      .WithMany()
+                      .HasForeignKey(e => e.OrganizacionId)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // Configuración para Expense
+            modelBuilder.Entity<Expense>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Descripcion).IsRequired().HasMaxLength(200);
+                entity.Property(e => e.Categoria).IsRequired().HasMaxLength(100);
+                entity.Property(e => e.Monto).HasPrecision(18, 2);
+                entity.Property(e => e.Justificacion).HasMaxLength(500);
+                entity.Property(e => e.DocumentoUrl).HasMaxLength(500);
+
+                // Relación con FinancialReport
+                entity.HasOne(e => e.FinancialReport)
+                      .WithMany(fr => fr.Gastos)
+                      .HasForeignKey(e => e.FinancialReportId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // Configuración para Donation
+            modelBuilder.Entity<Donation>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Donante).IsRequired().HasMaxLength(200);
+                entity.Property(e => e.Tipo).IsRequired().HasMaxLength(100);
+                entity.Property(e => e.Monto).HasPrecision(18, 2);
+                entity.Property(e => e.Proposito).HasMaxLength(500);
+                entity.Property(e => e.DocumentoUrl).HasMaxLength(500);
+
+                // Relación con FinancialReport
+                entity.HasOne(e => e.FinancialReport)
+                      .WithMany(fr => fr.Donaciones)
+                      .HasForeignKey(e => e.FinancialReportId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+
             // Mapeo de tablas para compatibilidad
             modelBuilder.Entity<Usuario>().ToTable("usuarios");
             modelBuilder.Entity<Organizacion>().ToTable("organizaciones");
@@ -239,6 +294,9 @@ namespace VoluntariadoConectadoRD.Data
             modelBuilder.Entity<UsuarioSkill>().ToTable("usuario_skills");
             modelBuilder.Entity<VolunteerActivity>().ToTable("volunteer_activities");
             modelBuilder.Entity<PlatformStats>().ToTable("platform_stats");
+            modelBuilder.Entity<FinancialReport>().ToTable("financial_reports");
+            modelBuilder.Entity<Expense>().ToTable("expenses");
+            modelBuilder.Entity<Donation>().ToTable("donations");
         }
     }
 }
