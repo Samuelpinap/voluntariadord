@@ -112,6 +112,7 @@ namespace VoluntariadoConectadoRD
                         new string[] {}
                     }
                 });
+
             });
 
             var app = builder.Build();
