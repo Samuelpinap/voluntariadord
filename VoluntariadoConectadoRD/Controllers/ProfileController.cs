@@ -92,14 +92,18 @@ namespace VoluntariadoConectadoRD.Controllers
         }
 
         [HttpPut("user")]
-        [RoleAuthorization(UserRole.Voluntario)] // Solo voluntarios
         public async Task<ActionResult<ApiResponseDto<UserProfileDto>>> UpdateUserProfile([FromBody] UpdateUserProfileDto updateDto)
         {
             try
             {
-                var userId = int.Parse(User.FindFirst("UserId")?.Value ?? "0");
+                // Debug logging
+                var allClaims = User.Claims.ToList();
+                _logger.LogInformation("User claims: {Claims}", string.Join(", ", allClaims.Select(c => $"{c.Type}={c.Value}")));
+                
+                var userId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "0");
                 if (userId == 0)
                 {
+                    _logger.LogWarning("UserId not found in token claims");
                     return Unauthorized(new ApiResponseDto<UserProfileDto>
                     {
                         Success = false,
@@ -129,12 +133,11 @@ namespace VoluntariadoConectadoRD.Controllers
         }
 
         [HttpPut("organization")]
-        [RoleAuthorization(UserRole.Organizacion)] // Solo organizaciones
         public async Task<ActionResult<ApiResponseDto<OrganizationProfileDto>>> UpdateOrganizationProfile([FromBody] UpdateOrganizationProfileDto updateDto)
         {
             try
             {
-                var userId = int.Parse(User.FindFirst("UserId")?.Value ?? "0");
+                var userId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "0");
                 if (userId == 0)
                 {
                     return Unauthorized(new ApiResponseDto<OrganizationProfileDto>

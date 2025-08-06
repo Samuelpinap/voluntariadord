@@ -34,7 +34,7 @@ namespace VoluntariadoConectadoRD.Controllers
                     });
                 }
 
-                var userId = int.Parse(User.FindFirst("UserId")?.Value ?? "0");
+                var userId = int.Parse(User.FindFirst("nameid")?.Value ?? "0");
                 if (userId == 0)
                 {
                     return Unauthorized(new ApiResponseDto<ImageUploadResponseDto>
@@ -90,7 +90,7 @@ namespace VoluntariadoConectadoRD.Controllers
                     });
                 }
 
-                var userId = int.Parse(User.FindFirst("UserId")?.Value ?? "0");
+                var userId = int.Parse(User.FindFirst("nameid")?.Value ?? "0");
                 if (userId == 0)
                 {
                     return Unauthorized(new ApiResponseDto<ImageUploadResponseDto>
@@ -136,7 +136,7 @@ namespace VoluntariadoConectadoRD.Controllers
         {
             try
             {
-                var userId = int.Parse(User.FindFirst("UserId")?.Value ?? "0");
+                var userId = int.Parse(User.FindFirst("nameid")?.Value ?? "0");
                 if (userId == 0)
                 {
                     return Unauthorized(new ApiResponseDto<object>
@@ -173,7 +173,7 @@ namespace VoluntariadoConectadoRD.Controllers
         {
             try
             {
-                var userId = int.Parse(User.FindFirst("UserId")?.Value ?? "0");
+                var userId = int.Parse(User.FindFirst("nameid")?.Value ?? "0");
                 if (userId == 0)
                 {
                     return Unauthorized(new ApiResponseDto<object>

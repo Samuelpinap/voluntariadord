@@ -71,11 +71,17 @@ namespace VoluntariadoConectadoRD.Services
                 }
 
                 // Always seed additional data if not exists
-                // TODO: Implement seeding methods
-                // await SeedVolunteerApplicationsAsync();
-                // await SeedBadgesAsync();
-                // await SeedUsuarioResenasAsync();
-                // await UpdateVolunteerProfilesAsync();
+                await SeedSkillsAsync();
+                await SeedBadgesAsync();
+                await SeedVolunteerApplicationsAsync();
+                await SeedVolunteerActivitiesAsync();
+                await SeedUsuarioResenasAsync();
+                await SeedPlatformStatsAsync();
+                await UpdateVolunteerProfilesAsync();
+                await SeedEnhancedDataForFundacionAsync();
+                await SeedSeasonalOpportunitiesAsync();
+                await SeedEmergencyResponseOpportunitiesAsync();
+                await SeedSkillDevelopmentWorkshopsAsync();
 
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
@@ -1291,6 +1297,710 @@ namespace VoluntariadoConectadoRD.Services
                 "Muy proactivo e innovador en la resolución de problemas."
             };
             return comments[new Random().Next(comments.Length)];
+        }
+
+        private async Task SeedSkillsAsync()
+        {
+            if (await _context.Skills.AnyAsync()) return;
+
+            _logger.LogInformation("Seeding skills...");
+
+            var skills = new[]
+            {
+                // Communication Skills
+                new Skill { Nombre = "Comunicación Oral", Descripcion = "Habilidad para expresarse claramente de forma verbal", Categoria = "Comunicación" },
+                new Skill { Nombre = "Comunicación Escrita", Descripcion = "Capacidad para redactar textos claros y efectivos", Categoria = "Comunicación" },
+                new Skill { Nombre = "Presentaciones Públicas", Descripcion = "Habilidad para hablar en público y hacer presentaciones", Categoria = "Comunicación" },
+                new Skill { Nombre = "Idiomas", Descripcion = "Conocimiento de idiomas extranjeros", Categoria = "Comunicación" },
+
+                // Leadership Skills
+                new Skill { Nombre = "Liderazgo", Descripcion = "Capacidad para dirigir y motivar equipos", Categoria = "Liderazgo" },
+                new Skill { Nombre = "Gestión de Equipos", Descripcion = "Habilidad para coordinar y organizar grupos de trabajo", Categoria = "Liderazgo" },
+                new Skill { Nombre = "Toma de Decisiones", Descripcion = "Capacidad para tomar decisiones efectivas bajo presión", Categoria = "Liderazgo" },
+                new Skill { Nombre = "Resolución de Conflictos", Descripcion = "Habilidad para mediar y resolver disputas", Categoria = "Liderazgo" },
+
+                // Technical Skills
+                new Skill { Nombre = "Informática Básica", Descripcion = "Conocimientos básicos de computación y software", Categoria = "Tecnología" },
+                new Skill { Nombre = "Redes Sociales", Descripcion = "Manejo de plataformas de redes sociales", Categoria = "Tecnología" },
+                new Skill { Nombre = "Diseño Gráfico", Descripcion = "Creación de contenido visual y gráfico", Categoria = "Tecnología" },
+                new Skill { Nombre = "Fotografía", Descripcion = "Técnicas de fotografía y composición", Categoria = "Tecnología" },
+
+                // Health & Education
+                new Skill { Nombre = "Primeros Auxilios", Descripcion = "Conocimientos básicos de atención médica de emergencia", Categoria = "Salud" },
+                new Skill { Nombre = "Educación", Descripcion = "Experiencia en enseñanza y pedagogía", Categoria = "Educación" },
+                new Skill { Nombre = "Trabajo Social", Descripcion = "Experiencia en asistencia y apoyo social", Categoria = "Social" },
+                new Skill { Nombre = "Psicología", Descripcion = "Conocimientos en apoyo psicológico y emocional", Categoria = "Salud" },
+
+                // Practical Skills
+                new Skill { Nombre = "Construcción", Descripcion = "Habilidades básicas de construcción y reparación", Categoria = "Técnica" },
+                new Skill { Nombre = "Jardinería", Descripcion = "Conocimientos de cultivo y cuidado de plantas", Categoria = "Medio Ambiente" },
+                new Skill { Nombre = "Cocina", Descripcion = "Preparación de alimentos y conocimientos culinarios", Categoria = "Práctica" },
+                new Skill { Nombre = "Organización de Eventos", Descripcion = "Planificación y coordinación de eventos", Categoria = "Organización" },
+
+                // Financial & Administrative
+                new Skill { Nombre = "Contabilidad", Descripcion = "Conocimientos básicos de contabilidad y finanzas", Categoria = "Administrativo" },
+                new Skill { Nombre = "Administración", Descripcion = "Habilidades administrativas y de oficina", Categoria = "Administrativo" },
+                new Skill { Nombre = "Recaudación de Fondos", Descripcion = "Experiencia en fundraising y gestión de donaciones", Categoria = "Administrativo" },
+                new Skill { Nombre = "Marketing", Descripcion = "Conocimientos de marketing y promoción", Categoria = "Marketing" }
+            };
+
+            await _context.Skills.AddRangeAsync(skills);
+            await _context.SaveChangesAsync();
+
+            // Add skills to some users
+            var users = await _context.Usuarios.Where(u => u.Rol == UserRole.Voluntario).ToListAsync();
+            var skillsList = await _context.Skills.ToListAsync();
+            var random = new Random();
+
+            foreach (var user in users)
+            {
+                var userSkillCount = random.Next(2, 6); // 2-5 skills per user
+                var selectedSkills = skillsList.OrderBy(x => random.Next()).Take(userSkillCount);
+
+                foreach (var skill in selectedSkills)
+                {
+                    var userSkill = new UsuarioSkill
+                    {
+                        UsuarioId = user.Id,
+                        SkillId = skill.Id,
+                        Nivel = random.Next(30, 95) // Random skill level between 30-95
+                    };
+                    _context.UsuarioSkills.Add(userSkill);
+                }
+            }
+
+            await _context.SaveChangesAsync();
+        }
+
+
+        private async Task SeedVolunteerActivitiesAsync()
+        {
+            if (await _context.VolunteerActivities.AnyAsync()) return;
+
+            _logger.LogInformation("Seeding volunteer activities...");
+
+            var applications = await _context.VolunteerApplications
+                .Include(va => va.Opportunity)
+                .Where(va => va.Estatus == ApplicationStatus.Aceptada)
+                .ToListAsync();
+
+            var random = new Random();
+            var activities = new List<VolunteerActivity>();
+
+            foreach (var application in applications)
+            {
+                // Create activity for accepted applications
+                var activity = new VolunteerActivity
+                {
+                    UsuarioId = application.UsuarioId,
+                    OpportunityId = application.OpportunityId,
+                    Titulo = application.Opportunity.Titulo,
+                    Descripcion = $"Participación en {application.Opportunity.Titulo}",
+                    FechaInicio = application.Opportunity.FechaInicio,
+                    FechaFin = application.Opportunity.FechaFin ?? application.Opportunity.FechaInicio.AddHours(application.Opportunity.DuracionHoras),
+                    Estado = GetRandomActivityStatus(application.Opportunity.FechaInicio),
+                    FechaCreacion = application.FechaAplicacion.AddDays(random.Next(1, 7))
+                };
+
+                // If activity is completed, add hours and potentially ratings
+                if (activity.Estado == ActivityStatus.Completada)
+                {
+                    activity.HorasCompletadas = random.Next(
+                        Math.Max(1, application.Opportunity.DuracionHoras - 2),
+                        application.Opportunity.DuracionHoras + 3
+                    );
+
+                    // 70% chance of having ratings
+                    if (random.Next(100) < 70)
+                    {
+                        activity.CalificacionVoluntario = random.Next(3, 6); // 3-5 rating
+                        activity.CalificacionOrganizacion = random.Next(3, 6);
+                        
+                        if (random.Next(100) < 50) // 50% chance of comments
+                        {
+                            activity.ComentarioVoluntario = GetRandomVolunteerComment();
+                            activity.ComentarioOrganizacion = GetRandomOrganizationComment();
+                        }
+                    }
+                }
+                else if (activity.Estado == ActivityStatus.EnProgreso)
+                {
+                    activity.HorasCompletadas = random.Next(0, application.Opportunity.DuracionHoras / 2);
+                }
+
+                activities.Add(activity);
+            }
+
+            await _context.VolunteerActivities.AddRangeAsync(activities);
+            await _context.SaveChangesAsync();
+
+            // Update user statistics based on completed activities
+            var users = await _context.Usuarios.Where(u => u.Rol == UserRole.Voluntario).ToListAsync();
+            foreach (var user in users)
+            {
+                var completedActivities = activities.Where(a => a.UsuarioId == user.Id && a.Estado == ActivityStatus.Completada);
+                user.HorasVoluntariado = completedActivities.Sum(a => a.HorasCompletadas);
+
+                if (completedActivities.Any())
+                {
+                    var ratings = completedActivities.Where(a => a.CalificacionOrganizacion.HasValue)
+                                                   .Select(a => a.CalificacionOrganizacion.Value);
+                    if (ratings.Any())
+                    {
+                        user.CalificacionPromedio = (decimal)ratings.Average();
+                        user.TotalResenas = ratings.Count();
+                    }
+                }
+            }
+
+            await _context.SaveChangesAsync();
+        }
+
+        private ActivityStatus GetRandomActivityStatus(DateTime opportunityDate)
+        {
+            var now = DateTime.UtcNow;
+            var random = new Random();
+
+            if (opportunityDate > now)
+            {
+                // Future activities are programmed
+                return ActivityStatus.Programada;
+            }
+            else if (opportunityDate > now.AddDays(-30))
+            {
+                // Recent activities - mix of statuses
+                var statuses = new[] { ActivityStatus.Completada, ActivityStatus.Completada, ActivityStatus.Completada, ActivityStatus.NoCompletada, ActivityStatus.EnProgreso };
+                return statuses[random.Next(statuses.Length)];
+            }
+            else
+            {
+                // Old activities are mostly completed
+                return random.Next(100) < 85 ? ActivityStatus.Completada : ActivityStatus.NoCompletada;
+            }
+        }
+
+        private string GetRandomVolunteerComment()
+        {
+            var comments = new[]
+            {
+                "Experiencia muy enriquecedora, aprendí mucho y pude contribuir significativamente.",
+                "Excelente organización del evento, me sentí muy bien coordinado y apoyado.",
+                "Gran oportunidad de hacer la diferencia en la comunidad.",
+                "El equipo de trabajo fue fantástico, muy colaborativo y profesional.",
+                "Actividad muy bien planificada y con impacto real en los beneficiarios.",
+                "Me encantó participar, definitivamente repetiré con esta organización.",
+                "Pude aplicar mis habilidades profesionales para una buena causa.",
+                "Experiencia transformadora que me permitió crecer como persona."
+            };
+            return comments[new Random().Next(comments.Length)];
+        }
+
+        private string GetRandomOrganizationComment()
+        {
+            var comments = new[]
+            {
+                "Voluntario excepcional, muy comprometido y profesional en todo momento.",
+                "Demostró gran iniciativa y contribuyó más allá de lo esperado.",
+                "Excelente trabajo en equipo y actitud positiva durante toda la actividad.",
+                "Sus habilidades técnicas fueron muy valiosas para el éxito del proyecto.",
+                "Muy puntual, responsable y con gran capacidad de adaptación.",
+                "Comunicación excelente con el equipo y los beneficiarios.",
+                "Aportó ideas creativas que mejoraron la ejecución del programa.",
+                "Voluntario confiable que cumplió todas las expectativas."
+            };
+            return comments[new Random().Next(comments.Length)];
+        }
+
+        private async Task SeedPlatformStatsAsync()
+        {
+            if (await _context.PlatformStats.AnyAsync()) return;
+
+            _logger.LogInformation("Seeding platform statistics...");
+
+            var voluntariosActivos = await _context.Usuarios
+                .CountAsync(u => u.Rol == UserRole.Voluntario && u.Estatus == UserStatus.Activo);
+
+            var organizacionesActivas = await _context.Organizaciones
+                .CountAsync(o => o.Estatus == OrganizacionStatus.Activa);
+
+            var proyectosActivos = await _context.VolunteerOpportunities
+                .CountAsync(o => o.Estatus == OpportunityStatus.Activa);
+
+            var horasTotales = await _context.VolunteerActivities
+                .Where(va => va.Estado == ActivityStatus.Completada)
+                .SumAsync(va => va.HorasCompletadas);
+
+            var stats = new PlatformStats
+            {
+                VoluntariosActivos = voluntariosActivos,
+                OrganizacionesActivas = organizacionesActivas,
+                ProyectosActivos = proyectosActivos,
+                HorasTotalesDonadas = horasTotales,
+                PersonasBeneficiadas = horasTotales * 2, // Estimation: 2 people benefited per hour
+                FondosRecaudados = horasTotales * 15.5m, // Estimation: $15.50 value per volunteer hour
+                FechaActualizacion = DateTime.UtcNow,
+                NotasEstadisticas = "Estadísticas iniciales generadas automáticamente durante el seeding de la base de datos."
+            };
+
+            _context.PlatformStats.Add(stats);
+            await _context.SaveChangesAsync();
+        }
+
+        private async Task SeedEnhancedDataForFundacionAsync()
+        {
+            _logger.LogInformation("Seeding enhanced data for Fundación Niños del Futuro...");
+
+            // Get Fundación Niños del Futuro
+            var fundacion = await _context.Organizaciones
+                .FirstOrDefaultAsync(o => o.Nombre == "Fundación Niños del Futuro");
+
+            if (fundacion == null)
+            {
+                _logger.LogWarning("Fundación Niños del Futuro not found for enhanced seeding.");
+                return;
+            }
+
+            // Get volunteers for creating applications
+            var volunteers = await _context.Usuarios
+                .Where(u => u.Rol == UserRole.Voluntario)
+                .ToListAsync();
+
+            // Get opportunities for this organization
+            var fundacionOpportunities = await _context.VolunteerOpportunities
+                .Where(o => o.OrganizacionId == fundacion.Id)
+                .ToListAsync();
+
+            var random = new Random();
+
+            // Create additional opportunities for Fundación Niños del Futuro
+            var additionalOpportunities = new List<VolunteerOpportunity>
+            {
+                new VolunteerOpportunity
+                {
+                    Titulo = "Programa de Lectura y Escritura",
+                    Descripcion = "Programa intensivo de alfabetización para niños de 6 a 12 años en comunidades vulnerables. Los voluntarios trabajarán con grupos pequeños desarrollando habilidades de lectura, escritura y comprensión lectora.",
+                    Ubicacion = "Centro Comunitario Los Mina, Santo Domingo",
+                    FechaInicio = DateTime.UtcNow.AddDays(-45), // Already completed
+                    FechaFin = DateTime.UtcNow.AddDays(-15),
+                    DuracionHoras = 80,
+                    VoluntariosRequeridos = 12,
+                    VoluntariosInscritos = 12,
+                    AreaInteres = "Educación",
+                    NivelExperiencia = "Intermedio",
+                    Requisitos = "Experiencia en educación, paciencia con niños, certificado de antecedentes penales",
+                    Beneficios = "Certificado de 80 horas, experiencia docente, material educativo incluido",
+                    Estatus = OpportunityStatus.Completada,
+                    OrganizacionId = fundacion.Id,
+                    FechaCreacion = DateTime.UtcNow.AddDays(-60)
+                },
+                new VolunteerOpportunity
+                {
+                    Titulo = "Taller de Habilidades Digitales",
+                    Descripcion = "Enseñanza de habilidades básicas de computación e internet para jóvenes de 13 a 18 años. Incluye uso de Microsoft Office, navegación web segura y herramientas educativas digitales.",
+                    Ubicacion = "Laboratorio de Informática, Villa Mella",
+                    FechaInicio = DateTime.UtcNow.AddDays(-30),
+                    FechaFin = DateTime.UtcNow.AddDays(-10),
+                    DuracionHoras = 40,
+                    VoluntariosRequeridos = 6,
+                    VoluntariosInscritos = 6,
+                    AreaInteres = "Tecnología",
+                    NivelExperiencia = "Avanzado",
+                    Requisitos = "Conocimientos avanzados de informática, experiencia enseñando tecnología",
+                    Beneficios = "Certificado especializado, acceso a material técnico",
+                    Estatus = OpportunityStatus.Completada,
+                    OrganizacionId = fundacion.Id,
+                    FechaCreacion = DateTime.UtcNow.AddDays(-45)
+                },
+                new VolunteerOpportunity
+                {
+                    Titulo = "Campaña de Nutrición Infantil",
+                    Descripcion = "Programa de educación nutricional para padres de familia y preparación de meriendas saludables para niños. Incluye talleres de cocina nutritiva y evaluación nutricional básica.",
+                    Ubicacion = "Centro de Salud Comunitario, Capotillo",
+                    FechaInicio = DateTime.UtcNow.AddDays(-60),
+                    FechaFin = DateTime.UtcNow.AddDays(-30),
+                    DuracionHoras = 60,
+                    VoluntariosRequeridos = 8,
+                    VoluntariosInscritos = 8,
+                    AreaInteres = "Salud y Nutrición",
+                    NivelExperiencia = "Intermedio",
+                    Requisitos = "Conocimientos en nutrición o salud, certificado de manipulación de alimentos",
+                    Beneficios = "Certificado en nutrición comunitaria, materiales educativos",
+                    Estatus = OpportunityStatus.Completada,
+                    OrganizacionId = fundacion.Id,
+                    FechaCreacion = DateTime.UtcNow.AddDays(-75)
+                },
+                new VolunteerOpportunity
+                {
+                    Titulo = "Actividades Recreativas y Deportivas",
+                    Descripcion = "Organización de actividades recreativas, deportivas y artísticas para niños durante vacaciones escolares. Incluye juegos, deportes, manualidades y actividades de expresión artística.",
+                    Ubicacion = "Parque Central de Los Alcarrizos",
+                    FechaInicio = DateTime.UtcNow.AddDays(-20),
+                    FechaFin = DateTime.UtcNow.AddDays(15),
+                    DuracionHoras = 50,
+                    VoluntariosRequeridos = 15,
+                    VoluntariosInscritos = 13,
+                    AreaInteres = "Recreación",
+                    NivelExperiencia = "Principiante",
+                    Requisitos = "Energía para trabajar con niños, creatividad, disponibilidad de mañana",
+                    Beneficios = "Certificado de recreación infantil, kit de materiales",
+                    Estatus = OpportunityStatus.Activa,
+                    OrganizacionId = fundacion.Id,
+                    FechaCreacion = DateTime.UtcNow.AddDays(-35)
+                }
+            };
+
+            _context.VolunteerOpportunities.AddRange(additionalOpportunities);
+            await _context.SaveChangesAsync();
+
+            // Create applications for these opportunities
+            var allFundacionOpportunities = await _context.VolunteerOpportunities
+                .Where(o => o.OrganizacionId == fundacion.Id)
+                .ToListAsync();
+
+            var applications = new List<VolunteerApplication>();
+            var activities = new List<VolunteerActivity>();
+
+            foreach (var opportunity in allFundacionOpportunities)
+            {
+                // Select volunteers for this opportunity
+                var volunteersForOpportunity = volunteers
+                    .OrderBy(x => random.Next())
+                    .Take(opportunity.VoluntariosRequeridos)
+                    .ToList();
+
+                foreach (var volunteer in volunteersForOpportunity)
+                {
+                    // Check if application already exists
+                    var existingApplication = await _context.VolunteerApplications
+                        .FirstOrDefaultAsync(va => va.UsuarioId == volunteer.Id && va.OpportunityId == opportunity.Id);
+
+                    if (existingApplication == null)
+                    {
+                        var application = new VolunteerApplication
+                        {
+                            UsuarioId = volunteer.Id,
+                            OpportunityId = opportunity.Id,
+                            Mensaje = GetRandomApplicationMessage(),
+                            Estatus = ApplicationStatus.Aceptada,
+                            FechaAplicacion = opportunity.FechaCreacion.AddDays(random.Next(1, 10)),
+                            FechaRespuesta = opportunity.FechaCreacion.AddDays(random.Next(2, 15)),
+                            NotasOrganizacion = "Candidato excelente para el programa educativo"
+                        };
+
+                        applications.Add(application);
+
+                        // Create corresponding activity if opportunity is completed or active
+                        if (opportunity.Estatus == OpportunityStatus.Completada || 
+                            (opportunity.Estatus == OpportunityStatus.Activa && opportunity.FechaInicio <= DateTime.UtcNow))
+                        {
+                            var activity = new VolunteerActivity
+                            {
+                                UsuarioId = volunteer.Id,
+                                OpportunityId = opportunity.Id,
+                                Titulo = opportunity.Titulo,
+                                Descripcion = $"Participación en {opportunity.Titulo} - Fundación Niños del Futuro",
+                                FechaInicio = opportunity.FechaInicio,
+                                FechaFin = opportunity.FechaFin ?? opportunity.FechaInicio.AddHours(opportunity.DuracionHoras),
+                                Estado = opportunity.Estatus == OpportunityStatus.Completada ? ActivityStatus.Completada : ActivityStatus.EnProgreso,
+                                HorasCompletadas = opportunity.Estatus == OpportunityStatus.Completada ? 
+                                    random.Next(opportunity.DuracionHoras - 5, opportunity.DuracionHoras + 3) : 
+                                    random.Next(0, opportunity.DuracionHoras / 2),
+                                CalificacionVoluntario = opportunity.Estatus == OpportunityStatus.Completada ? random.Next(4, 6) : null,
+                                CalificacionOrganizacion = opportunity.Estatus == OpportunityStatus.Completada ? random.Next(4, 6) : null,
+                                ComentarioVoluntario = opportunity.Estatus == OpportunityStatus.Completada ? GetRandomVolunteerComment() : null,
+                                ComentarioOrganizacion = opportunity.Estatus == OpportunityStatus.Completada ? GetRandomOrganizationComment() : null,
+                                FechaCreacion = application.FechaAplicacion
+                            };
+
+                            activities.Add(activity);
+                        }
+                    }
+                }
+            }
+
+            if (applications.Any())
+            {
+                _context.VolunteerApplications.AddRange(applications);
+                await _context.SaveChangesAsync();
+            }
+
+            if (activities.Any())
+            {
+                _context.VolunteerActivities.AddRange(activities);
+                await _context.SaveChangesAsync();
+            }
+
+            // Update volunteer statistics based on new activities
+            var completedActivities = activities.Where(a => a.Estado == ActivityStatus.Completada);
+            foreach (var volunteer in volunteers)
+            {
+                var volunteerActivities = completedActivities.Where(a => a.UsuarioId == volunteer.Id);
+                if (volunteerActivities.Any())
+                {
+                    volunteer.HorasVoluntariado += volunteerActivities.Sum(a => a.HorasCompletadas);
+                    
+                    var ratings = volunteerActivities.Where(a => a.CalificacionOrganizacion.HasValue)
+                                                   .Select(a => a.CalificacionOrganizacion.Value);
+                    if (ratings.Any())
+                    {
+                        // Recalculate average rating
+                        var totalRatings = volunteer.TotalResenas + ratings.Count();
+                        var totalRatingSum = (volunteer.CalificacionPromedio * volunteer.TotalResenas) + ratings.Sum();
+                        volunteer.CalificacionPromedio = totalRatingSum / totalRatings;
+                        volunteer.TotalResenas = totalRatings;
+                    }
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation("Enhanced data seeded for Fundación Niños del Futuro: {Apps} applications, {Activities} activities", 
+                applications.Count, activities.Count);
+        }
+
+        private async Task SeedSeasonalOpportunitiesAsync()
+        {
+            // Check if seasonal opportunities already exist
+            var existingSeasonalOpps = await _context.VolunteerOpportunities
+                .Where(o => o.Titulo.Contains("Navidad") || o.Titulo.Contains("Verano") || o.Titulo.Contains("Pascua"))
+                .AnyAsync();
+
+            if (existingSeasonalOpps)
+            {
+                _logger.LogInformation("Seasonal opportunities already exist, skipping seasonal seeding.");
+                return;
+            }
+
+            _logger.LogInformation("Seeding seasonal volunteer opportunities...");
+
+            var organizations = await _context.Organizaciones.ToListAsync();
+            if (!organizations.Any()) return;
+
+            var random = new Random();
+            var seasonalOpportunities = new List<VolunteerOpportunity>
+            {
+                new VolunteerOpportunity
+                {
+                    Titulo = "Campaña Navideña - Regalos para Niños Vulnerables",
+                    Descripcion = "Únete a nuestra campaña navideña para recolectar, envolver y entregar regalos a niños de comunidades vulnerables. Incluye organización de eventos navideños, decoración de espacios y actividades recreativas para las familias.",
+                    Ubicacion = "Santo Domingo y comunidades aledañas",
+                    FechaInicio = DateTime.UtcNow.AddDays(60), // 2 months from now
+                    FechaFin = DateTime.UtcNow.AddDays(90), // 3 months from now
+                    DuracionHoras = 24,
+                    VoluntariosRequeridos = 25,
+                    VoluntariosInscritos = 0,
+                    AreaInteres = "Eventos Especiales",
+                    NivelExperiencia = "Principiante",
+                    Requisitos = "Disponibilidad durante diciembre, actitud alegre y festiva, capacidad para trabajar con niños.",
+                    Beneficios = "Certificado especial navideño, experiencia organizando eventos comunitarios, refrigerios navideños.",
+                    Estatus = OpportunityStatus.Activa,
+                    OrganizacionId = organizations[0].Id,
+                    FechaCreacion = DateTime.UtcNow
+                },
+                new VolunteerOpportunity
+                {
+                    Titulo = "Campamento de Verano para Jóvenes",
+                    Descripcion = "Apoya nuestro campamento de verano dirigido a jóvenes de 12-17 años de comunidades de bajos recursos. Actividades incluyen deportes, arte, talleres educativos, excursiones y actividades de liderazgo juvenil.",
+                    Ubicacion = "Centro Recreativo La Vega",
+                    FechaInicio = DateTime.UtcNow.AddDays(180), // 6 months from now (summer)
+                    FechaFin = DateTime.UtcNow.AddDays(210), // 7 months from now
+                    DuracionHoras = 80,
+                    VoluntariosRequeridos = 15,
+                    VoluntariosInscritos = 0,
+                    AreaInteres = "Educación",
+                    NivelExperiencia = "Intermedio",
+                    Requisitos = "Experiencia trabajando con jóvenes, habilidades deportivas o artísticas, disponibilidad tiempo completo durante el campamento.",
+                    Beneficios = "Experiencia intensiva en educación juvenil, alojamiento y comidas incluidas, certificado de coordinador de campamento.",
+                    Estatus = OpportunityStatus.Activa,
+                    OrganizacionId = organizations[random.Next(organizations.Count)].Id,
+                    FechaCreacion = DateTime.UtcNow
+                },
+                new VolunteerOpportunity
+                {
+                    Titulo = "Celebración de Pascua con Adultos Mayores",
+                    Descripcion = "Organiza y participa en la celebración de Semana Santa y Pascua con nuestros adultos mayores. Incluye preparación de actividades religiosas, comida tradicional, presentaciones musicales y tiempo de convivencia familiar.",
+                    Ubicacion = "Hogar San Rafael, Los Alcarrizos",
+                    FechaInicio = DateTime.UtcNow.AddDays(120), // 4 months from now
+                    FechaFin = DateTime.UtcNow.AddDays(127), // Week of Easter
+                    DuracionHoras = 20,
+                    VoluntariosRequeridos = 12,
+                    VoluntariosInscritos = 0,
+                    AreaInteres = "Cuidado de Adultos Mayores",
+                    NivelExperiencia = "Principiante",
+                    Requisitos = "Respeto por tradiciones religiosas, paciencia con adultos mayores, disponibilidad durante Semana Santa.",
+                    Beneficios = "Experiencia intergeneracional única, certificado de voluntariado especial, comida tradicional incluida.",
+                    Estatus = OpportunityStatus.Activa,
+                    OrganizacionId = organizations[4].Id, // Hogar de Ancianos
+                    FechaCreacion = DateTime.UtcNow
+                }
+            };
+
+            _context.VolunteerOpportunities.AddRange(seasonalOpportunities);
+            await _context.SaveChangesAsync();
+            _logger.LogInformation("Seeded {Count} seasonal opportunities", seasonalOpportunities.Count);
+        }
+
+        private async Task SeedEmergencyResponseOpportunitiesAsync()
+        {
+            // Check if emergency response opportunities already exist
+            var existingEmergencyOpps = await _context.VolunteerOpportunities
+                .Where(o => o.Titulo.Contains("Emergencia") || o.Titulo.Contains("Desastre") || o.Titulo.Contains("Huracán"))
+                .AnyAsync();
+
+            if (existingEmergencyOpps)
+            {
+                _logger.LogInformation("Emergency response opportunities already exist, skipping emergency seeding.");
+                return;
+            }
+
+            _logger.LogInformation("Seeding emergency response volunteer opportunities...");
+
+            var organizations = await _context.Organizaciones.ToListAsync();
+            if (!organizations.Any()) return;
+
+            var emergencyOpportunities = new List<VolunteerOpportunity>
+            {
+                new VolunteerOpportunity
+                {
+                    Titulo = "Respuesta a Emergencias - Equipo de Respuesta Rápida",
+                    Descripcion = "Forma parte de nuestro equipo de respuesta rápida para desastres naturales. Recibirás entrenamiento en primeros auxilios, logística de emergencia, distribución de ayuda humanitaria y apoyo psicológico básico.",
+                    Ubicacion = "A nivel nacional - movilización según necesidad",
+                    FechaInicio = DateTime.UtcNow.AddDays(1),
+                    FechaFin = DateTime.UtcNow.AddDays(365), // Year-round availability
+                    DuracionHoras = 50,
+                    VoluntariosRequeridos = 30,
+                    VoluntariosInscritos = 0,
+                    AreaInteres = "Emergencias",
+                    NivelExperiencia = "Intermedio",
+                    Requisitos = "Disponibilidad inmediata, condición física adecuada, certificado de primeros auxilios (se puede obtener en el entrenamiento).",
+                    Beneficios = "Entrenamiento certificado en emergencias, equipos de seguridad incluidos, reconocimiento oficial de Cruz Roja.",
+                    Estatus = OpportunityStatus.Activa,
+                    OrganizacionId = organizations[1].Id, // Cruz Roja
+                    FechaCreacion = DateTime.UtcNow
+                },
+                new VolunteerOpportunity
+                {
+                    Titulo = "Preparación Comunitaria ante Huracanes",
+                    Descripcion = "Ayuda a preparar comunidades vulnerables para la temporada de huracanes. Actividades incluyen educación en prevención, distribución de kits de emergencia, identificación de refugios y capacitación en evacuación.",
+                    Ubicacion = "Zonas costeras - Samaná, Puerto Plata, Barahona",
+                    FechaInicio = DateTime.UtcNow.AddDays(30),
+                    FechaFin = DateTime.UtcNow.AddDays(150), // Before hurricane season
+                    DuracionHoras = 35,
+                    VoluntariosRequeridos = 20,
+                    VoluntariosInscritos = 0,
+                    AreaInteres = "Prevención",
+                    NivelExperiencia = "Principiante",
+                    Requisitos = "Disponibilidad para viajar a zonas costeras, habilidades de comunicación, interés en prevención de desastres.",
+                    Beneficios = "Entrenamiento en gestión de riesgos, transporte y alojamiento incluido, certificado en preparación ante desastres.",
+                    Estatus = OpportunityStatus.Activa,
+                    OrganizacionId = organizations[1].Id, // Cruz Roja
+                    FechaCreacion = DateTime.UtcNow
+                }
+            };
+
+            _context.VolunteerOpportunities.AddRange(emergencyOpportunities);
+            await _context.SaveChangesAsync();
+            _logger.LogInformation("Seeded {Count} emergency response opportunities", emergencyOpportunities.Count);
+        }
+
+        private async Task SeedSkillDevelopmentWorkshopsAsync()
+        {
+            // Check if skill development workshops already exist
+            var existingWorkshops = await _context.VolunteerOpportunities
+                .Where(o => o.Titulo.Contains("Taller") || o.Titulo.Contains("Capacitación") || o.Titulo.Contains("Curso"))
+                .AnyAsync();
+
+            if (existingWorkshops)
+            {
+                _logger.LogInformation("Skill development workshops already exist, skipping workshop seeding.");
+                return;
+            }
+
+            _logger.LogInformation("Seeding skill development workshops...");
+
+            var organizations = await _context.Organizaciones.ToListAsync();
+            if (!organizations.Any()) return;
+
+            var random = new Random();
+            var workshops = new List<VolunteerOpportunity>
+            {
+                new VolunteerOpportunity
+                {
+                    Titulo = "Taller de Habilidades Digitales para Jóvenes",
+                    Descripcion = "Enseña habilidades digitales básicas a jóvenes de comunidades vulnerables. Incluye uso de computadoras, internet seguro, herramientas de oficina, redes sociales responsables y oportunidades de empleo digital.",
+                    Ubicacion = "Centros comunitarios en Santo Domingo",
+                    FechaInicio = DateTime.UtcNow.AddDays(15),
+                    FechaFin = DateTime.UtcNow.AddDays(45), // 1 month
+                    DuracionHoras = 32,
+                    VoluntariosRequeridos = 8,
+                    VoluntariosInscritos = 0,
+                    AreaInteres = "Educación",
+                    NivelExperiencia = "Intermedio",
+                    Requisitos = "Conocimientos sólidos en informática, paciencia para enseñar, disponibilidad tardes entre semana.",
+                    Beneficios = "Experiencia en educación digital, certificado de instructor voluntario, acceso a recursos tecnológicos.",
+                    Estatus = OpportunityStatus.Activa,
+                    OrganizacionId = organizations[0].Id, // Fundación Niños del Futuro
+                    FechaCreacion = DateTime.UtcNow
+                },
+                new VolunteerOpportunity
+                {
+                    Titulo = "Capacitación en Emprendimiento para Mujeres",
+                    Descripcion = "Facilita talleres de emprendimiento dirigidos a mujeres cabeza de familia. Temas incluyen plan de negocios, finanzas básicas, marketing digital, liderazgo femenino y redes de apoyo empresarial.",
+                    Ubicacion = "Villa Mella y comunidades cercanas",
+                    FechaInicio = DateTime.UtcNow.AddDays(25),
+                    FechaFin = DateTime.UtcNow.AddDays(75), // 2 months
+                    DuracionHoras = 40,
+                    VoluntariosRequeridos = 6,
+                    VoluntariosInscritos = 0,
+                    AreaInteres = "Desarrollo Social",
+                    NivelExperiencia = "Avanzado",
+                    Requisitos = "Experiencia en negocios o emprendimiento, habilidades de facilitación, sensibilidad hacia temas de género.",
+                    Beneficios = "Red de emprendedoras sociales, certificado en facilitación empresarial, seguimiento post-capacitación.",
+                    Estatus = OpportunityStatus.Activa,
+                    OrganizacionId = organizations[3].Id, // Fundación Renacer
+                    FechaCreacion = DateTime.UtcNow
+                },
+                new VolunteerOpportunity
+                {
+                    Titulo = "Curso de Oficios Técnicos para Jóvenes",
+                    Descripcion = "Enseña oficios técnicos básicos como electricidad, plomería, carpintería y mecánica a jóvenes en riesgo social. Proporciona herramientas prácticas para generación de ingresos y inserción laboral.",
+                    Ubicacion = "Centro de Formación Técnica, Santiago",
+                    FechaInicio = DateTime.UtcNow.AddDays(40),
+                    FechaFin = DateTime.UtcNow.AddDays(130), // 3 months
+                    DuracionHoras = 72,
+                    VoluntariosRequeridos = 10,
+                    VoluntariosInscritos = 0,
+                    AreaInteres = "Capacitación Técnica",
+                    NivelExperiencia = "Avanzado",
+                    Requisitos = "Experiencia comprobada en oficios técnicos, herramientas propias, disponibilidad fines de semana.",
+                    Beneficios = "Impacto directo en inserción laboral juvenil, herramientas y materiales incluidos, certificado de instructor técnico.",
+                    Estatus = OpportunityStatus.Activa,
+                    OrganizacionId = organizations[random.Next(organizations.Count)].Id,
+                    FechaCreacion = DateTime.UtcNow
+                },
+                new VolunteerOpportunity
+                {
+                    Titulo = "Taller de Agricultura Sostenible",
+                    Descripcion = "Capacita a familias rurales en técnicas de agricultura sostenible, huertos orgánicos, compostaje, conservación de suelos y cultivos resistentes al cambio climático. Incluye componente práctico en fincas demostrativas.",
+                    Ubicacion = "Zona rural de Jarabacoa y comunidades montañosas",
+                    FechaInicio = DateTime.UtcNow.AddDays(50),
+                    FechaFin = DateTime.UtcNow.AddDays(110), // 2 months
+                    DuracionHoras = 48,
+                    VoluntariosRequeridos = 5,
+                    VoluntariosInscritos = 0,
+                    AreaInteres = "Medio Ambiente",
+                    NivelExperiencia = "Intermedio",
+                    Requisitos = "Conocimientos en agricultura o agronomía, disponibilidad para trabajo de campo, resistencia física para trabajo rural.",
+                    Beneficios = "Experiencia en desarrollo rural sostenible, alojamiento rural incluido, productos orgánicos del proyecto.",
+                    Estatus = OpportunityStatus.Activa,
+                    OrganizacionId = organizations[5].Id, // Centro de Educación Ambiental Verde
+                    FechaCreacion = DateTime.UtcNow
+                }
+            };
+
+            _context.VolunteerOpportunities.AddRange(workshops);
+            await _context.SaveChangesAsync();
+            _logger.LogInformation("Seeded {Count} skill development workshops", workshops.Count);
         }
     }
 }

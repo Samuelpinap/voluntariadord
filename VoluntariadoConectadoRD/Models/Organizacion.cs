@@ -37,6 +37,9 @@ namespace VoluntariadoConectadoRD.Models
         
         public DateTime FechaCreacion { get; set; } = DateTime.UtcNow;
         
+        // Alias for registration date (same as creation date)
+        public DateTime FechaRegistro => FechaCreacion;
+        
         public DateTime? FechaActualizacion { get; set; }
         
         public DateTime? FechaVerificacion { get; set; }
@@ -61,9 +64,14 @@ namespace VoluntariadoConectadoRD.Models
         
         public bool PerfilCompleto { get; set; } = false;
         
+        public bool Verificada { get; set; } = false;
+        
         // Usuario administrador de la organización
         public int UsuarioId { get; set; }
         public Usuario Usuario { get; set; } = null!;
+        
+        // Navigation properties
+        public virtual ICollection<VolunteerOpportunity> Opportunities { get; set; } = new List<VolunteerOpportunity>();
 
         public Organizacion()
         {
