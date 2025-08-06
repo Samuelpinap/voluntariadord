@@ -116,6 +116,23 @@ namespace VoluntariadoConectadoRD
 
             var app = builder.Build();
 
+            // Apply database migrations automatically
+            using (var scope = app.Services.CreateScope())
+            {
+                try
+                {
+                    var dbContext = scope.ServiceProvider.GetRequiredService<DbContextApplication>();
+                    dbContext.Database.Migrate();
+                    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+                    logger.LogInformation("Database migrations applied successfully.");
+                }
+                catch (Exception ex)
+                {
+                    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+                    logger.LogError(ex, "An error occurred while applying database migrations.");
+                }
+            }
+
             // // Configure the HTTP request pipeline.
             // if (app.Environment.IsDevelopment())
             // {
