@@ -73,6 +73,7 @@ namespace VoluntariadoConectadoRD
             builder.Services.AddScoped<IImageUploadService, VoluntariadoConectadoRd.Services.ImageUploadService>();
             builder.Services.AddScoped<IVolunteerService, VolunteerService>();
             builder.Services.AddScoped<IDashboardService, DashboardService>();
+            builder.Services.AddScoped<ITransparencyService, TransparencyService>();
 
             builder.Services.AddControllers();
             
