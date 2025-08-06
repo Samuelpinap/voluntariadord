@@ -161,6 +161,35 @@ namespace VoluntariadoConectadoRD.Controllers
         }
 
         /// <summary>
+        /// Get applications for a specific volunteer (Admin/Organization only)
+        /// </summary>
+        [HttpGet("applications/{volunteerId}")]
+        [RoleAuthorization(UserRole.Administrador, UserRole.Organizacion)]
+        public async Task<ActionResult<ApiResponseDto<IEnumerable<VolunteerApplicationDetailDto>>>> GetVolunteerApplications(int volunteerId)
+        {
+            try
+            {
+                var applications = await _volunteerService.GetMyApplicationsAsync(volunteerId);
+
+                return Ok(new ApiResponseDto<IEnumerable<VolunteerApplicationDetailDto>>
+                {
+                    Success = true,
+                    Message = "Aplicaciones del voluntario obtenidas exitosamente",
+                    Data = applications
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting volunteer applications for user {VolunteerId}", volunteerId);
+                return StatusCode(500, new ApiResponseDto<IEnumerable<VolunteerApplicationDetailDto>>
+                {
+                    Success = false,
+                    Message = "Error interno del servidor"
+                });
+            }
+        }
+
+        /// <summary>
         /// Get all available skills
         /// </summary>
         [HttpGet("skills")]

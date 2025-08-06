@@ -242,27 +242,6 @@ namespace VoluntariadoConectadoRD.Controllers
     }
 
     /// <summary>
-    /// Endpoint para administradores y organizaciones - Estadísticas generales
-    /// </summary>
-    [HttpGet("admin/stats")]
-    [OrganizacionOrAdmin]
-    public ActionResult<ApiResponseDto<object>> GetAdminStats()
-    {
-        return Ok(new ApiResponseDto<object>
-        {
-            Success = true,
-            Message = "Estad�sticas del sistema",
-            Data = new
-            {
-                totalUsers = 100,
-                totalOrganizations = 25,
-                totalOpportunities = 50,
-                message = "Estad�sticas generales del sistema"
-            }
-        });
-    }
-
-    /// <summary>
     /// Endpoint para voluntarios y administradores
     /// </summary>
     [HttpGet("my-applications")]
@@ -441,17 +420,48 @@ namespace VoluntariadoConectadoRD.Controllers
     /// </summary>
     [HttpPut("opportunities/{opportunityId}")]
     [OrganizacionOrAdmin]
-    public ActionResult<ApiResponseDto<object>> UpdateOpportunity(int opportunityId, [FromBody] object opportunityData)
+    public async Task<ActionResult<ApiResponseDto<OpportunityDetailDto>>> UpdateOpportunity(int opportunityId, [FromBody] UpdateOpportunityDto opportunityData)
     {
-        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
-
-        return Ok(new ApiResponseDto<object>
+        try
         {
-            Success = true,
-            Message = "Oportunidad actualizada",
-            Data = new { userId, userRole, opportunityId, message = "La oportunidad ha sido actualizada" }
-        });
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!int.TryParse(userIdClaim, out int userId))
+            {
+                return BadRequest(new ApiResponseDto<OpportunityDetailDto>
+                {
+                    Success = false,
+                    Message = "Usuario no válido"
+                });
+            }
+
+            var organizacionId = await _opportunityService.GetOrganizacionIdByUserAsync(userId);
+            if (!organizacionId.HasValue)
+            {
+                return BadRequest(new ApiResponseDto<OpportunityDetailDto>
+                {
+                    Success = false,
+                    Message = "Usuario no asociado a una organización"
+                });
+            }
+
+            var result = await _opportunityService.UpdateOpportunityAsync(opportunityId, opportunityData, organizacionId.Value);
+            
+            if (!result.Success)
+            {
+                return BadRequest(result);
+            }
+
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error updating opportunity {OpportunityId}", opportunityId);
+            return StatusCode(500, new ApiResponseDto<OpportunityDetailDto>
+            {
+                Success = false,
+                Message = "Error interno del servidor"
+            });
+        }
     }
 
     /// <summary>
@@ -486,18 +496,52 @@ namespace VoluntariadoConectadoRD.Controllers
             var activeOrganizations = await _context.Organizaciones
                 .CountAsync(o => o.Estatus == OrganizacionStatus.Activa);
 
-            // Simulate monthly donation data based on volunteer hours
+            // Calculate recurrent donors percentage from applications
+            var totalApplicants = await _context.VolunteerApplications
+                .Select(va => va.UsuarioId)
+                .Distinct()
+                .CountAsync();
+            
+            var recurrentApplicants = await _context.VolunteerApplications
+                .GroupBy(va => va.UsuarioId)
+                .Where(g => g.Count() > 1)
+                .CountAsync();
+            
+            var recurrentPercentage = totalApplicants > 0 ? (int)Math.Round((double)recurrentApplicants / totalApplicants * 100) : 0;
+
+            // Calculate growth percentage based on recent vs older applications
+            var threeMonthsAgo = DateTime.Now.AddMonths(-3);
+            var recentApplications = await _context.VolunteerApplications
+                .CountAsync(va => va.FechaAplicacion >= threeMonthsAgo);
+            var olderApplications = await _context.VolunteerApplications
+                .CountAsync(va => va.FechaAplicacion < threeMonthsAgo);
+            
+            var growthPercentage = olderApplications > 0 ? 
+                (int)Math.Round((double)(recentApplications - olderApplications) / olderApplications * 100) : 0;
+
+            // Calculate new communities from recent organizations
+            var newCommunities = await _context.Organizaciones
+                .CountAsync(o => o.FechaRegistro >= threeMonthsAgo && o.Estatus == OrganizacionStatus.Activa);
+
+            // Calculate real monthly donation data from completed volunteer hours
             var monthlyDonations = new List<MonthlyDonationDto>();
             var months = new[] { "Ene", "Feb", "Mar", "Abr", "May", "Jun" };
-            var baseAmount = totalHours * 15.5m / 6; // Average across 6 months
             
             for (int i = 0; i < months.Length; i++)
             {
-                var variation = (decimal)(0.8 + (i * 0.1)); // Growth pattern
+                var monthStart = DateTime.Now.AddMonths(-(months.Length - 1 - i)).Date.AddDays(-(DateTime.Now.Day - 1));
+                var monthEnd = monthStart.AddMonths(1);
+                
+                var monthlyHours = await _context.VolunteerActivities
+                    .Where(va => va.Estado == ActivityStatus.Completada && 
+                                va.FechaCompletada >= monthStart && 
+                                va.FechaCompletada < monthEnd)
+                    .SumAsync(va => (decimal?)va.HorasCompletadas) ?? 0;
+                
                 monthlyDonations.Add(new MonthlyDonationDto 
                 { 
                     Month = months[i], 
-                    Amount = Math.Round(baseAmount * variation, 0)
+                    Amount = Math.Round(monthlyHours * 15.5m, 0) // Estimated value per hour
                 });
             }
 
@@ -508,12 +552,12 @@ namespace VoluntariadoConectadoRD.Controllers
                 TotalDonations = Math.Round(totalHours * 15.5m, 0), // Estimated value per hour
                 ActiveProjects = totalProjects,
                 AverageDonation = totalVolunteers > 0 ? Math.Round((totalHours * 15.5m) / totalVolunteers, 0) : 0,
-                NewDonors = Math.Max(1, activeVolunteers / 10), // 10% are new
-                RecurrentDonorsPercentage = 78, // Static for now
+                NewDonors = Math.Max(1, activeVolunteers / 10), // 10% are estimated as new
+                RecurrentDonorsPercentage = recurrentPercentage,
                 PeopleBenefited = totalHours * 2, // Estimate 2 people benefited per hour
                 CommunitiesReached = activeOrganizations,
-                GrowthPercentage = 12, // Static growth percentage
-                NewCommunities = Math.Max(1, activeOrganizations / 7), // Some new communities
+                GrowthPercentage = Math.Max(-50, Math.Min(growthPercentage, 200)), // Cap between -50% and 200%
+                NewCommunities = newCommunities,
                 MonthlyDonations = monthlyDonations,
                 ImpactDistribution = new List<ImpactDistributionDto>
                 {
@@ -586,18 +630,46 @@ namespace VoluntariadoConectadoRD.Controllers
                 })
                 .ToListAsync();
 
-            // Add default image URLs based on organization type or event category
-            var imageUrls = new[]
+            // Set image URLs based on organization logos or category-specific defaults
+            var categoryImageMap = new Dictionary<string, string>
             {
-                "https://images.unsplash.com/photo-1527525443983-6e60c75fff46?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-                "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-                "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"
+                { "educación", "/images/categories/educacion.jpg" },
+                { "salud", "/images/categories/salud.jpg" },
+                { "medio ambiente", "/images/categories/medio-ambiente.jpg" },
+                { "comunitario", "/images/categories/comunitario.jpg" },
+                { "emergencia", "/images/categories/emergencia.jpg" },
+                { "default", "/images/categories/voluntariado-default.jpg" }
             };
 
-            var random = new Random();
             foreach (var evt in userEvents)
             {
-                evt.ImageUrl = imageUrls[random.Next(imageUrls.Length)];
+                // First try to use organization logo if available
+                if (!string.IsNullOrEmpty(evt.OrganizationName))
+                {
+                    // Check if organization has a logo stored in database
+                    var orgLogo = await _context.Organizaciones
+                        .Where(o => o.Nombre == evt.OrganizationName && !string.IsNullOrEmpty(o.LogoUrl))
+                        .Select(o => o.LogoUrl)
+                        .FirstOrDefaultAsync();
+                    
+                    if (!string.IsNullOrEmpty(orgLogo))
+                    {
+                        evt.ImageUrl = orgLogo;
+                        continue;
+                    }
+                }
+                
+                // Fallback to category-based image from opportunity's area of interest
+                var opportunity = await _context.VolunteerOpportunities
+                    .Where(vo => vo.Id == evt.Id)
+                    .Select(vo => vo.AreaInteres)
+                    .FirstOrDefaultAsync();
+                
+                var categoryKey = opportunity?.ToLower() ?? "default";
+                if (!categoryImageMap.ContainsKey(categoryKey))
+                    categoryKey = "default";
+                
+                evt.ImageUrl = categoryImageMap[categoryKey];
             }
 
             return Ok(new ApiResponseDto<IEnumerable<UserEventDto>>
@@ -633,26 +705,30 @@ namespace VoluntariadoConectadoRD.Controllers
                 .ToListAsync();
 
             var events = new List<OrganizationEventDto>();
-            var random = new Random();
-            var iconOptions = new[]
+            
+            // Define icons based on opportunity category or type
+            var categoryIconMap = new Dictionary<string, (string Icon, string Color)>
             {
-                new { Icon = "bi-tree", Color = "text-success" },
-                new { Icon = "bi-heart-pulse", Color = "text-danger" },
-                new { Icon = "bi-mortarboard", Color = "text-info" },
-                new { Icon = "bi-umbrella", Color = "text-warning" },
-                new { Icon = "bi-people", Color = "text-primary" },
-                new { Icon = "bi-house-heart", Color = "text-secondary" }
+                { "educación", ("bi-mortarboard", "text-info") },
+                { "salud", ("bi-heart-pulse", "text-danger") },
+                { "medio ambiente", ("bi-tree", "text-success") },
+                { "comunitario", ("bi-people", "text-primary") },
+                { "emergencia", ("bi-umbrella", "text-warning") },
+                { "default", ("bi-house-heart", "text-secondary") }
             };
 
             foreach (var opportunity in opportunities)
             {
-                var iconData = iconOptions[random.Next(iconOptions.Length)];
+                // Select icon based on category or use default
+                var categoryKey = opportunity.AreaInteres?.ToLower() ?? "default";
+                if (!categoryIconMap.ContainsKey(categoryKey))
+                    categoryKey = "default";
                 
-                // Get applications count for this opportunity
-                var applications = await _context.VolunteerApplications
+                var (icon, color) = categoryIconMap[categoryKey];
+                
+                // Get actual applications count for this opportunity
+                var participants = await _context.VolunteerApplications
                     .CountAsync(va => va.OpportunityId == opportunity.Id && va.Estatus == ApplicationStatus.Aceptada);
-                
-                var participants = Math.Max(applications, random.Next(15, 50)); // Ensure some participants
                 
                 // Determine status based on dates
                 var status = "Completado";
@@ -673,26 +749,11 @@ namespace VoluntariadoConectadoRD.Controllers
                     Location = opportunity.Ubicacion ?? "Ubicación por definir",
                     Participants = participants,
                     Status = status,
-                    Icon = iconData.Icon,
-                    IconColor = iconData.Color
+                    Icon = icon,
+                    IconColor = color
                 });
             }
 
-            // If no opportunities found, add some default events
-            if (!events.Any())
-            {
-                events.Add(new OrganizationEventDto
-                {
-                    Id = 1,
-                    Name = "Programa Inicial de Voluntariado",
-                    Date = DateTime.Now.AddDays(-30),
-                    Location = "Centro Comunitario",
-                    Participants = 25,
-                    Status = "Completado",
-                    Icon = "bi-people",
-                    IconColor = "text-success"
-                });
-            }
 
             return Ok(new ApiResponseDto<IEnumerable<OrganizationEventDto>>
             {

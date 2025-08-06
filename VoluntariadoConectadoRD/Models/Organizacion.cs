@@ -37,6 +37,9 @@ namespace VoluntariadoConectadoRD.Models
         
         public DateTime FechaCreacion { get; set; } = DateTime.UtcNow;
         
+        // Alias for registration date (same as creation date)
+        public DateTime FechaRegistro => FechaCreacion;
+        
         public DateTime? FechaActualizacion { get; set; }
         
         public DateTime? FechaVerificacion { get; set; }

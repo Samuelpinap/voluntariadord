@@ -26,6 +26,8 @@ namespace VoluntariadoConectadoRD.Models
 
         public DateTime? FechaFin { get; set; }
 
+        public DateTime? FechaCompletada { get; set; }
+
         [Range(0, 24)]
         public int HorasCompletadas { get; set; } = 0;
 

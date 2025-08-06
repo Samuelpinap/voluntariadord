@@ -29,9 +29,9 @@ namespace VoluntariadoConectadoRD
                 });
             });
             
-            // Configure Entity Framework
+            // Configure Entity Framework with SQLite
             builder.Services.AddDbContext<DbContextApplication>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+                options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             // Configure JWT Authentication
             var jwtSettings = builder.Configuration.GetSection("JwtSettings");
