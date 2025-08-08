@@ -354,7 +354,6 @@ C:/Users/ismae/Documents/VoluntariadoRD/VoluntariadoConectadoRD/obj/Debug/net8.0
 /Users/samuelpinapolanco/Development/Unibe/voluntariado/backend/VoluntariadoConectadoRD/obj/Debug/net8.0/VoluntariadoConectadoRD.sourcelink.json
 /Users/samuelpinapolanco/Development/Unibe/voluntariado/backend/VoluntariadoConectadoRD/bin/Debug/net8.0/appsettings.Development.json
 /Users/samuelpinapolanco/Development/Unibe/voluntariado/backend/VoluntariadoConectadoRD/bin/Debug/net8.0/appsettings.json
-/Users/samuelpinapolanco/Development/Unibe/voluntariado/backend/VoluntariadoConectadoRD/bin/Debug/net8.0/VoluntariadoConectadoRD.staticwebassets.runtime.json
 /Users/samuelpinapolanco/Development/Unibe/voluntariado/backend/VoluntariadoConectadoRD/bin/Debug/net8.0/VoluntariadoConectadoRD
 /Users/samuelpinapolanco/Development/Unibe/voluntariado/backend/VoluntariadoConectadoRD/bin/Debug/net8.0/VoluntariadoConectadoRD.deps.json
 /Users/samuelpinapolanco/Development/Unibe/voluntariado/backend/VoluntariadoConectadoRD/bin/Debug/net8.0/VoluntariadoConectadoRD.runtimeconfig.json

@@ -82,6 +82,7 @@ namespace VoluntariadoConectadoRD.Services
                 await SeedSeasonalOpportunitiesAsync();
                 await SeedEmergencyResponseOpportunitiesAsync();
                 await SeedSkillDevelopmentWorkshopsAsync();
+                await SeedFinancialDataAsync();
 
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
@@ -2001,6 +2002,292 @@ namespace VoluntariadoConectadoRD.Services
             _context.VolunteerOpportunities.AddRange(workshops);
             await _context.SaveChangesAsync();
             _logger.LogInformation("Seeded {Count} skill development workshops", workshops.Count);
+        }
+
+        private async Task SeedFinancialDataAsync()
+        {
+            // Check if financial data already exists
+            var existingReports = await _context.FinancialReports.AnyAsync();
+            if (existingReports)
+            {
+                _logger.LogInformation("Financial reports already exist, skipping financial data seeding.");
+                return;
+            }
+
+            _logger.LogInformation("Seeding financial data...");
+
+            var organizations = await _context.Organizaciones.ToListAsync();
+            if (!organizations.Any()) return;
+
+            var random = new Random();
+
+            // Create 2-3 financial reports per organization for different quarters/years
+            foreach (var org in organizations)
+            {
+                for (int year = 2023; year <= 2024; year++)
+                {
+                    for (int quarter = 1; quarter <= 4; quarter++)
+                    {
+                        // Skip some quarters randomly to make it more realistic
+                        if (random.Next(10) < 3) continue;
+
+                        var report = new FinancialReport
+                        {
+                            OrganizacionId = org.Id,
+                            Titulo = $"Reporte Financiero Q{quarter} {year} - {org.Nombre}",
+                            Año = year,
+                            Trimestre = quarter,
+                            TotalIngresos = 0, // Will be calculated from donations
+                            TotalGastos = 0, // Will be calculated from expenses
+                            Balance = 0, // Will be calculated
+                            Resumen = GetFinancialReportSummary(org.Nombre, quarter, year),
+                            EsPublico = true,
+                            FechaCreacion = new DateTime(year, quarter * 3, random.Next(1, 29)),
+                            FechaActualizacion = null
+                        };
+
+                        _context.FinancialReports.Add(report);
+                        await _context.SaveChangesAsync(); // Save to get the ID
+
+                        // Add donations for this report
+                        var reportDonations = GenerateDonationsForReport(report, random);
+                        _context.Donations.AddRange(reportDonations);
+
+                        // Add expenses for this report
+                        var reportExpenses = GenerateExpensesForReport(report, random);
+                        _context.Expenses.AddRange(reportExpenses);
+
+                        await _context.SaveChangesAsync(); // Save donations and expenses
+
+                        // Calculate totals and update report
+                        report.TotalIngresos = reportDonations.Sum(d => d.Monto);
+                        report.TotalGastos = reportExpenses.Sum(e => e.Monto);
+                        report.Balance = report.TotalIngresos - report.TotalGastos;
+                        
+                        _context.FinancialReports.Update(report);
+                        await _context.SaveChangesAsync(); // Save updated totals
+                    }
+                }
+            }
+
+            // Count the seeded data for logging
+            var reportCount = await _context.FinancialReports.CountAsync();
+            var expenseCount = await _context.Expenses.CountAsync();
+            var donationCount = await _context.Donations.CountAsync();
+            
+            _logger.LogInformation("Financial data seeded successfully. Total in database: {ReportCount} reports, {ExpenseCount} expenses, {DonationCount} donations", 
+                reportCount, expenseCount, donationCount);
+        }
+
+        private string GetFinancialReportSummary(string organizationName, int quarter, int year)
+        {
+            var summaries = new[]
+            {
+                $"Durante Q{quarter} {year}, {organizationName} mantuvo un enfoque sólido en la transparencia financiera y el uso eficiente de recursos para maximizar el impacto social.",
+                $"Este trimestre se caracterizó por un incremento en las actividades programáticas, reflejando nuestro compromiso con la comunidad beneficiaria.",
+                $"Los gastos operativos se mantuvieron dentro de los parámetros establecidos, permitiendo destinar la mayoría de recursos a programas directos.",
+                $"Se registró un crecimiento en las donaciones recurrentes, evidenciando la confianza de nuestros colaboradores en la gestión organizacional.",
+                $"Este período mostró una distribución equilibrada entre gastos administrativos, operativos y programáticos, cumpliendo con estándares de buenas prácticas."
+            };
+            
+            var random = new Random();
+            return summaries[random.Next(summaries.Length)];
+        }
+
+        private List<Donation> GenerateDonationsForReport(FinancialReport report, Random random)
+        {
+            var donations = new List<Donation>();
+            var donationCount = random.Next(3, 8); // 3-7 donations per report
+
+            var donorNames = new[]
+            {
+                "Fundación Internacional de Desarrollo",
+                "Empresa Nacional de Telecomunicaciones",
+                "Banco Popular Dominicano",
+                "Ministerio de Desarrollo Social",
+                "Fundación Propagas",
+                "Grupo Puntacana Foundation",
+                "USAID República Dominicana",
+                "Cooperación Española",
+                "Fundación Reservation Real",
+                "Ayuntamiento Municipal",
+                "Universidad INTEC",
+                "Claro Dominicana",
+                "Banco de Reservas",
+                "Donante Anónimo",
+                "Colecta Comunitaria"
+            };
+
+            var donationTypes = new[] { "Monetaria", "Especie" };
+            var purposes = new[]
+            {
+                "Programa de educación infantil",
+                "Proyecto de desarrollo comunitario",
+                "Campaña de salud preventiva",
+                "Capacitación técnica y laboral",
+                "Ayuda alimentaria de emergencia",
+                "Infraestructura y equipamiento",
+                "Becas educativas para jóvenes",
+                "Programa de emprendimiento femenino",
+                "Conservación del medio ambiente",
+                "Atención a población vulnerable"
+            };
+
+            for (int i = 0; i < donationCount; i++)
+            {
+                var donationType = donationTypes[random.Next(donationTypes.Length)];
+                var isRecurrent = random.Next(10) < 3; // 30% chance of being recurrent
+
+                var donation = new Donation
+                {
+                    FinancialReportId = report.Id,
+                    Donante = donorNames[random.Next(donorNames.Length)],
+                    Tipo = donationType,
+                    Monto = GenerateRealisticDonationAmount(donationType, random),
+                    Fecha = GenerateRandomDateInQuarter(report.Año, report.Trimestre, random),
+                    Proposito = purposes[random.Next(purposes.Length)],
+                    EsRecurrente = isRecurrent,
+                    FechaCreacion = report.FechaCreacion
+                };
+
+                donations.Add(donation);
+            }
+
+            return donations;
+        }
+
+        private List<Expense> GenerateExpensesForReport(FinancialReport report, Random random)
+        {
+            var expenses = new List<Expense>();
+            var expenseCount = random.Next(5, 12); // 5-11 expenses per report
+
+            var categories = new[] { "Operativo", "Programa", "Administrativo" };
+            
+            var operativeExpenses = new[]
+            {
+                "Alquiler de oficina y servicios básicos",
+                "Transporte y combustible",
+                "Comunicaciones y internet",
+                "Material de oficina y suministros",
+                "Mantenimiento de equipos",
+                "Seguridad y vigilancia"
+            };
+
+            var programExpenses = new[]
+            {
+                "Talleres y capacitaciones",
+                "Material educativo y didáctico",
+                "Alimentación para beneficiarios",
+                "Medicamentos y atención médica",
+                "Equipos y herramientas de trabajo",
+                "Eventos y actividades comunitarias",
+                "Becas y ayudas económicas",
+                "Construcción y infraestructura"
+            };
+
+            var administrativeExpenses = new[]
+            {
+                "Salarios del personal administrativo",
+                "Auditoría y consultoría legal",
+                "Capacitación del personal",
+                "Seguros y bonificaciones",
+                "Gastos bancarios y financieros",
+                "Publicidad y promoción institucional"
+            };
+
+            for (int i = 0; i < expenseCount; i++)
+            {
+                var category = categories[random.Next(categories.Length)];
+                string description;
+                
+                switch (category)
+                {
+                    case "Operativo":
+                        description = operativeExpenses[random.Next(operativeExpenses.Length)];
+                        break;
+                    case "Programa":
+                        description = programExpenses[random.Next(programExpenses.Length)];
+                        break;
+                    default: // Administrativo
+                        description = administrativeExpenses[random.Next(administrativeExpenses.Length)];
+                        break;
+                }
+
+                var expense = new Expense
+                {
+                    FinancialReportId = report.Id,
+                    Descripcion = description,
+                    Categoria = category,
+                    Monto = GenerateRealisticExpenseAmount(category, random),
+                    Fecha = GenerateRandomDateInQuarter(report.Año, report.Trimestre, random),
+                    Justificacion = GenerateExpenseJustification(category, description),
+                    DocumentoUrl = random.Next(10) < 3 ? $"/documents/receipts/receipt_{random.Next(1000, 9999)}.pdf" : null,
+                    FechaCreacion = report.FechaCreacion
+                };
+
+                expenses.Add(expense);
+            }
+
+            return expenses;
+        }
+
+        private decimal GenerateRealisticDonationAmount(string type, Random random)
+        {
+            return type switch
+            {
+                "Monetaria" => random.Next(50000, 2500000), // RD$ 50K - 2.5M
+                "Especie" => random.Next(25000, 500000), // RD$ 25K - 500K (estimated value)
+                _ => random.Next(50000, 1000000)
+            };
+        }
+
+        private decimal GenerateRealisticExpenseAmount(string category, Random random)
+        {
+            return category switch
+            {
+                "Programa" => random.Next(30000, 800000), // RD$ 30K - 800K (highest for programs)
+                "Operativo" => random.Next(15000, 300000), // RD$ 15K - 300K
+                "Administrativo" => random.Next(20000, 400000), // RD$ 20K - 400K
+                _ => random.Next(25000, 200000)
+            };
+        }
+
+        private DateTime GenerateRandomDateInQuarter(int year, int quarter, Random random)
+        {
+            int startMonth = (quarter - 1) * 3 + 1;
+            int endMonth = quarter * 3;
+            int month = random.Next(startMonth, endMonth + 1);
+            int day = random.Next(1, DateTime.DaysInMonth(year, month) + 1);
+            
+            return new DateTime(year, month, day);
+        }
+
+        private string GenerateExpenseJustification(string category, string description)
+        {
+            var justifications = category switch
+            {
+                "Operativo" => new[]
+                {
+                    "Gasto necesario para el funcionamiento básico de la organización",
+                    "Inversión requerida para mantener las operaciones administrativas",
+                    "Costo operativo esencial para la continuidad institucional"
+                },
+                "Programa" => new[]
+                {
+                    "Inversión directa en beneficiarios del programa social",
+                    "Gasto programático alineado con objetivos estratégicos",
+                    "Recurso destinado al impacto directo en la comunidad"
+                },
+                _ => new[] // Administrativo
+                {
+                    "Gasto administrativo para cumplimiento legal y financiero",
+                    "Inversión en fortalecimiento institucional y transparencia",
+                    "Costo necesario para la gestión y supervisión organizacional"
+                }
+            };
+
+            var random = new Random();
+            return justifications[random.Next(justifications.Length)];
         }
     }
 }

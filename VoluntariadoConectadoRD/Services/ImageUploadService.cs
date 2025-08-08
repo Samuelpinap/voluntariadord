@@ -209,22 +209,102 @@ namespace VoluntariadoConectadoRd.Services
         public bool IsValidImageFile(IFormFile file)
         {
             if (file == null || file.Length == 0)
+            {
+                _logger.LogWarning("File is null or empty");
                 return false;
+            }
 
             // Check file size
             if (file.Length > MaxFileSizeBytes)
+            {
+                _logger.LogWarning("File size {FileSize} exceeds maximum allowed size {MaxSize}", file.Length, MaxFileSizeBytes);
                 return false;
+            }
+
+            // Check minimum file size (avoid 1-byte malicious files)
+            if (file.Length < 100)
+            {
+                _logger.LogWarning("File size {FileSize} is too small to be a valid image", file.Length);
+                return false;
+            }
 
             // Check file extension
-            var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
-            if (!_allowedExtensions.Contains(extension))
+            var extension = Path.GetExtension(file.FileName)?.ToLowerInvariant();
+            if (string.IsNullOrEmpty(extension) || !_allowedExtensions.Contains(extension))
+            {
+                _logger.LogWarning("File extension {Extension} is not allowed", extension);
                 return false;
+            }
 
             // Check MIME type
-            if (!_allowedMimeTypes.Contains(file.ContentType.ToLowerInvariant()))
+            if (string.IsNullOrEmpty(file.ContentType) || !_allowedMimeTypes.Contains(file.ContentType.ToLowerInvariant()))
+            {
+                _logger.LogWarning("MIME type {ContentType} is not allowed", file.ContentType);
                 return false;
+            }
+
+            // Check for potentially malicious filenames
+            var fileName = Path.GetFileName(file.FileName);
+            if (string.IsNullOrEmpty(fileName) || fileName.Contains("..") || fileName.Contains("/") || fileName.Contains("\\"))
+            {
+                _logger.LogWarning("Potentially malicious filename: {FileName}", fileName);
+                return false;
+            }
+
+            // Additional security: Check file signature (magic bytes)
+            if (!IsValidImageFileSignature(file))
+            {
+                _logger.LogWarning("File signature validation failed for {FileName}", fileName);
+                return false;
+            }
 
             return true;
+        }
+
+        private bool IsValidImageFileSignature(IFormFile file)
+        {
+            try
+            {
+                using var reader = new BinaryReader(file.OpenReadStream());
+                var bytes = reader.ReadBytes(8);
+                
+                // Check for common image file signatures
+                // JPEG: FF D8 FF
+                if (bytes.Length >= 3 && bytes[0] == 0xFF && bytes[1] == 0xD8 && bytes[2] == 0xFF)
+                    return true;
+                
+                // PNG: 89 50 4E 47 0D 0A 1A 0A
+                if (bytes.Length >= 8 && bytes[0] == 0x89 && bytes[1] == 0x50 && bytes[2] == 0x4E && bytes[3] == 0x47)
+                    return true;
+                
+                // GIF: GIF87a or GIF89a
+                if (bytes.Length >= 6)
+                {
+                    var header = System.Text.Encoding.ASCII.GetString(bytes, 0, 6);
+                    if (header == "GIF87a" || header == "GIF89a")
+                        return true;
+                }
+                
+                // WebP: RIFF....WEBP
+                if (bytes.Length >= 8)
+                {
+                    var riff = System.Text.Encoding.ASCII.GetString(bytes, 0, 4);
+                    if (riff == "RIFF")
+                        return true; // Simplified WebP check
+                }
+                
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error validating file signature");
+                return false;
+            }
+            finally
+            {
+                // Reset stream position
+                file.OpenReadStream().Position = 0;
+            }
         }
 
         private string GenerateUniqueFileName(string originalFileName)
