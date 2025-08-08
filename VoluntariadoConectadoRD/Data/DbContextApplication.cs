@@ -23,6 +23,10 @@ namespace VoluntariadoConectadoRD.Data
         public DbSet<FinancialReport> FinancialReports { get; set; }
         public DbSet<Expense> Expenses { get; set; }
         public DbSet<Donation> Donations { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
+        public DbSet<UserOnlineStatus> UserOnlineStatuses { get; set; }
+        public DbSet<Message> Messages { get; set; }
+        public DbSet<Conversation> Conversations { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -297,6 +301,125 @@ namespace VoluntariadoConectadoRD.Data
             modelBuilder.Entity<FinancialReport>().ToTable("financial_reports");
             modelBuilder.Entity<Expense>().ToTable("expenses");
             modelBuilder.Entity<Donation>().ToTable("donations");
+            // Configuración para Notification
+            modelBuilder.Entity<Notification>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Title).IsRequired().HasMaxLength(100);
+                entity.Property(e => e.Message).IsRequired().HasMaxLength(500);
+                entity.Property(e => e.Type).IsRequired().HasMaxLength(50);
+                entity.Property(e => e.ActionUrl).HasMaxLength(200);
+                entity.Property(e => e.Data).HasColumnType("TEXT");
+
+                // Relación con Usuario (Recipient)
+                entity.HasOne(e => e.Recipient)
+                      .WithMany()
+                      .HasForeignKey(e => e.RecipientId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                // Relación con Usuario (Sender) - Opcional
+                entity.HasOne(e => e.Sender)
+                      .WithMany()
+                      .HasForeignKey(e => e.SenderId)
+                      .OnDelete(DeleteBehavior.SetNull);
+
+                // Índices para mejorar performance
+                entity.HasIndex(e => e.RecipientId);
+                entity.HasIndex(e => e.Type);
+                entity.HasIndex(e => e.IsRead);
+                entity.HasIndex(e => e.CreatedAt);
+            });
+
+            // Configuración para UserOnlineStatus
+            modelBuilder.Entity<UserOnlineStatus>(entity =>
+            {
+                entity.HasKey(e => e.UserId);
+                entity.Property(e => e.ConnectionId).HasMaxLength(100);
+
+                // Relación con Usuario
+                entity.HasOne(e => e.User)
+                      .WithOne()
+                      .HasForeignKey<UserOnlineStatus>(e => e.UserId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                // Índices
+                entity.HasIndex(e => e.IsOnline);
+                entity.HasIndex(e => e.LastSeen);
+            });
+
+            // Configuración para Message
+            modelBuilder.Entity<Message>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Content).IsRequired().HasMaxLength(2000);
+                entity.Property(e => e.ConversationId).IsRequired().HasMaxLength(50);
+                entity.Property(e => e.AttachmentFileName).HasMaxLength(255);
+                entity.Property(e => e.AttachmentMimeType).HasMaxLength(100);
+                entity.Property(e => e.AttachmentUrl).HasMaxLength(500);
+
+                // Relaciones
+                entity.HasOne(e => e.Sender)
+                      .WithMany()
+                      .HasForeignKey(e => e.SenderId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.Recipient)
+                      .WithMany()
+                      .HasForeignKey(e => e.RecipientId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.ReplyToMessage)
+                      .WithMany(e => e.Replies)
+                      .HasForeignKey(e => e.ReplyToMessageId)
+                      .OnDelete(DeleteBehavior.SetNull);
+
+                // Índices para performance
+                entity.HasIndex(e => e.SenderId);
+                entity.HasIndex(e => e.RecipientId);
+                entity.HasIndex(e => e.ConversationId);
+                entity.HasIndex(e => e.SentAt);
+                entity.HasIndex(e => e.IsRead);
+                entity.HasIndex(e => e.IsDeleted);
+                entity.HasIndex(e => new { e.RecipientId, e.IsRead, e.IsDeleted });
+            });
+
+            // Configuración para Conversation
+            modelBuilder.Entity<Conversation>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Id).HasMaxLength(50);
+
+                // Relaciones
+                entity.HasOne(e => e.User1)
+                      .WithMany()
+                      .HasForeignKey(e => e.User1Id)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.User2)
+                      .WithMany()
+                      .HasForeignKey(e => e.User2Id)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.LastMessage)
+                      .WithMany()
+                      .HasForeignKey(e => e.LastMessageId)
+                      .OnDelete(DeleteBehavior.SetNull);
+
+                // Relación con Messages
+                entity.HasMany(e => e.Messages)
+                      .WithOne()
+                      .HasForeignKey(m => m.ConversationId)
+                      .HasPrincipalKey(c => c.Id)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                // Índices
+                entity.HasIndex(e => e.User1Id);
+                entity.HasIndex(e => e.User2Id);
+                entity.HasIndex(e => e.LastMessageAt);
+                entity.HasIndex(e => e.IsArchived);
+                entity.HasIndex(e => new { e.User1Id, e.User1HasUnread });
+                entity.HasIndex(e => new { e.User2Id, e.User2HasUnread });
+            });
         }
     }
 }

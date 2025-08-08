@@ -4,12 +4,13 @@ namespace VoluntariadoConectadoRD.Models.DTOs
 {
     public class LoginRequestDto
     {
-        [Required]
-        [EmailAddress]
+        [Required(ErrorMessage = "El email es requerido")]
+        [EmailAddress(ErrorMessage = "El formato del email es inválido")]
+        [StringLength(254, ErrorMessage = "El email no puede exceder 254 caracteres")]
         public string Email { get; set; } = string.Empty;
         
-        [Required]
-        [MinLength(6)]
+        [Required(ErrorMessage = "La contraseña es requerida")]
+        [StringLength(100, MinimumLength = 8, ErrorMessage = "La contraseña debe tener entre 8 y 100 caracteres")]
         public string Password { get; set; } = string.Empty;
     }
 
@@ -23,28 +24,36 @@ namespace VoluntariadoConectadoRD.Models.DTOs
 
     public class RegisterVoluntarioDto
     {
-        [Required]
-        [StringLength(100)]
+        [Required(ErrorMessage = "El nombre es requerido")]
+        [StringLength(100, MinimumLength = 2, ErrorMessage = "El nombre debe tener entre 2 y 100 caracteres")]
+        [RegularExpression(@"^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$", ErrorMessage = "El nombre solo puede contener letras y espacios")]
         public string Nombre { get; set; } = string.Empty;
         
-        [Required]
-        [StringLength(100)]
+        [Required(ErrorMessage = "El apellido es requerido")]
+        [StringLength(100, MinimumLength = 2, ErrorMessage = "El apellido debe tener entre 2 y 100 caracteres")]
+        [RegularExpression(@"^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$", ErrorMessage = "El apellido solo puede contener letras y espacios")]
         public string Apellido { get; set; } = string.Empty;
         
-        [Required]
-        [EmailAddress]
+        [Required(ErrorMessage = "El email es requerido")]
+        [EmailAddress(ErrorMessage = "El formato del email es inválido")]
+        [StringLength(254, ErrorMessage = "El email no puede exceder 254 caracteres")]
         public string Email { get; set; } = string.Empty;
         
-        [Required]
-        [MinLength(6)]
+        [Required(ErrorMessage = "La contraseña es requerida")]
+        [StringLength(100, MinimumLength = 8, ErrorMessage = "La contraseña debe tener entre 8 y 100 caracteres")]
+        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,}$", 
+            ErrorMessage = "La contraseña debe contener al menos una mayúscula, una minúscula, un número y un carácter especial")]
         public string Password { get; set; } = string.Empty;
         
-        [Phone]
+        [Phone(ErrorMessage = "El formato del teléfono es inválido")]
+        [StringLength(20, ErrorMessage = "El teléfono no puede exceder 20 caracteres")]
         public string? Telefono { get; set; }
         
+        [StringLength(500, ErrorMessage = "La dirección no puede exceder 500 caracteres")]
         public string? Direccion { get; set; }
         
-        [Required]
+        [Required(ErrorMessage = "La fecha de nacimiento es requerida")]
+        [DataType(DataType.Date, ErrorMessage = "Formato de fecha inválido")]
         public DateTime FechaNacimiento { get; set; }
     }
 
@@ -92,6 +101,30 @@ namespace VoluntariadoConectadoRD.Models.DTOs
         
         [Required]
         public DateTime FechaNacimientoAdmin { get; set; }
+    }
+
+    public class ForgotPasswordDto
+    {
+        [Required(ErrorMessage = "El email es requerido")]
+        [EmailAddress(ErrorMessage = "El formato del email es inválido")]
+        [StringLength(254, ErrorMessage = "El email no puede exceder 254 caracteres")]
+        public string Email { get; set; } = string.Empty;
+    }
+
+    public class ResetPasswordDto
+    {
+        [Required(ErrorMessage = "El token es requerido")]
+        public string Token { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "El email es requerido")]
+        [EmailAddress(ErrorMessage = "El formato del email es inválido")]
+        public string Email { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "La nueva contraseña es requerida")]
+        [StringLength(100, MinimumLength = 8, ErrorMessage = "La contraseña debe tener entre 8 y 100 caracteres")]
+        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,}$", 
+            ErrorMessage = "La contraseña debe contener al menos una mayúscula, una minúscula, un número y un carácter especial")]
+        public string NewPassword { get; set; } = string.Empty;
     }
 
     public class UserInfoDto

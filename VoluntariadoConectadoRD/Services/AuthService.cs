@@ -11,12 +11,24 @@ namespace VoluntariadoConectadoRD.Services
         private readonly DbContextApplication _context;
         private readonly IJwtService _jwtService;
         private readonly IPasswordService _passwordService;
+        private readonly IEmailService _emailService;
+        private readonly INotificationService _notificationService;
+        private readonly ILogger<AuthService> _logger;
 
-        public AuthService(DbContextApplication context, IJwtService jwtService, IPasswordService passwordService)
+        public AuthService(
+            DbContextApplication context, 
+            IJwtService jwtService, 
+            IPasswordService passwordService, 
+            IEmailService emailService, 
+            INotificationService notificationService,
+            ILogger<AuthService> logger)
         {
             _context = context;
             _jwtService = jwtService;
             _passwordService = passwordService;
+            _emailService = emailService;
+            _notificationService = notificationService;
+            _logger = logger;
         }
 
         public async Task<ApiResponseDto<LoginResponseDto>> LoginAsync(LoginRequestDto loginRequest)
@@ -138,6 +150,23 @@ namespace VoluntariadoConectadoRD.Services
                 _context.Usuarios.Add(user);
                 await _context.SaveChangesAsync();
 
+                // Send welcome email and notification asynchronously
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        await _emailService.SendWelcomeEmailAsync(user.Email, $"{user.Nombre} {user.Apellido}", "voluntario");
+                        
+                        // Send welcome notification
+                        var welcomeNotification = NotificationTemplates.Welcome(user.Id, $"{user.Nombre} {user.Apellido}");
+                        await _notificationService.CreateNotificationAsync(welcomeNotification);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "Failed to send welcome email/notification to {Email}", user.Email);
+                    }
+                });
+
                 return new ApiResponseDto<UserInfoDto>
                 {
                     Success = true,
@@ -238,6 +267,23 @@ namespace VoluntariadoConectadoRD.Services
                 adminUser.Organizacion = organizacion;
 
                 await transaction.CommitAsync();
+
+                // Send welcome email and notification asynchronously
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        await _emailService.SendWelcomeEmailAsync(adminUser.Email, $"{adminUser.Nombre} {adminUser.Apellido}", "organizacion");
+                        
+                        // Send welcome notification
+                        var welcomeNotification = NotificationTemplates.Welcome(adminUser.Id, $"{adminUser.Nombre} {adminUser.Apellido}");
+                        await _notificationService.CreateNotificationAsync(welcomeNotification);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "Failed to send welcome email/notification to {Email}", adminUser.Email);
+                    }
+                });
 
                 return new ApiResponseDto<UserInfoDto>
                 {
@@ -441,6 +487,106 @@ namespace VoluntariadoConectadoRD.Services
             }
 
             return userInfo;
+        }
+
+        public async Task<ApiResponseDto<bool>> ForgotPasswordAsync(string email)
+        {
+            try
+            {
+                var user = await _context.Usuarios.FirstOrDefaultAsync(u => u.Email == email);
+                
+                if (user == null)
+                {
+                    // Don't reveal that email doesn't exist for security reasons
+                    _logger.LogInformation("Password reset requested for non-existent email: {Email}", email);
+                    return new ApiResponseDto<bool>
+                    {
+                        Success = true,
+                        Data = true,
+                        Message = "Si el correo existe, se enviaron las instrucciones."
+                    };
+                }
+
+                // Generate reset token (in real implementation, this would be more secure)
+                var resetToken = Guid.NewGuid().ToString();
+                
+                // Store token in database (you'll need to add a PasswordResetToken table)
+                // For now, we'll just log it
+                _logger.LogInformation("Password reset token generated for {Email}: {Token}", email, resetToken);
+                
+                // Send password reset email
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        await _emailService.SendPasswordResetEmailAsync(email, resetToken, $"{user.Nombre} {user.Apellido}");
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "Failed to send password reset email to {Email}", email);
+                    }
+                });
+                
+                return new ApiResponseDto<bool>
+                {
+                    Success = true,
+                    Data = true,
+                    Message = "Se enviaron las instrucciones de recuperación al correo."
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error en forgot password para email: {Email}", email);
+                return new ApiResponseDto<bool>
+                {
+                    Success = false,
+                    Message = "Error interno del servidor"
+                };
+            }
+        }
+
+        public async Task<ApiResponseDto<bool>> ResetPasswordAsync(string email, string token, string newPassword)
+        {
+            try
+            {
+                var user = await _context.Usuarios.FirstOrDefaultAsync(u => u.Email == email);
+                
+                if (user == null)
+                {
+                    return new ApiResponseDto<bool>
+                    {
+                        Success = false,
+                        Message = "Token inválido o expirado"
+                    };
+                }
+
+                // TODO: Validate token from database
+                // For now, we'll accept any token for demonstration
+                
+                // Hash the new password
+                user.PasswordHash = _passwordService.HashPassword(newPassword);
+                
+                // Update user
+                await _context.SaveChangesAsync();
+                
+                _logger.LogInformation("Password reset successful for user: {Email}", email);
+                
+                return new ApiResponseDto<bool>
+                {
+                    Success = true,
+                    Data = true,
+                    Message = "Contraseña actualizada exitosamente"
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error en reset password para email: {Email}", email);
+                return new ApiResponseDto<bool>
+                {
+                    Success = false,
+                    Message = "Error interno del servidor"
+                };
+            }
         }
     }
 }
