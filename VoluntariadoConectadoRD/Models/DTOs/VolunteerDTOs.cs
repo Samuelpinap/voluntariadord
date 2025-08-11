@@ -23,22 +23,6 @@ namespace VoluntariadoConectadoRD.Models.DTOs
     }
 
     // Skill DTOs
-    public class SkillDto
-    {
-        public int Id { get; set; }
-        public string Nombre { get; set; } = string.Empty;
-        public string? Descripcion { get; set; }
-        public string? Categoria { get; set; }
-    }
-
-    public class UserSkillDto
-    {
-        public int Id { get; set; }
-        public string Nombre { get; set; } = string.Empty;
-        public int Nivel { get; set; }
-        public string? Categoria { get; set; }
-        public DateTime FechaCreacion { get; set; }
-    }
 
     public class CreateUserSkillDto
     {

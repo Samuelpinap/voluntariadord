@@ -152,15 +152,6 @@ namespace VoluntariadoConectadoRD.Models.DTOs
         public List<ResenaDto>? UltimasResenas { get; set; }
     }
 
-    public class BadgeDto
-    {
-        public int Id { get; set; }
-        public string Nombre { get; set; } = string.Empty;
-        public string? Descripcion { get; set; }
-        public string? IconoUrl { get; set; }
-        public string Color { get; set; } = "primary";
-        public DateTime FechaObtenido { get; set; }
-    }
 
     public class ResenaDto
     {

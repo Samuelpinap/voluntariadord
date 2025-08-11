@@ -513,3 +513,8 @@ C:/Users/ismae/Documents/VoluntariadoRD/VoluntariadoConectadoRD/obj/Debug/net8.0
 /Users/samuelpinapolanco/Development/Unibe/voluntariado/backend/VoluntariadoConectadoRD/bin/Debug/net8.0/runtimes/win-arm64/native/e_sqlite3.dll
 /Users/samuelpinapolanco/Development/Unibe/voluntariado/backend/VoluntariadoConectadoRD/bin/Debug/net8.0/runtimes/win-x64/native/e_sqlite3.dll
 /Users/samuelpinapolanco/Development/Unibe/voluntariado/backend/VoluntariadoConectadoRD/bin/Debug/net8.0/runtimes/win-x86/native/e_sqlite3.dll
+/Users/samuelpinapolanco/Development/Unibe/voluntariado/backend/VoluntariadoConectadoRD/bin/Debug/net8.0/appsettings.Production.json
+/Users/samuelpinapolanco/Development/Unibe/voluntariado/backend/VoluntariadoConectadoRD/bin/Debug/net8.0/Microsoft.ApplicationInsights.dll
+/Users/samuelpinapolanco/Development/Unibe/voluntariado/backend/VoluntariadoConectadoRD/bin/Debug/net8.0/Microsoft.Extensions.Logging.ApplicationInsights.dll
+/Users/samuelpinapolanco/Development/Unibe/voluntariado/backend/VoluntariadoConectadoRD/bin/Debug/net8.0/Newtonsoft.Json.dll
+/Users/samuelpinapolanco/Development/Unibe/voluntariado/backend/VoluntariadoConectadoRD/bin/Debug/net8.0/System.Net.WebSockets.WebSocketProtocol.dll

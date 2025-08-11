@@ -209,7 +209,7 @@ namespace VoluntariadoConectadoRD.Models.DTOs
                 new CreateBadgeDto
                 {
                     Nombre = "Líder Comunitario",
-                    Descripción = "Organizó múltiples oportunidades de voluntariado",
+                    Descripcion = "Organizó múltiples oportunidades de voluntariado",
                     IconoUrl = "/images/badges/lider-comunitario.png",
                     Color = "#dc3545",
                     Categoria = BadgeCategories.LIDERAZGO,

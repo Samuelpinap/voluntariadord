@@ -17,7 +17,7 @@ namespace VoluntariadoConectadoRD.Services
         Task<bool> UpdateUserSkillAsync(int userId, int skillId, UpdateUserSkillDto updateDto);
         Task<List<SkillDto>> SearchSkillsAsync(string searchTerm);
         Task<SkillStatsDto> GetSkillStatsAsync();
-        Task<List<UserSkillDto>> GetUsersWithSkillAsync(int skillId, int page = 1, int pageSize = 20);
+        Task<List<UserSkillDetailDto>> GetUsersWithSkillAsync(int skillId, int page = 1, int pageSize = 20);
         Task<List<SkillDto>> GetSkillsForOpportunityMatchingAsync(int userId);
         Task SeedDefaultSkillsAsync();
     }
@@ -75,7 +75,7 @@ namespace VoluntariadoConectadoRD.Services
                     EsActivo = us.Skill.EsActivo,
                     FechaCreacion = us.Skill.FechaCreacion,
                     TotalUsuarios = 0, // Will be calculated separately if needed
-                    Nivel = us.Nivel,
+                    Nivel = us.Nivel.ToString(),
                     Certificacion = us.Certificacion,
                     FechaAdquisicion = us.FechaAdquisicion
                 }).ToList();
@@ -194,12 +194,19 @@ namespace VoluntariadoConectadoRD.Services
                     return false;
                 }
 
+                // Parse nivel to int, default to 50 if not provided
+                int nivelInt = 50;
+                if (!string.IsNullOrEmpty(nivel) && int.TryParse(nivel, out int parsedNivel))
+                {
+                    nivelInt = Math.Max(1, Math.Min(100, parsedNivel)); // Ensure it's between 1-100
+                }
+
                 // Add the skill
                 var userSkill = new UsuarioSkill
                 {
                     UsuarioId = userId,
                     SkillId = skillId,
-                    Nivel = nivel,
+                    Nivel = nivelInt,
                     Certificacion = certificacion,
                     FechaAdquisicion = DateTime.UtcNow
                 };
@@ -256,7 +263,11 @@ namespace VoluntariadoConectadoRD.Services
                     return false;
                 }
 
-                userSkill.Nivel = updateDto.Nivel;
+                // Parse nivel to int if provided
+                if (!string.IsNullOrEmpty(updateDto.Nivel) && int.TryParse(updateDto.Nivel, out int parsedNivel))
+                {
+                    userSkill.Nivel = Math.Max(1, Math.Min(100, parsedNivel)); // Ensure it's between 1-100
+                }
                 userSkill.Certificacion = updateDto.Certificacion;
 
                 await _context.SaveChangesAsync();
@@ -346,7 +357,7 @@ namespace VoluntariadoConectadoRD.Services
             }
         }
 
-        public async Task<List<UserSkillDto>> GetUsersWithSkillAsync(int skillId, int page = 1, int pageSize = 20)
+        public async Task<List<UserSkillDetailDto>> GetUsersWithSkillAsync(int skillId, int page = 1, int pageSize = 20)
         {
             try
             {
@@ -359,7 +370,7 @@ namespace VoluntariadoConectadoRD.Services
                     .Take(pageSize)
                     .ToListAsync();
 
-                return userSkills.Select(us => new UserSkillDto
+                return userSkills.Select(us => new UserSkillDetailDto
                 {
                     UsuarioId = us.UsuarioId,
                     SkillId = us.SkillId,
@@ -371,9 +382,9 @@ namespace VoluntariadoConectadoRD.Services
                         ImagenUrl = us.Usuario.ImagenUrl
                     },
                     Skill = MapToSkillDto(us.Skill),
-                    Nivel = us.Nivel,
+                    Nivel = us.Nivel.ToString(),
                     Certificacion = us.Certificacion,
-                    FechaAdquisicion = us.FechaAdquisicion
+                    FechaAdquisicion = us.FechaAdquisicion ?? DateTime.UtcNow
                 }).ToList();
             }
             catch (Exception ex)

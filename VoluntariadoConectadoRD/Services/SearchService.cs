@@ -32,7 +32,7 @@ namespace VoluntariadoConectadoRD.Services
                 var query = _context.VolunteerOpportunities
                     .Include(o => o.Organizacion)
                     .Include(o => o.VolunteerApplications)
-                    .Where(o => o.Estado == "Activo");
+                    .Where(o => o.Estatus == OpportunityStatus.Activa);
 
                 // Apply search filters
                 if (!string.IsNullOrEmpty(searchDto.SearchTerm))
@@ -117,7 +117,7 @@ namespace VoluntariadoConectadoRD.Services
             try
             {
                 var query = _context.Usuarios
-                    .Where(u => u.Rol == 1 && u.Estado == 1); // Voluntarios activos
+                    .Where(u => u.Rol == UserRole.Voluntario && u.Estatus == UserStatus.Activo); // Voluntarios activos
 
                 // Apply search filters
                 if (!string.IsNullOrEmpty(searchDto.SearchTerm))
@@ -152,7 +152,7 @@ namespace VoluntariadoConectadoRD.Services
                 if (searchDto.IsActive.HasValue)
                 {
                     var statusFilter = searchDto.IsActive.Value ? 1 : 2;
-                    query = query.Where(u => u.Estado == statusFilter);
+                    query = query.Where(u => u.Estatus == (UserStatus)statusFilter);
                 }
 
                 // Apply sorting
@@ -199,7 +199,7 @@ namespace VoluntariadoConectadoRD.Services
             {
                 var query = _context.Organizaciones
                     .Include(o => o.Usuario)
-                    .Where(o => o.Usuario.Estado == 1); // Organizaciones activas
+                    .Where(o => o.Usuario.Estatus == UserStatus.Activo); // Organizaciones activas
 
                 // Apply search filters
                 if (!string.IsNullOrEmpty(searchDto.SearchTerm))
@@ -268,7 +268,7 @@ namespace VoluntariadoConectadoRD.Services
                 {
                     var opportunities = await _context.VolunteerOpportunities
                         .Include(o => o.Organizacion)
-                        .Where(o => o.Estado == "Activo" && 
+                        .Where(o => o.Estatus == OpportunityStatus.Activa && 
                                (o.Titulo.ToLower().Contains(term) || 
                                 o.Descripcion.ToLower().Contains(term)))
                         .Take(searchDto.Limit)
@@ -290,7 +290,7 @@ namespace VoluntariadoConectadoRD.Services
                 if (searchDto.Type == "all" || searchDto.Type == "volunteers")
                 {
                     var volunteers = await _context.Usuarios
-                        .Where(u => u.Rol == 1 && u.Estado == 1 &&
+                        .Where(u => u.Rol == UserRole.Voluntario && u.Estatus == UserStatus.Activo &&
                                (u.Nombre.ToLower().Contains(term) || 
                                 u.Apellido.ToLower().Contains(term)))
                         .Take(searchDto.Limit)
@@ -313,7 +313,7 @@ namespace VoluntariadoConectadoRD.Services
                 {
                     var organizations = await _context.Organizaciones
                         .Include(o => o.Usuario)
-                        .Where(o => o.Usuario.Estado == 1 &&
+                        .Where(o => o.Usuario.Estatus == UserStatus.Activo &&
                                (o.Nombre.ToLower().Contains(term) || 
                                 o.Descripcion.ToLower().Contains(term)))
                         .Take(searchDto.Limit)
@@ -354,8 +354,8 @@ namespace VoluntariadoConectadoRD.Services
                     case "opportunities":
                         // Categories
                         filters.Categories = await _context.VolunteerOpportunities
-                            .Where(o => o.Estado == "Activo" && !string.IsNullOrEmpty(o.Categoria))
-                            .GroupBy(o => o.Categoria)
+                            .Where(o => o.Estatus == OpportunityStatus.Activa && !string.IsNullOrEmpty(o.AreaInteres))
+                            .GroupBy(o => o.AreaInteres)
                             .Select(g => new FilterOption
                             {
                                 Value = g.Key,
@@ -367,7 +367,7 @@ namespace VoluntariadoConectadoRD.Services
 
                         // Locations
                         filters.Locations = await _context.VolunteerOpportunities
-                            .Where(o => o.Estado == "Activo" && !string.IsNullOrEmpty(o.Ubicacion))
+                            .Where(o => o.Estatus == OpportunityStatus.Activa && !string.IsNullOrEmpty(o.Ubicacion))
                             .GroupBy(o => o.Ubicacion)
                             .Select(g => new FilterOption
                             {
@@ -381,7 +381,7 @@ namespace VoluntariadoConectadoRD.Services
                         // Organizations
                         filters.Organizations = await _context.VolunteerOpportunities
                             .Include(o => o.Organizacion)
-                            .Where(o => o.Estado == "Activo")
+                            .Where(o => o.Estatus == OpportunityStatus.Activa)
                             .GroupBy(o => new { o.Organizacion.Id, o.Organizacion.Nombre })
                             .Select(g => new FilterOption
                             {
@@ -394,7 +394,7 @@ namespace VoluntariadoConectadoRD.Services
 
                         // Duration range
                         var durationStats = await _context.VolunteerOpportunities
-                            .Where(o => o.Estado == "Activo")
+                            .Where(o => o.Estatus == OpportunityStatus.Activa)
                             .GroupBy(o => 1)
                             .Select(g => new { 
                                 Min = g.Min(o => o.DuracionHoras), 
@@ -416,11 +416,11 @@ namespace VoluntariadoConectadoRD.Services
                     case "volunteers":
                         // Experience range
                         var experienceStats = await _context.Usuarios
-                            .Where(u => u.Rol == 1 && u.Estado == 1)
+                            .Where(u => u.Rol == UserRole.Voluntario && u.Estatus == UserStatus.Activo && u.ExperienciaAnios.HasValue)
                             .GroupBy(u => 1)
                             .Select(g => new { 
-                                Min = g.Min(u => u.ExperienciaAnios), 
-                                Max = g.Max(u => u.ExperienciaAnios) 
+                                Min = g.Min(u => u.ExperienciaAnios) ?? 0, 
+                                Max = g.Max(u => u.ExperienciaAnios) ?? 0
                             })
                             .FirstOrDefaultAsync();
 
@@ -435,7 +435,7 @@ namespace VoluntariadoConectadoRD.Services
 
                         // Locations
                         filters.Locations = await _context.Usuarios
-                            .Where(u => u.Rol == 1 && u.Estado == 1 && !string.IsNullOrEmpty(u.Ubicacion))
+                            .Where(u => u.Rol == UserRole.Voluntario && u.Estatus == UserStatus.Activo && !string.IsNullOrEmpty(u.Ubicacion))
                             .GroupBy(u => u.Ubicacion)
                             .Select(g => new FilterOption
                             {
@@ -452,7 +452,7 @@ namespace VoluntariadoConectadoRD.Services
                         // Categories
                         filters.Categories = await _context.Organizaciones
                             .Include(o => o.Usuario)
-                            .Where(o => o.Usuario.Estado == 1 && !string.IsNullOrEmpty(o.TipoOrganizacion))
+                            .Where(o => o.Usuario.Estatus == UserStatus.Activo && !string.IsNullOrEmpty(o.TipoOrganizacion))
                             .GroupBy(o => o.TipoOrganizacion)
                             .Select(g => new FilterOption
                             {
@@ -466,7 +466,7 @@ namespace VoluntariadoConectadoRD.Services
                         // Locations
                         filters.Locations = await _context.Organizaciones
                             .Include(o => o.Usuario)
-                            .Where(o => o.Usuario.Estado == 1 && !string.IsNullOrEmpty(o.Direccion))
+                            .Where(o => o.Usuario.Estatus == UserStatus.Activo && !string.IsNullOrEmpty(o.Direccion))
                             .GroupBy(o => o.Direccion)
                             .Select(g => new FilterOption
                             {

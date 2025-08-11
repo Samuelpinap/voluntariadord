@@ -44,6 +44,9 @@ namespace VoluntariadoConectadoRD.Models
         
         public DateTime? FechaVerificacion { get; set; }
         
+        // Compatibility property
+        public bool EsVerificada => Estatus == OrganizacionStatus.Verificada;
+        
         // Extended Organization Profile Fields
         [StringLength(100)]
         public string? TipoOrganizacion { get; set; }
@@ -84,6 +87,7 @@ namespace VoluntariadoConectadoRD.Models
         Inactiva = 2,
         Suspendida = 3,
         PendienteVerificacion = 4,
-        Rechazada = 5
+        Rechazada = 5,
+        Verificada = 6
     }
 }

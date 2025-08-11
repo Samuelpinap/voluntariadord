@@ -87,6 +87,15 @@ namespace VoluntariadoConectadoRD.Models.DTOs
 
     public class UserSkillDto
     {
+        public int Id { get; set; }
+        public string Nombre { get; set; } = string.Empty;
+        public int Nivel { get; set; }
+        public string? Categoria { get; set; }
+        public DateTime FechaCreacion { get; set; }
+    }
+
+    public class UserSkillDetailDto
+    {
         public int UsuarioId { get; set; }
         public int SkillId { get; set; }
         public UserBasicDto Usuario { get; set; } = new UserBasicDto();

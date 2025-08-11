@@ -103,6 +103,30 @@ namespace VoluntariadoConectadoRd.Services
             }
         }
 
+        public async Task<ImageUploadResponseDto> UploadFileAsync(IFormFile file, string folder)
+        {
+            if (!IsValidImageFile(file))
+                throw new ArgumentException("Archivo de imagen no válido");
+
+            try
+            {
+                var fileName = await SaveImageAsync(file, folder);
+                var imageUrl = GetImageUrl(fileName, folder);
+
+                return new ImageUploadResponseDto
+                {
+                    FileName = fileName,
+                    Url = imageUrl,
+                    Size = file.Length
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al subir archivo a carpeta {Folder}", folder);
+                throw;
+            }
+        }
+
         public async Task DeleteAvatarAsync(int userId)
         {
             try

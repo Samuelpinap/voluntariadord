@@ -17,6 +17,12 @@ namespace VoluntariadoConectadoRD.Models
         [StringLength(100)]
         public string? Categoria { get; set; }
 
+        [StringLength(200)]
+        public string? IconoUrl { get; set; }
+
+        [StringLength(20)]
+        public string Color { get; set; } = "primary";
+
         public bool EsActivo { get; set; } = true;
 
         public DateTime FechaCreacion { get; set; } = DateTime.UtcNow;
@@ -38,6 +44,11 @@ namespace VoluntariadoConectadoRD.Models
 
         [Range(1, 100)]
         public int Nivel { get; set; } = 50; // Nivel de competencia del 1-100
+
+        [StringLength(200)]
+        public string? Certificacion { get; set; }
+
+        public DateTime? FechaAdquisicion { get; set; }
 
         public DateTime FechaCreacion { get; set; } = DateTime.UtcNow;
 

@@ -4,6 +4,7 @@ using VoluntariadoConectadoRD.Data;
 using VoluntariadoConectadoRD.Hubs;
 using VoluntariadoConectadoRD.Models;
 using VoluntariadoConectadoRD.Models.DTOs;
+using VoluntariadoConectadoRD.Interfaces;
 using System.Text.RegularExpressions;
 
 namespace VoluntariadoConectadoRD.Services

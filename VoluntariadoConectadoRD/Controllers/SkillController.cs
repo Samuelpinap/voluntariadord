@@ -450,7 +450,7 @@ namespace VoluntariadoConectadoRD.Controllers
             {
                 var users = await _skillService.GetUsersWithSkillAsync(skillId, page, pageSize);
 
-                return Ok(new ApiResponseDto<List<UserSkillDto>>
+                return Ok(new ApiResponseDto<List<UserSkillDetailDto>>
                 {
                     Success = true,
                     Message = "Usuarios con la habilidad obtenidos",

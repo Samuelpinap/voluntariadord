@@ -412,7 +412,7 @@ namespace VoluntariadoConectadoRD.Services
                     Id = notification.Sender.Id,
                     Nombre = notification.Sender.Nombre,
                     Apellido = notification.Sender.Apellido,
-                    ImagenUrl = notification.Sender.ImagenUrl
+                    ImagenUrl = notification.Sender.ProfileImageUrl
                 } : null
             };
         }

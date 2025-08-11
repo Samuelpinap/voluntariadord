@@ -425,7 +425,7 @@ namespace VoluntariadoConectadoRD.Services
         {
             // Award to users who completed their first volunteer activity
             var completedActivities = await _context.VolunteerApplications
-                .CountAsync(va => va.VolunteerId == userId && va.Estado == "Completado");
+                .CountAsync(va => va.VolunteerId == userId && va.Estado == (int)ApplicationStatus.Completado);
 
             return completedActivities >= 1;
         }
@@ -444,7 +444,7 @@ namespace VoluntariadoConectadoRD.Services
         {
             // Award to users who completed 10+ volunteer activities
             var completedActivities = await _context.VolunteerApplications
-                .CountAsync(va => va.VolunteerId == userId && va.Estado == "Completado");
+                .CountAsync(va => va.VolunteerId == userId && va.Estado == (int)ApplicationStatus.Completado);
 
             return completedActivities >= 10;
         }
