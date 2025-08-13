@@ -27,6 +27,7 @@ namespace VoluntariadoConectadoRD.Data
         public DbSet<UserOnlineStatus> UserOnlineStatuses { get; set; }
         public DbSet<Message> Messages { get; set; }
         public DbSet<Conversation> Conversations { get; set; }
+        public DbSet<PayPalTransaction> PayPalTransactions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -58,6 +59,7 @@ namespace VoluntariadoConectadoRD.Data
                 entity.Property(e => e.Direccion).HasMaxLength(300);
                 entity.Property(e => e.SitioWeb).HasMaxLength(200);
                 entity.Property(e => e.NumeroRegistro).HasMaxLength(50);
+                entity.Property(e => e.SaldoActual).HasPrecision(18, 2);
 
                 // Relación con Usuario
                 entity.HasOne(e => e.Usuario)
@@ -278,12 +280,27 @@ namespace VoluntariadoConectadoRD.Data
                 entity.Property(e => e.Monto).HasPrecision(18, 2);
                 entity.Property(e => e.Proposito).HasMaxLength(500);
                 entity.Property(e => e.DocumentoUrl).HasMaxLength(500);
+                entity.Property(e => e.PayPalTransactionId).HasMaxLength(100);
+                entity.Property(e => e.PayPalOrderId).HasMaxLength(100);
+                entity.Property(e => e.PayPalPaymentStatus).HasMaxLength(50);
+                entity.Property(e => e.PayPalPayerEmail).HasMaxLength(150);
+                entity.Property(e => e.PayPalPayerId).HasMaxLength(200);
 
-                // Relación con FinancialReport
+                // Relación con FinancialReport (opcional)
                 entity.HasOne(e => e.FinancialReport)
                       .WithMany(fr => fr.Donaciones)
                       .HasForeignKey(e => e.FinancialReportId)
                       .OnDelete(DeleteBehavior.Cascade);
+
+                // Relación con Organizacion (opcional, para donaciones directas)
+                entity.HasOne(e => e.Organizacion)
+                      .WithMany(o => o.Donations)
+                      .HasForeignKey(e => e.OrganizacionId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                // Índices para PayPal
+                entity.HasIndex(e => e.PayPalTransactionId);
+                entity.HasIndex(e => e.PayPalOrderId);
             });
 
             // Mapeo de tablas para compatibilidad
@@ -420,6 +437,44 @@ namespace VoluntariadoConectadoRD.Data
                 entity.HasIndex(e => new { e.User1Id, e.User1HasUnread });
                 entity.HasIndex(e => new { e.User2Id, e.User2HasUnread });
             });
+
+            // Configuración para PayPalTransaction
+            modelBuilder.Entity<PayPalTransaction>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.PayPalOrderId).IsRequired().HasMaxLength(100);
+                entity.Property(e => e.PayPalTransactionId).HasMaxLength(100);
+                entity.Property(e => e.Amount).HasPrecision(18, 2);
+                entity.Property(e => e.Currency).IsRequired().HasMaxLength(3);
+                entity.Property(e => e.Status).IsRequired().HasMaxLength(50);
+                entity.Property(e => e.PayerEmail).HasMaxLength(150);
+                entity.Property(e => e.PayerId).HasMaxLength(200);
+                entity.Property(e => e.PayerName).HasMaxLength(200);
+                entity.Property(e => e.RawPayPalResponse).HasColumnType("TEXT");
+                entity.Property(e => e.WebhookData).HasColumnType("TEXT");
+
+                // Relación con Organizacion
+                entity.HasOne(e => e.Organizacion)
+                      .WithMany()
+                      .HasForeignKey(e => e.OrganizacionId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                // Relación con Donation (opcional)
+                entity.HasOne(e => e.Donation)
+                      .WithMany()
+                      .HasForeignKey(e => e.DonationId)
+                      .OnDelete(DeleteBehavior.SetNull);
+
+                // Índices
+                entity.HasIndex(e => e.PayPalOrderId).IsUnique();
+                entity.HasIndex(e => e.PayPalTransactionId);
+                entity.HasIndex(e => e.OrganizacionId);
+                entity.HasIndex(e => e.Status);
+                entity.HasIndex(e => e.CreatedAt);
+            });
+
+            // Tabla mapping
+            modelBuilder.Entity<PayPalTransaction>().ToTable("paypal_transactions");
         }
     }
 }
