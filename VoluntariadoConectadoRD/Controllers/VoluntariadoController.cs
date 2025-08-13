@@ -524,7 +524,7 @@ namespace VoluntariadoConectadoRD.Controllers
 
             // Calculate new communities from recent organizations
             var newCommunities = await _context.Organizaciones
-                .CountAsync(o => o.FechaRegistro >= threeMonthsAgo && o.Estatus == OrganizacionStatus.Activa);
+                .CountAsync(o => o.FechaCreacion >= threeMonthsAgo && o.Estatus == OrganizacionStatus.Activa);
 
             // Calculate real monthly donation data from completed volunteer hours
             var monthlyDonations = new List<MonthlyDonationDto>();

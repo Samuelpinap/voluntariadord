@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace VoluntariadoConectadoRD.Models
 {
@@ -69,12 +70,17 @@ namespace VoluntariadoConectadoRD.Models
         
         public bool Verificada { get; set; } = false;
         
+        // Balance actual de donaciones
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal SaldoActual { get; set; } = 0;
+        
         // Usuario administrador de la organización
         public int UsuarioId { get; set; }
         public Usuario Usuario { get; set; } = null!;
         
         // Navigation properties
         public virtual ICollection<VolunteerOpportunity> Opportunities { get; set; } = new List<VolunteerOpportunity>();
+        public virtual ICollection<Donation> Donations { get; set; } = new List<Donation>();
 
         public Organizacion()
         {

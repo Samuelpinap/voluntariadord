@@ -92,7 +92,8 @@ namespace VoluntariadoConectadoRd.Services
                     Vision = organization.Vision,
                     AreasInteres = organization.AreasInteres?.Split(',').ToList() ?? new List<string>(),
                     LogoUrl = organization.LogoUrl,
-                    PerfilCompleto = organization.PerfilCompleto
+                    PerfilCompleto = organization.PerfilCompleto,
+                    SaldoActual = organization.SaldoActual
                 };
             }
             catch (Exception ex)

@@ -57,6 +57,7 @@ namespace VoluntariadoConectadoRD.Controllers
         }
 
         [HttpGet("organization/{orgId}")]
+        [AllowAnonymous]
         public async Task<ActionResult<ApiResponseDto<OrganizationProfileDto>>> GetOrganizationProfile(int orgId)
         {
             try

@@ -46,8 +46,15 @@ namespace VoluntariadoConectadoRd.Services
                 var user = await _context.Usuarios.FindAsync(userId);
                 if (user != null)
                 {
+                    _logger.LogInformation("Updating user {UserId} avatar URL to {AvatarUrl}", userId, imageUrl);
                     user.ProfileImageUrl = imageUrl;
+                    user.FechaActualizacion = DateTime.UtcNow;
                     await _context.SaveChangesAsync();
+                    _logger.LogInformation("User avatar updated successfully");
+                }
+                else
+                {
+                    _logger.LogWarning("User not found for userId {UserId}", userId);
                 }
 
                 return new ImageUploadResponseDto
@@ -85,8 +92,15 @@ namespace VoluntariadoConectadoRd.Services
 
                 if (organization != null)
                 {
+                    _logger.LogInformation("Updating organization {OrgId} logo URL to {LogoUrl}", organization.Id, imageUrl);
                     organization.LogoUrl = imageUrl;
+                    organization.FechaActualizacion = DateTime.UtcNow;
                     await _context.SaveChangesAsync();
+                    _logger.LogInformation("Organization logo updated successfully");
+                }
+                else
+                {
+                    _logger.LogWarning("Organization not found for userId {UserId}", userId);
                 }
 
                 return new ImageUploadResponseDto
@@ -289,20 +303,24 @@ namespace VoluntariadoConectadoRd.Services
         {
             try
             {
-                using var reader = new BinaryReader(file.OpenReadStream());
-                var bytes = reader.ReadBytes(8);
+                using var stream = file.OpenReadStream();
+                var bytes = new byte[8];
+                var bytesRead = stream.Read(bytes, 0, 8);
+                
+                // Reset stream position for subsequent operations
+                stream.Position = 0;
                 
                 // Check for common image file signatures
                 // JPEG: FF D8 FF
-                if (bytes.Length >= 3 && bytes[0] == 0xFF && bytes[1] == 0xD8 && bytes[2] == 0xFF)
+                if (bytesRead >= 3 && bytes[0] == 0xFF && bytes[1] == 0xD8 && bytes[2] == 0xFF)
                     return true;
                 
                 // PNG: 89 50 4E 47 0D 0A 1A 0A
-                if (bytes.Length >= 8 && bytes[0] == 0x89 && bytes[1] == 0x50 && bytes[2] == 0x4E && bytes[3] == 0x47)
+                if (bytesRead >= 8 && bytes[0] == 0x89 && bytes[1] == 0x50 && bytes[2] == 0x4E && bytes[3] == 0x47)
                     return true;
                 
                 // GIF: GIF87a or GIF89a
-                if (bytes.Length >= 6)
+                if (bytesRead >= 6)
                 {
                     var header = System.Text.Encoding.ASCII.GetString(bytes, 0, 6);
                     if (header == "GIF87a" || header == "GIF89a")
@@ -310,7 +328,7 @@ namespace VoluntariadoConectadoRd.Services
                 }
                 
                 // WebP: RIFF....WEBP
-                if (bytes.Length >= 8)
+                if (bytesRead >= 8)
                 {
                     var riff = System.Text.Encoding.ASCII.GetString(bytes, 0, 4);
                     if (riff == "RIFF")
@@ -323,11 +341,6 @@ namespace VoluntariadoConectadoRd.Services
             {
                 _logger.LogError(ex, "Error validating file signature");
                 return false;
-            }
-            finally
-            {
-                // Reset stream position
-                file.OpenReadStream().Position = 0;
             }
         }
 

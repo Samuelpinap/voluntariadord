@@ -218,6 +218,7 @@ namespace VoluntariadoConectadoRD.Models.DTOs
         public List<string> AreasInteres { get; set; } = new List<string>();
         public string? LogoUrl { get; set; }
         public bool PerfilCompleto { get; set; }
+        public decimal SaldoActual { get; set; } = 0;
     }
 
     public class UpdateUserProfileDto

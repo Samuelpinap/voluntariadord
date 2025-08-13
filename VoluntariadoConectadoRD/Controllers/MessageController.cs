@@ -85,6 +85,9 @@ namespace VoluntariadoConectadoRD.Controllers
                 }
 
                 var conversations = await _messageService.GetUserConversationsAsync(userId, page, pageSize);
+                
+                _logger.LogInformation("Returning {ConversationCount} conversations for user {UserId}", 
+                    conversations?.Conversations?.Count ?? 0, userId);
 
                 return Ok(new ApiResponseDto<ConversationListDto>
                 {
