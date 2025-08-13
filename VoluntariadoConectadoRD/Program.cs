@@ -28,9 +28,10 @@ namespace VoluntariadoConectadoRD
                 {
                     if (builder.Environment.IsDevelopment())
                     {
-                        corsBuilder.AllowAnyOrigin()
+                        corsBuilder.WithOrigins("http://localhost:5009", "https://localhost:7264")
                                   .AllowAnyMethod()
-                                  .AllowAnyHeader();
+                                  .AllowAnyHeader()
+                                  .AllowCredentials();
                     }
                     else
                     {
@@ -135,8 +136,17 @@ namespace VoluntariadoConectadoRD
             builder.Services.AddScoped<IMessageService, MessageService>();
             builder.Services.AddScoped<IBadgeService, BadgeService>();
             builder.Services.AddScoped<ISkillService, SkillService>();
+            builder.Services.AddScoped<IPayPalService, PayPalService>();
+            
+            // Add HttpClient for PayPal API calls
+            builder.Services.AddHttpClient<IPayPalService, PayPalService>();
 
-            builder.Services.AddControllers();
+            builder.Services.AddControllers()
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+                    options.JsonSerializerOptions.WriteIndented = builder.Environment.IsDevelopment();
+                });
             
             // Add SignalR
             builder.Services.AddSignalR();

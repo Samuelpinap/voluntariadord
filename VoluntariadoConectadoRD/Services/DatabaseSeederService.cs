@@ -83,6 +83,7 @@ namespace VoluntariadoConectadoRD.Services
                 await SeedEmergencyResponseOpportunitiesAsync();
                 await SeedSkillDevelopmentWorkshopsAsync();
                 await SeedFinancialDataAsync();
+                await SeedMessagesAsync();
 
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
@@ -761,6 +762,9 @@ namespace VoluntariadoConectadoRD.Services
                 await _context.SaveChangesAsync(); // Save to get the user ID
 
                 // Create organization
+                // Add additional data based on organization
+                var additionalData = GetOrganizationAdditionalData(orgData.OrgName);
+                
                 var organization = new Organizacion
                 {
                     Nombre = orgData.OrgName,
@@ -770,6 +774,11 @@ namespace VoluntariadoConectadoRD.Services
                     Direccion = orgData.OrgAddress,
                     SitioWeb = orgData.OrgWebsite,
                     NumeroRegistro = orgData.OrgRegistration,
+                    TipoOrganizacion = additionalData.Type,
+                    Mision = additionalData.Mission,
+                    Vision = additionalData.Vision,
+                    AreasInteres = additionalData.Areas,
+                    FechaFundacion = additionalData.FoundationDate,
                     Estatus = OrganizacionStatus.Activa,
                     FechaCreacion = DateTime.UtcNow,
                     UsuarioId = adminUser.Id
@@ -1510,6 +1519,98 @@ namespace VoluntariadoConectadoRD.Services
                 "Voluntario confiable que cumplió todas las expectativas."
             };
             return comments[new Random().Next(comments.Length)];
+        }
+
+        private static (string Type, string Mission, string Vision, string Areas, DateTime? FoundationDate) GetOrganizationAdditionalData(string orgName)
+        {
+            return orgName switch
+            {
+                "Fundación Niños del Futuro" => (
+                    "Fundación",
+                    "Brindar oportunidades de desarrollo integral a niños y jóvenes en situación de vulnerabilidad, fortaleciendo sus capacidades educativas, nutricionales y sociales para construir un futuro próspero.",
+                    "Ser la organización líder en República Dominicana en la transformación de vidas de niños y jóvenes vulnerables, creando comunidades más fuertes y equitativas.",
+                    "Educación,Nutrición,Salud,Desarrollo Juvenil",
+                    new DateTime(2018, 3, 15)
+                ),
+                "Cruz Roja Dominicana" => (
+                    "Organización Internacional",
+                    "Prevenir y aliviar el sufrimiento humano en todas las circunstancias, proteger la vida y la salud, y hacer respetar la dignidad de la persona humana.",
+                    "Ser la organización humanitaria líder en República Dominicana, reconocida por nuestra capacidad de respuesta efectiva y nuestro compromiso con los más vulnerables.",
+                    "Emergencias,Salud,Primeros Auxilios,Desarrollo Comunitario,Desastres Naturales",
+                    new DateTime(1927, 8, 12)
+                ),
+                "Hábitat para la Humanidad RD" => (
+                    "ONG Internacional",
+                    "Construir hogares, comunidades y esperanza junto a familias que necesitan una vivienda digna, promoviendo la construcción sostenible y el desarrollo habitacional.",
+                    "Un mundo donde todas las personas tengan un lugar digno donde vivir.",
+                    "Vivienda,Construcción,Desarrollo Comunitario,Sostenibilidad",
+                    new DateTime(1995, 6, 20)
+                ),
+                "Fundación Renacer" => (
+                    "Fundación",
+                    "Trabajar por la reinserción social de jóvenes en situación de riesgo, ex convictos y personas en procesos de rehabilitación, ofreciendo programas de capacitación laboral y apoyo psicosocial.",
+                    "Una sociedad inclusiva donde todas las personas tengan oportunidades de desarrollo y reintegración social.",
+                    "Reinserción Social,Capacitación Laboral,Apoyo Psicosocial,Prevención",
+                    new DateTime(2010, 11, 5)
+                ),
+                "Hogar de Ancianos San Rafael" => (
+                    "Hogar de Cuidado",
+                    "Brindar cuidado integral y digno para adultos mayores en situación de abandono o vulnerabilidad, ofreciendo servicios de salud, alimentación, recreación y acompañamiento emocional.",
+                    "Ser el referente nacional en cuidado integral de adultos mayores, promoviendo su dignidad y bienestar.",
+                    "Adultos Mayores,Salud,Cuidado Integral,Acompañamiento",
+                    new DateTime(2005, 4, 12)
+                ),
+                "Centro de Educación Ambiental Verde" => (
+                    "Centro Educativo",
+                    "Dedicarnos a la educación ambiental y conservación de los recursos naturales de República Dominicana, desarrollando programas de concienciación ecológica y turismo sostenible.",
+                    "Ser líderes en educación ambiental, formando ciudadanos comprometidos con la conservación y el desarrollo sostenible.",
+                    "Medio Ambiente,Educación Ambiental,Conservación,Turismo Sostenible",
+                    new DateTime(2012, 9, 22)
+                ),
+                "Asociación Dominicana de Bienestar Animal" => (
+                    "Asociación",
+                    "Proteger y defender los derechos de los animales en República Dominicana, realizando rescates, campañas de adopción, esterilización y educación sobre tenencia responsable.",
+                    "Un país donde todos los animales sean tratados con respeto y dignidad, libres de maltrato y abandono.",
+                    "Bienestar Animal,Adopción,Esterilización,Educación",
+                    new DateTime(2008, 1, 15)
+                ),
+                "Fundación Educativa Esperanza" => (
+                    "Fundación",
+                    "Promover la educación de calidad para niños y jóvenes de comunidades rurales, ofreciendo becas, programas de alfabetización y capacitación tecnológica.",
+                    "Cerrar la brecha educativa en comunidades rurales, asegurando que todos los niños tengan acceso a una educación de calidad.",
+                    "Educación,Becas,Alfabetización,Tecnología,Desarrollo Rural",
+                    new DateTime(2015, 8, 30)
+                ),
+                "Centro de Apoyo Integral a la Mujer" => (
+                    "Centro de Apoyo",
+                    "Empoderar a mujeres en situación de vulnerabilidad a través de programas de capacitación laboral, apoyo psicológico, asesoría legal y microcréditos para emprendimiento.",
+                    "Una sociedad donde las mujeres tengan igualdad de oportunidades y vivan libres de violencia y discriminación.",
+                    "Empoderamiento Femenino,Capacitación Laboral,Apoyo Psicológico,Emprendimiento",
+                    new DateTime(2013, 3, 8)
+                ),
+                "Fundación Salud Comunitaria" => (
+                    "Fundación",
+                    "Llevar servicios de salud preventiva y curativa a comunidades rurales y urbanas marginales, organizando brigadas médicas y programas de salud materno-infantil.",
+                    "Garantizar el acceso universal a servicios de salud de calidad, especialmente en comunidades desatendidas.",
+                    "Salud Comunitaria,Brigadas Médicas,Salud Materno-Infantil,Prevención",
+                    new DateTime(2009, 7, 18)
+                ),
+                "Asociación de Desarrollo Turístico Sostenible" => (
+                    "Asociación",
+                    "Promover el desarrollo del turismo sostenible en República Dominicana, capacitando a comunidades locales en servicios turísticos y conservación del patrimonio.",
+                    "Posicionar a República Dominicana como líder mundial en turismo sostenible y responsable.",
+                    "Turismo Sostenible,Capacitación,Conservación,Desarrollo Local",
+                    new DateTime(2016, 2, 14)
+                ),
+                "Centro de Rehabilitación y Terapia" => (
+                    "Centro de Salud",
+                    "Brindar servicios de rehabilitación física y terapia ocupacional para personas con discapacidades, ofreciendo terapias especializadas y programas de integración social.",
+                    "Una sociedad inclusiva donde las personas con discapacidad tengan acceso pleno a oportunidades de desarrollo y participación.",
+                    "Rehabilitación,Terapia Ocupacional,Discapacidad,Integración Social",
+                    new DateTime(2011, 5, 25)
+                ),
+                _ => ("ONG", "Organización comprometida con el desarrollo social", "Un mundo mejor para todos", "Desarrollo Social", DateTime.Now.AddYears(-5))
+            };
         }
 
         private async Task SeedPlatformStatsAsync()
@@ -2288,6 +2389,327 @@ namespace VoluntariadoConectadoRD.Services
 
             var random = new Random();
             return justifications[random.Next(justifications.Length)];
+        }
+
+        private async Task SeedMessagesAsync()
+        {
+            // Check if messages already exist
+            var existingMessages = await _context.Messages.AnyAsync();
+            if (existingMessages)
+            {
+                _logger.LogInformation("Messages already exist, skipping message seeding.");
+                return;
+            }
+
+            _logger.LogInformation("Seeding messages and conversations...");
+
+            var random = new Random();
+
+            // Get volunteers and organization admins for conversations
+            var volunteers = await _context.Usuarios
+                .Where(u => u.Rol == UserRole.Voluntario) // Voluntario role
+                .OrderBy(u => u.Id)
+                .Take(10) // Take first 10 volunteers
+                .ToListAsync();
+
+            var organizationAdmins = await _context.Usuarios
+                .Where(u => u.Rol == UserRole.Organizacion) // Organizacion role
+                .OrderBy(u => u.Id)
+                .ToListAsync();
+
+            if (!volunteers.Any() || !organizationAdmins.Any())
+            {
+                _logger.LogWarning("No volunteers or organization admins found for message seeding.");
+                return;
+            }
+
+            // Create comprehensive conversations ensuring every user has at least 3 conversations
+            var conversationPairs = new List<(int user1Id, int user2Id, string context)>();
+            var userConversationCount = new Dictionary<int, int>();
+            
+            // Initialize conversation counts
+            foreach (var volunteer in volunteers)
+            {
+                userConversationCount[volunteer.Id] = 0;
+            }
+            foreach (var orgAdmin in organizationAdmins)
+            {
+                userConversationCount[orgAdmin.Id] = 0;
+            }
+
+            // Define conversation contexts for variety
+            var contexts = new[]
+            {
+                "Consulta sobre voluntariado",
+                "Programa de apoyo social",
+                "Emergencia médica - Apoyo urgente", 
+                "Taller de capacitación",
+                "Coordinación entre voluntarios",
+                "Compartir experiencias",
+                "Proyecto comunitario",
+                "Actividad educativa",
+                "Campaña de concientización",
+                "Evento de recaudación",
+                "Apoyo logístico",
+                "Mentoría profesional",
+                "Intercambio de recursos",
+                "Planificación de actividades",
+                "Seguimiento de proyectos"
+            };
+
+            // First, create conversations between volunteers and organizations
+            for (int i = 0; i < volunteers.Count; i++)
+            {
+                var volunteer = volunteers[i];
+                
+                // Each volunteer gets 2-3 conversations with organizations
+                var orgConversations = random.Next(2, 4);
+                for (int j = 0; j < orgConversations && j < organizationAdmins.Count; j++)
+                {
+                    var orgAdmin = organizationAdmins[(i + j) % organizationAdmins.Count];
+                    var context = contexts[random.Next(contexts.Length)];
+                    
+                    conversationPairs.Add((volunteer.Id, orgAdmin.Id, context));
+                    userConversationCount[volunteer.Id]++;
+                    userConversationCount[orgAdmin.Id]++;
+                }
+            }
+
+            // Second, create volunteer-to-volunteer conversations
+            for (int i = 0; i < volunteers.Count; i++)
+            {
+                var volunteer1 = volunteers[i];
+                
+                // Each volunteer gets 1-2 conversations with other volunteers
+                var volunteerConversations = random.Next(1, 3);
+                for (int j = 0; j < volunteerConversations; j++)
+                {
+                    var volunteer2 = volunteers[(i + j + 1) % volunteers.Count];
+                    if (volunteer1.Id != volunteer2.Id)
+                    {
+                        var context = contexts[random.Next(contexts.Length)];
+                        conversationPairs.Add((volunteer1.Id, volunteer2.Id, context));
+                        userConversationCount[volunteer1.Id]++;
+                        userConversationCount[volunteer2.Id]++;
+                    }
+                }
+            }
+
+            // Third, ensure every user has at least 3 conversations
+            var allUsers = volunteers.Cast<Usuario>().Concat(organizationAdmins.Cast<Usuario>()).ToList();
+            foreach (var user in allUsers)
+            {
+                while (userConversationCount[user.Id] < 3)
+                {
+                    // Find another user to create a conversation with
+                    var otherUser = allUsers.Where(u => u.Id != user.Id).OrderBy(x => random.Next()).First();
+                    var context = contexts[random.Next(contexts.Length)];
+                    
+                    // Check if conversation already exists
+                    var existingPair = conversationPairs.FirstOrDefault(p => 
+                        (p.user1Id == user.Id && p.user2Id == otherUser.Id) ||
+                        (p.user1Id == otherUser.Id && p.user2Id == user.Id));
+                        
+                    if (existingPair == default)
+                    {
+                        conversationPairs.Add((user.Id, otherUser.Id, context));
+                        userConversationCount[user.Id]++;
+                        userConversationCount[otherUser.Id]++;
+                    }
+                }
+            }
+
+            foreach (var (user1Id, user2Id, context) in conversationPairs)
+            {
+                if (user1Id == 0 || user2Id == 0) continue;
+
+                // Create conversation ID (lower ID first)
+                var conversationId = user1Id < user2Id ? $"{user1Id}_{user2Id}" : $"{user2Id}_{user1Id}";
+
+                // Check if conversation already exists
+                var existingConversation = await _context.Conversations.FindAsync(conversationId);
+                if (existingConversation != null) continue;
+
+                // Create conversation
+                var conversation = new Conversation
+                {
+                    Id = conversationId,
+                    User1Id = Math.Min(user1Id, user2Id),
+                    User2Id = Math.Max(user1Id, user2Id),
+                    CreatedAt = DateTime.UtcNow.AddDays(-random.Next(1, 30)),
+                    LastMessageAt = DateTime.UtcNow.AddDays(-random.Next(0, 7)),
+                    User1HasUnread = false,
+                    User2HasUnread = false,
+                    IsArchived = false
+                };
+
+                _context.Conversations.Add(conversation);
+                await _context.SaveChangesAsync();
+
+                // Generate messages for this conversation
+                var messages = GenerateSpanishConversationMessages(user1Id, user2Id, conversationId, context, random);
+                
+                foreach (var message in messages)
+                {
+                    _context.Messages.Add(message);
+                    await _context.SaveChangesAsync();
+
+                    // Update last message in conversation
+                    conversation.LastMessageId = message.Id;
+                    conversation.LastMessageAt = message.SentAt;
+                }
+
+                // Mark some messages as read
+                var messagesToMarkRead = await _context.Messages
+                    .Where(m => m.ConversationId == conversationId)
+                    .OrderBy(m => m.SentAt)
+                    .Take(messages.Count - random.Next(1, 3)) // Leave 1-2 messages unread
+                    .ToListAsync();
+
+                foreach (var msg in messagesToMarkRead)
+                {
+                    msg.IsRead = true;
+                    msg.ReadAt = msg.SentAt.AddMinutes(random.Next(1, 120));
+                }
+
+                // Update unread status
+                var unreadForUser1 = await _context.Messages
+                    .Where(m => m.ConversationId == conversationId && m.RecipientId == conversation.User1Id && !m.IsRead)
+                    .AnyAsync();
+                var unreadForUser2 = await _context.Messages
+                    .Where(m => m.ConversationId == conversationId && m.RecipientId == conversation.User2Id && !m.IsRead)
+                    .AnyAsync();
+
+                conversation.User1HasUnread = unreadForUser1;
+                conversation.User2HasUnread = unreadForUser2;
+
+                await _context.SaveChangesAsync();
+            }
+
+            _logger.LogInformation($"Seeded {conversationPairs.Count} conversations with messages.");
+        }
+
+        private List<Message> GenerateSpanishConversationMessages(int user1Id, int user2Id, string conversationId, string context, Random random)
+        {
+            var messages = new List<Message>();
+            var messageCount = random.Next(3, 10);
+            var currentDate = DateTime.UtcNow.AddDays(-random.Next(7, 30));
+
+            // Define conversation templates based on context
+            var conversationTemplates = GetSpanishConversationTemplate(context);
+
+            for (int i = 0; i < Math.Min(messageCount, conversationTemplates.Count); i++)
+            {
+                var template = conversationTemplates[i];
+                var isFromUser1 = template.IsFromFirst;
+                
+                var message = new Message
+                {
+                    SenderId = isFromUser1 ? user1Id : user2Id,
+                    RecipientId = isFromUser1 ? user2Id : user1Id,
+                    Content = template.Content,
+                    Type = MessageType.Text,
+                    ConversationId = conversationId,
+                    SentAt = currentDate,
+                    IsRead = false,
+                    IsDeleted = false
+                };
+
+                messages.Add(message);
+                currentDate = currentDate.AddMinutes(random.Next(5, 180)); // 5 minutes to 3 hours between messages
+            }
+
+            return messages;
+        }
+
+        private List<(bool IsFromFirst, string Content)> GetSpanishConversationTemplate(string context)
+        {
+            return context switch
+            {
+                "Cruz Roja - Consulta sobre voluntariado" => new List<(bool, string)>
+                {
+                    (true, "¡Hola! Me gustaría obtener información sobre las oportunidades de voluntariado en Cruz Roja. ¿Qué requisitos necesito cumplir?"),
+                    (false, "¡Bienvenido! Nos alegra mucho tu interés en ser voluntario. Los requisitos básicos son: ser mayor de 18 años, tener disponibilidad de tiempo y muchas ganas de ayudar."),
+                    (false, "También ofrecemos capacitación gratuita en primeros auxilios y respuesta a emergencias. ¿Qué área te interesa más?"),
+                    (true, "Me interesa mucho el área de primeros auxilios. Soy estudiante de medicina y creo que podría aportar mis conocimientos."),
+                    (false, "¡Excelente! Tu perfil es perfecto para nuestro equipo de respuesta médica. Te envío el enlace para que completes el formulario de inscripción."),
+                    (true, "Muchas gracias, ya completé el formulario. ¿Cuándo sería la próxima capacitación?"),
+                    (false, "La próxima capacitación es el sábado 15 de 9:00 AM a 2:00 PM en nuestra sede principal. Te confirmamos tu participación. ¡Bienvenido al equipo!"),
+                    (true, "¡Perfecto! Ahí estaré. Gracias por toda la información. 🙏")
+                },
+
+                "Fundación Renacer - Programa de apoyo" => new List<(bool, string)>
+                {
+                    (true, "Buenos días, vi su publicación sobre el programa de apoyo a jóvenes. Me gustaría participar como voluntaria."),
+                    (false, "¡Buenos días! Gracias por contactarnos. Nuestro programa busca mentores para jóvenes en proceso de reinserción. ¿Tienes experiencia trabajando con jóvenes?"),
+                    (true, "Sí, soy psicóloga y he trabajado 3 años en orientación juvenil. Me apasiona ayudar a los jóvenes a encontrar su camino."),
+                    (false, "Tu perfil es ideal para nuestro programa. Necesitamos profesionales comprometidos como tú. ¿Podrías dedicar 4 horas semanales?"),
+                    (true, "Por supuesto, puedo los sábados por la mañana o entre semana después de las 5 PM."),
+                    (false, "Perfecto. Te invito a una reunión este jueves a las 6 PM para conocer al equipo y explicarte los detalles del programa."),
+                    (true, "Excelente, confirmo mi asistencia. ¿Necesito llevar algún documento?"),
+                    (false, "Solo tu cédula y certificado de antecedentes penales. Nos vemos el jueves. ¡Bienvenida!")
+                },
+
+                "Emergencia médica - Apoyo urgente" => new List<(bool, string)>
+                {
+                    (true, "¡URGENTE! Soy paramédico y vi que necesitan apoyo para la emergencia en San Cristóbal. ¿Cómo puedo ayudar?"),
+                    (false, "¡Gracias por responder! Sí, necesitamos personal médico urgentemente. ¿Puedes venir hoy mismo?"),
+                    (true, "Sí, puedo estar allá en 1 hora. ¿Qué debo llevar?"),
+                    (false, "Trae tu equipo básico si tienes. Nosotros proporcionamos el resto. La dirección es Calle Principal #45, San Cristóbal."),
+                    (true, "En camino. ¿Cuántas personas afectadas hay aproximadamente?"),
+                    (false, "Alrededor de 50 familias afectadas por las inundaciones. Tu ayuda será invaluable. Pregunta por el Dr. Méndez al llegar."),
+                    (true, "Entendido. Ya estoy a 20 minutos. Gracias por coordinar todo."),
+                    (false, "Gracias a ti por tu respuesta inmediata. Tu ayuda marca la diferencia. 🙏")
+                },
+
+                "Taller de capacitación" => new List<(bool, string)>
+                {
+                    (true, "Hola, me interesa el taller de liderazgo comunitario que anunciaron. ¿Todavía hay cupos disponibles?"),
+                    (false, "¡Hola! Sí, aún tenemos 5 cupos disponibles. El taller es totalmente gratuito y incluye materiales y refrigerio."),
+                    (true, "¡Qué bueno! ¿Cuáles son las fechas y horarios?"),
+                    (false, "Será los sábados 8, 15 y 22 de marzo, de 9:00 AM a 1:00 PM. Son 3 sesiones y es importante asistir a todas."),
+                    (true, "Perfecto, puedo asistir a todas. ¿Cómo me inscribo?"),
+                    (false, "Envíame tu nombre completo, cédula y número de teléfono. También necesitamos saber tu experiencia en trabajo comunitario."),
+                    (true, "Ana Martínez, 001-2345678-9, 809-555-0123. Llevo 2 años coordinando la junta de vecinos de mi sector."),
+                    (false, "¡Excelente experiencia! Estás inscrita. Te enviaré por WhatsApp la ubicación y agenda detallada. ¡Te esperamos!")
+                },
+
+                "Coordinación entre voluntarios" => new List<(bool, string)>
+                {
+                    (true, "¡Hola! Vi que también eres voluntario. ¿En qué organización participas?"),
+                    (false, "¡Hola! Estoy con Hábitat Dominicana, construyendo casas para familias necesitadas. ¿Y tú?"),
+                    (true, "¡Qué cool! Yo estoy con Un Techo para mi País. Hacemos algo similar. ¿Cómo ha sido tu experiencia?"),
+                    (false, "Increíble, muy gratificante. El sábado pasado terminamos una casa para una madre soltera con 3 hijos. ¿Cuánto tiempo llevas?"),
+                    (true, "Llevo 6 meses y me encanta. Deberíamos organizar una actividad conjunta entre ambas organizaciones."),
+                    (false, "¡Me parece genial! Podríamos hacer una jornada masiva de construcción. Tengo contactos que podrían ayudar."),
+                    (true, "Perfecto, hablemos con nuestros coordinadores. ¿Tienes WhatsApp para mantenernos en contacto?"),
+                    (false, "Sí, es 809-555-0789. ¡Hagamos que esto suceda! Unidos podemos lograr más. 💪")
+                },
+
+                "Compartir experiencias" => new List<(bool, string)>
+                {
+                    (true, "Hola, vi tu perfil y me inspiró tu trabajo con niños. ¿Cómo empezaste en el voluntariado?"),
+                    (false, "¡Qué lindo mensaje! Empecé hace 3 años cuando mi sobrina estuvo en el hospital y vi la necesidad de apoyo emocional para los niños."),
+                    (true, "Wow, qué historia tan conmovedora. Yo quiero empezar pero no sé por dónde. ¿Algún consejo?"),
+                    (false, "Mi consejo es que empieces por algo que te apasione. ¿Qué te gusta hacer? ¿Con qué población te gustaría trabajar?"),
+                    (true, "Me encanta la lectura y siempre he querido enseñar a leer a niños que no tienen acceso a educación."),
+                    (false, "¡Perfecto! Conozco una fundación que busca voluntarios para su programa de alfabetización. Te puedo conectar con ellos."),
+                    (true, "¡Sería maravilloso! Mil gracias por tu ayuda y por compartir tu experiencia."),
+                    (false, "Con gusto. El voluntariado cambia vidas, incluida la tuya. ¡Bienvenida a esta hermosa comunidad! ❤️")
+                },
+
+                _ => new List<(bool, string)>
+                {
+                    (true, "Hola, ¿cómo estás? Vi tu perfil y me gustaría saber más sobre tu trabajo voluntario."),
+                    (false, "¡Hola! Muy bien, gracias. Claro, con gusto te cuento sobre lo que hacemos."),
+                    (true, "Me interesa mucho participar. ¿Qué tipo de actividades realizan?"),
+                    (false, "Hacemos varias actividades: jornadas de limpieza, apoyo educativo, y distribución de alimentos."),
+                    (true, "Suena genial. ¿Cómo puedo unirme al equipo?"),
+                    (false, "Es muy fácil. Te envío el link del formulario de inscripción. ¿Tienes alguna experiencia previa?"),
+                    (true, "No tengo experiencia formal, pero tengo muchas ganas de ayudar y aprender."),
+                    (false, "¡Eso es lo más importante! La actitud cuenta más que la experiencia. ¡Bienvenido!")
+                }
+            };
         }
     }
 }
