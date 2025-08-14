@@ -13,18 +13,11 @@ jobs:
     env:
       PORT: 5000   
       ASPNETCORE_ENVIRONMENT: Development  
-      ConnectionStrings__DefaultConnection: Data Source=voluntariado.db
       JwtSettings__SecretKey: VoluntariadoConectadoRD-Super-Secret-Key-256-bits-long-for-security
       JwtSettings__Issuer: VoluntariadoConectadoRD
       JwtSettings__Audience: VoluntariadoConectadoRD-Users
       JwtSettings__ExpirationMinutes: 60
-      Logging__LogLevel__Default: Information
-      Logging__LogLevel__Microsoft.AspNetCore: Warning
-      AllowedHosts: "*"
-      BaseUrl: https://localhost:7199
-      PayPal__BaseUrl: https://api-m.sandbox.paypal.com
-      PayPal__ClientId: AeaEfAAN9JgvB50JZkKUbZwpkuQn4pb21LspbMEHh0ZZ9RXf7LfWHDd3N6BPXYjxpBBnr00WdxoYpTC_
-      PayPal__ClientSecret: EH84yXMl9DgMMPUw8MrI01R63_jWWwQFgC3mKgmYj7Q-vUHoWAcvvAmztXMj6NREj6W34B8AD4BJD9Nv
+      ConnectionStrings__DefaultConnection: ${{ secrets.CONNECTION_STRING }}
 
     steps:
     # ── checkout & build ─────────────────────────────────────────────

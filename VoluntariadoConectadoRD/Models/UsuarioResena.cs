@@ -53,12 +53,7 @@ namespace VoluntariadoConectadoRD.Models
         
         public int RequisitoValor { get; set; } = 0; // Hours, years, count, etc.
 
-        [StringLength(500)]
-        public string? Requisitos { get; set; }
-
         public bool EsActivo { get; set; } = true;
-
-        public bool EsAutomatico { get; set; } = true;
 
         public DateTime FechaCreacion { get; set; } = DateTime.UtcNow;
 
@@ -80,9 +75,6 @@ namespace VoluntariadoConectadoRD.Models
 
         [StringLength(500)]
         public string? NotasObtencion { get; set; }
-
-        [StringLength(500)]
-        public string? RazonOtorgamiento { get; set; }
 
         // Navigation properties
         public Usuario Usuario { get; set; } = null!;

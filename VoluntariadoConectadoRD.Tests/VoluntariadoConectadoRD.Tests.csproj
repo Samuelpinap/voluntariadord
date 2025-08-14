@@ -1,34 +1,34 @@
-<Project Sdk="Microsoft.NET.Sdk">
+&lt;Project Sdk="Microsoft.NET.Sdk"&gt;
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <IsPackable>false</IsPackable>
-    <IsTestProject>true</IsTestProject>
-  </PropertyGroup>
+  &lt;PropertyGroup&gt;
+    &lt;TargetFramework&gt;net8.0&lt;/TargetFramework&gt;
+    &lt;Nullable&gt;enable&lt;/Nullable&gt;
+    &lt;ImplicitUsings&gt;enable&lt;/ImplicitUsings&gt;
+    &lt;IsPackable&gt;false&lt;/IsPackable&gt;
+    &lt;IsTestProject&gt;true&lt;/IsTestProject&gt;
+  &lt;/PropertyGroup&gt;
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.7" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
-    <PackageReference Include="xunit" Version="2.4.2" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="coverlet.collector" Version="6.0.0">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="Moq" Version="4.20.69" />
-    <PackageReference Include="FluentAssertions" Version="6.12.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
-    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
-  </ItemGroup>
+  &lt;ItemGroup&gt;
+    &lt;PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.0" /&gt;
+    &lt;PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.7" /&gt;
+    &lt;PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" /&gt;
+    &lt;PackageReference Include="xunit" Version="2.4.2" /&gt;
+    &lt;PackageReference Include="xunit.runner.visualstudio" Version="2.4.5"&gt;
+      &lt;IncludeAssets&gt;runtime; build; native; contentfiles; analyzers; buildtransitive&lt;/IncludeAssets&gt;
+      &lt;PrivateAssets&gt;all&lt;/PrivateAssets&gt;
+    &lt;/PackageReference&gt;
+    &lt;PackageReference Include="coverlet.collector" Version="6.0.0"&gt;
+      &lt;IncludeAssets&gt;runtime; build; native; contentfiles; analyzers; buildtransitive&lt;/IncludeAssets&gt;
+      &lt;PrivateAssets&gt;all&lt;/PrivateAssets&gt;
+    &lt;/PackageReference&gt;
+    &lt;PackageReference Include="Moq" Version="4.20.69" /&gt;
+    &lt;PackageReference Include="FluentAssertions" Version="6.12.0" /&gt;
+    &lt;PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" /&gt;
+    &lt;PackageReference Include="BCrypt.Net-Next" Version="4.0.3" /&gt;
+  &lt;/ItemGroup&gt;
 
-  <ItemGroup>
-    <ProjectReference Include="../VoluntariadoConectadoRD/VoluntariadoConectadoRD.csproj" />
-  </ItemGroup>
+  &lt;ItemGroup&gt;
+    &lt;ProjectReference Include="../VoluntariadoConectadoRD/VoluntariadoConectadoRD.csproj" /&gt;
+  &lt;/ItemGroup&gt;
 
-</Project>
+&lt;/Project&gt;

@@ -11,7 +11,5 @@ namespace VoluntariadoConectadoRD.Interfaces
         Task<ApiResponseDto<UserInfoDto>> GetUserByIdAsync(int userId);
         Task<ApiResponseDto<bool>> ValidateEmailAsync(string email);
         Task<ApiResponseDto<bool>> ChangePasswordAsync(int userId, string currentPassword, string newPassword);
-        Task<ApiResponseDto<bool>> ForgotPasswordAsync(string email);
-        Task<ApiResponseDto<bool>> ResetPasswordAsync(string email, string token, string newPassword);
     }
 }

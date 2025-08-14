@@ -4,7 +4,6 @@ using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using VoluntariadoConectadoRD.Interfaces;
 using VoluntariadoConectadoRD.Models.DTOs;
-using Microsoft.AspNetCore.RateLimiting;
 
 namespace VoluntariadoConectadoRD.Controllers
 {
@@ -25,7 +24,6 @@ namespace VoluntariadoConectadoRD.Controllers
         /// Login de usuario (voluntario u organización)
         /// </summary>
         [HttpPost("login")]
-        [EnableRateLimiting("AuthPolicy")]
         public async Task<ActionResult<ApiResponseDto<LoginResponseDto>>> Login([FromBody] LoginRequestDto loginRequest)
         {
             try
@@ -64,7 +62,6 @@ namespace VoluntariadoConectadoRD.Controllers
         /// Registro de voluntario
         /// </summary>
         [HttpPost("register/voluntario")]
-        [EnableRateLimiting("AuthPolicy")]
         public async Task<ActionResult<ApiResponseDto<UserInfoDto>>> RegisterVoluntario([FromBody] RegisterVoluntarioDto registerDto)
         {
             try
@@ -103,7 +100,6 @@ namespace VoluntariadoConectadoRD.Controllers
         /// Registro de organización
         /// </summary>
         [HttpPost("register/organizacion")]
-        [EnableRateLimiting("AuthPolicy")]
         public async Task<ActionResult<ApiResponseDto<UserInfoDto>>> RegisterOrganizacion([FromBody] RegisterOrganizacionDto registerDto)
         {
             try
@@ -278,86 +274,6 @@ namespace VoluntariadoConectadoRD.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error en logout");
-                return StatusCode(500, new ApiResponseDto<bool>
-                {
-                    Success = false,
-                    Message = "Error interno del servidor"
-                });
-            }
-        }
-
-        /// <summary>
-        /// Solicitar recuperación de contraseña
-        /// </summary>
-        [HttpPost("forgot-password")]
-        [EnableRateLimiting("AuthPolicy")]
-        public async Task<ActionResult<ApiResponseDto<bool>>> ForgotPassword([FromBody] ForgotPasswordDto forgotPasswordDto)
-        {
-            try
-            {
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(new ApiResponseDto<bool>
-                    {
-                        Success = false,
-                        Message = "Datos de entrada inválidos",
-                        Errors = ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage)).ToList()
-                    });
-                }
-
-                var result = await _authService.ForgotPasswordAsync(forgotPasswordDto.Email);
-                
-                // Always return success for security reasons (don't reveal if email exists)
-                return Ok(new ApiResponseDto<bool>
-                {
-                    Success = true,
-                    Data = true,
-                    Message = "Si el correo existe en nuestro sistema, recibirás instrucciones para restablecer tu contraseña."
-                });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error en forgot password para email: {Email}", forgotPasswordDto.Email);
-                return Ok(new ApiResponseDto<bool>
-                {
-                    Success = true,
-                    Data = true,
-                    Message = "Si el correo existe en nuestro sistema, recibirás instrucciones para restablecer tu contraseña."
-                });
-            }
-        }
-
-        /// <summary>
-        /// Restablecer contraseña con token
-        /// </summary>
-        [HttpPost("reset-password")]
-        [EnableRateLimiting("AuthPolicy")]
-        public async Task<ActionResult<ApiResponseDto<bool>>> ResetPassword([FromBody] ResetPasswordDto resetPasswordDto)
-        {
-            try
-            {
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(new ApiResponseDto<bool>
-                    {
-                        Success = false,
-                        Message = "Datos de entrada inválidos",
-                        Errors = ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage)).ToList()
-                    });
-                }
-
-                var result = await _authService.ResetPasswordAsync(resetPasswordDto.Email, resetPasswordDto.Token, resetPasswordDto.NewPassword);
-                
-                if (!result.Success)
-                {
-                    return BadRequest(result);
-                }
-
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error en reset password para email: {Email}", resetPasswordDto.Email);
                 return StatusCode(500, new ApiResponseDto<bool>
                 {
                     Success = false,

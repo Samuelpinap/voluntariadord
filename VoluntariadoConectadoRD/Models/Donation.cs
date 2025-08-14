@@ -8,17 +8,11 @@ namespace VoluntariadoConectadoRD.Models
         [Key]
         public int Id { get; set; }
 
-        // Optional link to financial report (for legacy compatibility)
-        public int? FinancialReportId { get; set; }
+        [Required]
+        public int FinancialReportId { get; set; }
 
         [ForeignKey("FinancialReportId")]
-        public virtual FinancialReport? FinancialReport { get; set; }
-
-        // Direct link to organization for PayPal donations
-        public int? OrganizacionId { get; set; }
-
-        [ForeignKey("OrganizacionId")]
-        public virtual Organizacion? Organizacion { get; set; }
+        public virtual FinancialReport FinancialReport { get; set; } = null!;
 
         [Required]
         [StringLength(200)]
@@ -43,46 +37,7 @@ namespace VoluntariadoConectadoRD.Models
 
         public bool EsRecurrente { get; set; } = false;
 
-        // PayPal-specific fields
-        [StringLength(100)]
-        public string? PayPalTransactionId { get; set; }
-
-        [StringLength(100)]
-        public string? PayPalOrderId { get; set; }
-
-        [StringLength(50)]
-        public string? PayPalPaymentStatus { get; set; }
-
-        [StringLength(150)]
-        public string? PayPalPayerEmail { get; set; }
-
-        [StringLength(200)]
-        public string? PayPalPayerId { get; set; }
-
-        // Payment method enum
-        public DonationPaymentMethod MetodoPago { get; set; } = DonationPaymentMethod.Manual;
-
-        // Payment status
-        public DonationStatus EstadoPago { get; set; } = DonationStatus.Pendiente;
-
         public DateTime FechaCreacion { get; set; }
         public DateTime? FechaActualizacion { get; set; }
-    }
-
-    public enum DonationPaymentMethod
-    {
-        Manual = 1,
-        PayPal = 2,
-        Transferencia = 3,
-        Efectivo = 4
-    }
-
-    public enum DonationStatus
-    {
-        Pendiente = 1,
-        Completado = 2,
-        Fallido = 3,
-        Cancelado = 4,
-        Reembolsado = 5
     }
 }

@@ -19,21 +19,10 @@ namespace VoluntariadoConectadoRD.Services
         public JwtService(IConfiguration configuration)
         {
             _configuration = configuration;
-            
-            // Get JWT secret from environment variable or configuration
-            _secretKey = Environment.GetEnvironmentVariable("JWT_SECRET_KEY") 
-                        ?? _configuration["JwtSettings:SecretKey"] 
-                        ?? throw new InvalidOperationException("JWT Secret Key not configured. Set JWT_SECRET_KEY environment variable.");
-            
+            _secretKey = _configuration["JwtSettings:SecretKey"] ?? "your-256-bit-secret-key-here-make-it-secure";
             _issuer = _configuration["JwtSettings:Issuer"] ?? "VoluntariadoConectadoRD";
             _audience = _configuration["JwtSettings:Audience"] ?? "VoluntariadoConectadoRD-Users";
             _expirationMinutes = int.Parse(_configuration["JwtSettings:ExpirationMinutes"] ?? "60");
-            
-            // Validate secret key length for security
-            if (_secretKey.Length < 32)
-            {
-                throw new InvalidOperationException("JWT Secret Key must be at least 32 characters long for security.");
-            }
         }
 
         public string GenerateToken(Usuario user)
