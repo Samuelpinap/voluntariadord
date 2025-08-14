@@ -27,6 +27,9 @@ namespace VoluntariadoConectadoRD.Controllers
             _logger = logger;
         }
 
+        /// <summary>
+        /// Crear una orden de donación en PayPal
+        /// </summary>
         [HttpPost("create-order")]
         public async Task<ActionResult<ApiResponseDto<PayPalOrderResponse>>> CreateOrder([FromBody] CreateDonationOrderRequest request)
         {
@@ -88,6 +91,9 @@ namespace VoluntariadoConectadoRD.Controllers
             }
         }
 
+        /// <summary>
+        /// Capturar el pago de una orden de PayPal
+        /// </summary>
         [HttpPost("capture-payment/{orderId}")]
         public async Task<ActionResult<ApiResponseDto<PayPalCaptureResponse>>> CapturePayment(string orderId)
         {
@@ -114,6 +120,9 @@ namespace VoluntariadoConectadoRD.Controllers
             }
         }
 
+        /// <summary>
+        /// Obtener las donaciones de una organización
+        /// </summary>
         [HttpGet("organization/{organizacionId}")]
         public async Task<ActionResult<ApiResponseDto<OrganizationDonationsResponse>>> GetOrganizationDonations(
             int organizacionId, 

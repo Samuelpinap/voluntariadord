@@ -19,6 +19,9 @@ namespace VoluntariadoConectadoRD.Controllers
             _logger = logger;
         }
 
+        /// <summary>
+        /// Subir imagen de avatar para un usuario
+        /// </summary>
         [HttpPost("upload/avatar")]
         public async Task<ActionResult<ApiResponseDto<ImageUploadResponseDto>>> UploadAvatar(IFormFile file)
         {
@@ -75,6 +78,9 @@ namespace VoluntariadoConectadoRD.Controllers
             }
         }
 
+        /// <summary>
+        /// Subir logo para una organización
+        /// </summary>
         [HttpPost("upload/logo")]
         public async Task<ActionResult<ApiResponseDto<ImageUploadResponseDto>>> UploadLogo(IFormFile file)
         {
@@ -131,6 +137,9 @@ namespace VoluntariadoConectadoRD.Controllers
             }
         }
 
+        /// <summary>
+        /// Eliminar avatar de un usuario
+        /// </summary>
         [HttpDelete("avatar")]
         public async Task<ActionResult<ApiResponseDto<object>>> DeleteAvatar()
         {
@@ -168,6 +177,9 @@ namespace VoluntariadoConectadoRD.Controllers
             }
         }
 
+        /// <summary>
+        /// Eliminar logo de una organización
+        /// </summary>
         [HttpDelete("logo")]
         public async Task<ActionResult<ApiResponseDto<object>>> DeleteLogo()
         {
