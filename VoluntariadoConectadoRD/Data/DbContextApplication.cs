@@ -23,6 +23,11 @@ namespace VoluntariadoConectadoRD.Data
         public DbSet<FinancialReport> FinancialReports { get; set; }
         public DbSet<Expense> Expenses { get; set; }
         public DbSet<Donation> Donations { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
+        public DbSet<UserOnlineStatus> UserOnlineStatuses { get; set; }
+        public DbSet<Message> Messages { get; set; }
+        public DbSet<Conversation> Conversations { get; set; }
+        public DbSet<PayPalTransaction> PayPalTransactions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -54,6 +59,7 @@ namespace VoluntariadoConectadoRD.Data
                 entity.Property(e => e.Direccion).HasMaxLength(300);
                 entity.Property(e => e.SitioWeb).HasMaxLength(200);
                 entity.Property(e => e.NumeroRegistro).HasMaxLength(50);
+                entity.Property(e => e.SaldoActual).HasPrecision(18, 2);
 
                 // Relación con Usuario
                 entity.HasOne(e => e.Usuario)
@@ -274,12 +280,27 @@ namespace VoluntariadoConectadoRD.Data
                 entity.Property(e => e.Monto).HasPrecision(18, 2);
                 entity.Property(e => e.Proposito).HasMaxLength(500);
                 entity.Property(e => e.DocumentoUrl).HasMaxLength(500);
+                entity.Property(e => e.PayPalTransactionId).HasMaxLength(100);
+                entity.Property(e => e.PayPalOrderId).HasMaxLength(100);
+                entity.Property(e => e.PayPalPaymentStatus).HasMaxLength(50);
+                entity.Property(e => e.PayPalPayerEmail).HasMaxLength(150);
+                entity.Property(e => e.PayPalPayerId).HasMaxLength(200);
 
-                // Relación con FinancialReport
+                // Relación con FinancialReport (opcional)
                 entity.HasOne(e => e.FinancialReport)
                       .WithMany(fr => fr.Donaciones)
                       .HasForeignKey(e => e.FinancialReportId)
                       .OnDelete(DeleteBehavior.Cascade);
+
+                // Relación con Organizacion (opcional, para donaciones directas)
+                entity.HasOne(e => e.Organizacion)
+                      .WithMany(o => o.Donations)
+                      .HasForeignKey(e => e.OrganizacionId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                // Índices para PayPal
+                entity.HasIndex(e => e.PayPalTransactionId);
+                entity.HasIndex(e => e.PayPalOrderId);
             });
 
             // Mapeo de tablas para compatibilidad
@@ -297,6 +318,163 @@ namespace VoluntariadoConectadoRD.Data
             modelBuilder.Entity<FinancialReport>().ToTable("financial_reports");
             modelBuilder.Entity<Expense>().ToTable("expenses");
             modelBuilder.Entity<Donation>().ToTable("donations");
+            // Configuración para Notification
+            modelBuilder.Entity<Notification>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Title).IsRequired().HasMaxLength(100);
+                entity.Property(e => e.Message).IsRequired().HasMaxLength(500);
+                entity.Property(e => e.Type).IsRequired().HasMaxLength(50);
+                entity.Property(e => e.ActionUrl).HasMaxLength(200);
+                entity.Property(e => e.Data).HasColumnType("TEXT");
+
+                // Relación con Usuario (Recipient)
+                entity.HasOne(e => e.Recipient)
+                      .WithMany()
+                      .HasForeignKey(e => e.RecipientId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                // Relación con Usuario (Sender) - Opcional
+                entity.HasOne(e => e.Sender)
+                      .WithMany()
+                      .HasForeignKey(e => e.SenderId)
+                      .OnDelete(DeleteBehavior.SetNull);
+
+                // Índices para mejorar performance
+                entity.HasIndex(e => e.RecipientId);
+                entity.HasIndex(e => e.Type);
+                entity.HasIndex(e => e.IsRead);
+                entity.HasIndex(e => e.CreatedAt);
+            });
+
+            // Configuración para UserOnlineStatus
+            modelBuilder.Entity<UserOnlineStatus>(entity =>
+            {
+                entity.HasKey(e => e.UserId);
+                entity.Property(e => e.ConnectionId).HasMaxLength(100);
+
+                // Relación con Usuario
+                entity.HasOne(e => e.User)
+                      .WithOne()
+                      .HasForeignKey<UserOnlineStatus>(e => e.UserId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                // Índices
+                entity.HasIndex(e => e.IsOnline);
+                entity.HasIndex(e => e.LastSeen);
+            });
+
+            // Configuración para Message
+            modelBuilder.Entity<Message>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Content).IsRequired().HasMaxLength(2000);
+                entity.Property(e => e.ConversationId).IsRequired().HasMaxLength(50);
+                entity.Property(e => e.AttachmentFileName).HasMaxLength(255);
+                entity.Property(e => e.AttachmentMimeType).HasMaxLength(100);
+                entity.Property(e => e.AttachmentUrl).HasMaxLength(500);
+
+                // Relaciones
+                entity.HasOne(e => e.Sender)
+                      .WithMany()
+                      .HasForeignKey(e => e.SenderId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.Recipient)
+                      .WithMany()
+                      .HasForeignKey(e => e.RecipientId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.ReplyToMessage)
+                      .WithMany(e => e.Replies)
+                      .HasForeignKey(e => e.ReplyToMessageId)
+                      .OnDelete(DeleteBehavior.SetNull);
+
+                // Índices para performance
+                entity.HasIndex(e => e.SenderId);
+                entity.HasIndex(e => e.RecipientId);
+                entity.HasIndex(e => e.ConversationId);
+                entity.HasIndex(e => e.SentAt);
+                entity.HasIndex(e => e.IsRead);
+                entity.HasIndex(e => e.IsDeleted);
+                entity.HasIndex(e => new { e.RecipientId, e.IsRead, e.IsDeleted });
+            });
+
+            // Configuración para Conversation
+            modelBuilder.Entity<Conversation>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Id).HasMaxLength(50);
+
+                // Relaciones
+                entity.HasOne(e => e.User1)
+                      .WithMany()
+                      .HasForeignKey(e => e.User1Id)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.User2)
+                      .WithMany()
+                      .HasForeignKey(e => e.User2Id)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.LastMessage)
+                      .WithMany()
+                      .HasForeignKey(e => e.LastMessageId)
+                      .OnDelete(DeleteBehavior.SetNull);
+
+                // Relación con Messages
+                entity.HasMany(e => e.Messages)
+                      .WithOne()
+                      .HasForeignKey(m => m.ConversationId)
+                      .HasPrincipalKey(c => c.Id)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                // Índices
+                entity.HasIndex(e => e.User1Id);
+                entity.HasIndex(e => e.User2Id);
+                entity.HasIndex(e => e.LastMessageAt);
+                entity.HasIndex(e => e.IsArchived);
+                entity.HasIndex(e => new { e.User1Id, e.User1HasUnread });
+                entity.HasIndex(e => new { e.User2Id, e.User2HasUnread });
+            });
+
+            // Configuración para PayPalTransaction
+            modelBuilder.Entity<PayPalTransaction>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.PayPalOrderId).IsRequired().HasMaxLength(100);
+                entity.Property(e => e.PayPalTransactionId).HasMaxLength(100);
+                entity.Property(e => e.Amount).HasPrecision(18, 2);
+                entity.Property(e => e.Currency).IsRequired().HasMaxLength(3);
+                entity.Property(e => e.Status).IsRequired().HasMaxLength(50);
+                entity.Property(e => e.PayerEmail).HasMaxLength(150);
+                entity.Property(e => e.PayerId).HasMaxLength(200);
+                entity.Property(e => e.PayerName).HasMaxLength(200);
+                entity.Property(e => e.RawPayPalResponse).HasColumnType("TEXT");
+                entity.Property(e => e.WebhookData).HasColumnType("TEXT");
+
+                // Relación con Organizacion
+                entity.HasOne(e => e.Organizacion)
+                      .WithMany()
+                      .HasForeignKey(e => e.OrganizacionId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                // Relación con Donation (opcional)
+                entity.HasOne(e => e.Donation)
+                      .WithMany()
+                      .HasForeignKey(e => e.DonationId)
+                      .OnDelete(DeleteBehavior.SetNull);
+
+                // Índices
+                entity.HasIndex(e => e.PayPalOrderId).IsUnique();
+                entity.HasIndex(e => e.PayPalTransactionId);
+                entity.HasIndex(e => e.OrganizacionId);
+                entity.HasIndex(e => e.Status);
+                entity.HasIndex(e => e.CreatedAt);
+            });
+
+            // Tabla mapping
+            modelBuilder.Entity<PayPalTransaction>().ToTable("paypal_transactions");
         }
     }
 }

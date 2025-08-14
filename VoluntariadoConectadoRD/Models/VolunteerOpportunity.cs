@@ -52,6 +52,10 @@ namespace VoluntariadoConectadoRD.Models
 
         public DateTime? FechaActualizacion { get; set; }
 
+        // Compatibility properties
+        public int Estado => (int)Estatus;
+        public string? Categoria => AreaInteres;
+
         // Foreign Key to Organization
         [Required]
         public int OrganizacionId { get; set; }
@@ -61,6 +65,7 @@ namespace VoluntariadoConectadoRD.Models
 
         // Navigation property for applications
         public virtual ICollection<VolunteerApplication> Aplicaciones { get; set; } = new List<VolunteerApplication>();
+        public virtual ICollection<VolunteerApplication> VolunteerApplications { get; set; } = new List<VolunteerApplication>(); // Alias for compatibility
     }
 
     public enum OpportunityStatus
@@ -79,6 +84,9 @@ namespace VoluntariadoConectadoRD.Models
 
         [Required]
         public int UsuarioId { get; set; }
+
+        // Alias for compatibility
+        public int VolunteerId => UsuarioId;
 
         [ForeignKey("UsuarioId")]
         public virtual Usuario Usuario { get; set; } = null!;
@@ -102,6 +110,9 @@ namespace VoluntariadoConectadoRD.Models
 
         [StringLength(500)]
         public string? NotasOrganizacion { get; set; }
+
+        // Compatibility property
+        public int Estado => (int)Estatus;
     }
 
     public enum ApplicationStatus
@@ -109,6 +120,7 @@ namespace VoluntariadoConectadoRD.Models
         Pendiente = 0,
         Aceptada = 1,
         Rechazada = 2,
-        Retirada = 3
+        Retirada = 3,
+        Completado = 4
     }
 }

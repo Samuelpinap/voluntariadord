@@ -39,6 +39,9 @@ namespace VoluntariadoConectadoRD.Migrations
                     b.Property<bool>("EsActivo")
                         .HasColumnType("INTEGER");
 
+                    b.Property<bool>("EsAutomatico")
+                        .HasColumnType("INTEGER");
+
                     b.Property<DateTime>("FechaCreacion")
                         .HasColumnType("TEXT");
 
@@ -54,12 +57,71 @@ namespace VoluntariadoConectadoRD.Migrations
                     b.Property<int>("RequisitoValor")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("Requisitos")
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("Tipo")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
                     b.ToTable("badges", (string)null);
+                });
+
+            modelBuilder.Entity("VoluntariadoConectadoRD.Models.Conversation", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsArchived")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("LastMessageAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("LastMessageId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("User1HasUnread")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("User1Id")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("User1LastSeen")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("User2HasUnread")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("User2Id")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("User2LastSeen")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IsArchived");
+
+                    b.HasIndex("LastMessageAt");
+
+                    b.HasIndex("LastMessageId");
+
+                    b.HasIndex("User1Id");
+
+                    b.HasIndex("User2Id");
+
+                    b.HasIndex("User1Id", "User1HasUnread");
+
+                    b.HasIndex("User2Id", "User2HasUnread");
+
+                    b.ToTable("Conversations");
                 });
 
             modelBuilder.Entity("VoluntariadoConectadoRD.Models.Donation", b =>
@@ -80,6 +142,9 @@ namespace VoluntariadoConectadoRD.Migrations
                     b.Property<bool>("EsRecurrente")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("EstadoPago")
+                        .HasColumnType("INTEGER");
+
                     b.Property<DateTime>("Fecha")
                         .HasColumnType("TEXT");
 
@@ -89,12 +154,38 @@ namespace VoluntariadoConectadoRD.Migrations
                     b.Property<DateTime>("FechaCreacion")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("FinancialReportId")
+                    b.Property<int?>("FinancialReportId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("MetodoPago")
                         .HasColumnType("INTEGER");
 
                     b.Property<decimal>("Monto")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<int?>("OrganizacionId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("PayPalOrderId")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PayPalPayerEmail")
+                        .HasMaxLength(150)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PayPalPayerId")
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PayPalPaymentStatus")
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PayPalTransactionId")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Proposito")
                         .HasMaxLength(500)
@@ -108,6 +199,12 @@ namespace VoluntariadoConectadoRD.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("FinancialReportId");
+
+                    b.HasIndex("OrganizacionId");
+
+                    b.HasIndex("PayPalOrderId");
+
+                    b.HasIndex("PayPalTransactionId");
 
                     b.ToTable("donations", (string)null);
                 });
@@ -215,6 +312,149 @@ namespace VoluntariadoConectadoRD.Migrations
                     b.ToTable("financial_reports", (string)null);
                 });
 
+            modelBuilder.Entity("VoluntariadoConectadoRD.Models.Message", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("AttachmentFileName")
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("AttachmentMimeType")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<long?>("AttachmentSize")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("AttachmentUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ConversationId")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("EditedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("ReadAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("RecipientId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("ReplyToMessageId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("SenderId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("SentAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ConversationId");
+
+                    b.HasIndex("IsDeleted");
+
+                    b.HasIndex("IsRead");
+
+                    b.HasIndex("RecipientId");
+
+                    b.HasIndex("ReplyToMessageId");
+
+                    b.HasIndex("SenderId");
+
+                    b.HasIndex("SentAt");
+
+                    b.HasIndex("RecipientId", "IsRead", "IsDeleted");
+
+                    b.ToTable("Messages");
+                });
+
+            modelBuilder.Entity("VoluntariadoConectadoRD.Models.Notification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ActionUrl")
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Data")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Priority")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("ReadAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("RecipientId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("SenderId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedAt");
+
+                    b.HasIndex("IsRead");
+
+                    b.HasIndex("RecipientId");
+
+                    b.HasIndex("SenderId");
+
+                    b.HasIndex("Type");
+
+                    b.ToTable("Notifications");
+                });
+
             modelBuilder.Entity("VoluntariadoConectadoRD.Models.Organizacion", b =>
                 {
                     b.Property<int>("Id")
@@ -273,6 +513,10 @@ namespace VoluntariadoConectadoRD.Migrations
                     b.Property<bool>("PerfilCompleto")
                         .HasColumnType("INTEGER");
 
+                    b.Property<decimal>("SaldoActual")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<string>("SitioWeb")
                         .HasMaxLength(200)
                         .HasColumnType("TEXT");
@@ -304,6 +548,89 @@ namespace VoluntariadoConectadoRD.Migrations
                         .IsUnique();
 
                     b.ToTable("organizaciones", (string)null);
+                });
+
+            modelBuilder.Entity("VoluntariadoConectadoRD.Models.PayPalTransaction", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<decimal>("Amount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasMaxLength(3)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("DonationId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("OrganizacionId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("PayPalOrderId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PayPalTransactionId")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PayerEmail")
+                        .HasMaxLength(150)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PayerId")
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PayerName")
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ProcessedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("RawPayPalResponse")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("TransactionType")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("WebhookData")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedAt");
+
+                    b.HasIndex("DonationId");
+
+                    b.HasIndex("OrganizacionId");
+
+                    b.HasIndex("PayPalOrderId")
+                        .IsUnique();
+
+                    b.HasIndex("PayPalTransactionId");
+
+                    b.HasIndex("Status");
+
+                    b.ToTable("paypal_transactions", (string)null);
                 });
 
             modelBuilder.Entity("VoluntariadoConectadoRD.Models.PlatformStats", b =>
@@ -373,6 +700,11 @@ namespace VoluntariadoConectadoRD.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Color")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Descripcion")
                         .HasMaxLength(500)
                         .HasColumnType("TEXT");
@@ -383,6 +715,10 @@ namespace VoluntariadoConectadoRD.Migrations
                     b.Property<DateTime>("FechaCreacion")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("IconoUrl")
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Nombre")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -391,6 +727,30 @@ namespace VoluntariadoConectadoRD.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("skills", (string)null);
+                });
+
+            modelBuilder.Entity("VoluntariadoConectadoRD.Models.UserOnlineStatus", b =>
+                {
+                    b.Property<int>("UserId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ConnectionId")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsOnline")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("LastSeen")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("UserId");
+
+                    b.HasIndex("IsOnline");
+
+                    b.HasIndex("LastSeen");
+
+                    b.ToTable("UserOnlineStatuses");
                 });
 
             modelBuilder.Entity("VoluntariadoConectadoRD.Models.Usuario", b =>
@@ -425,6 +785,9 @@ namespace VoluntariadoConectadoRD.Migrations
                         .HasMaxLength(150)
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("Estado")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("Estatus")
                         .HasColumnType("INTEGER");
 
@@ -446,6 +809,10 @@ namespace VoluntariadoConectadoRD.Migrations
 
                     b.Property<int>("HorasVoluntariado")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("ImagenUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Nombre")
                         .IsRequired()
@@ -473,6 +840,10 @@ namespace VoluntariadoConectadoRD.Migrations
                     b.Property<int>("TotalResenas")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("Ubicacion")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
                     b.HasKey("Id");
 
                     b.HasIndex("Email")
@@ -497,12 +868,21 @@ namespace VoluntariadoConectadoRD.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("RazonOtorgamiento")
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("UsuarioId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("UsuarioId1")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
                     b.HasIndex("BadgeId");
+
+                    b.HasIndex("UsuarioId1");
 
                     b.HasIndex("UsuarioId", "BadgeId")
                         .IsUnique();
@@ -551,6 +931,13 @@ namespace VoluntariadoConectadoRD.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("Certificacion")
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("FechaAdquisicion")
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("FechaCreacion")
                         .HasColumnType("TEXT");
@@ -672,9 +1059,14 @@ namespace VoluntariadoConectadoRD.Migrations
                     b.Property<int>("UsuarioId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int?>("VolunteerOpportunityId")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("Id");
 
                     b.HasIndex("OpportunityId");
+
+                    b.HasIndex("VolunteerOpportunityId");
 
                     b.HasIndex("UsuarioId", "OpportunityId")
                         .IsUnique();
@@ -752,15 +1144,47 @@ namespace VoluntariadoConectadoRD.Migrations
                     b.ToTable("volunteer_opportunities", (string)null);
                 });
 
+            modelBuilder.Entity("VoluntariadoConectadoRD.Models.Conversation", b =>
+                {
+                    b.HasOne("VoluntariadoConectadoRD.Models.Message", "LastMessage")
+                        .WithMany()
+                        .HasForeignKey("LastMessageId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("VoluntariadoConectadoRD.Models.Usuario", "User1")
+                        .WithMany()
+                        .HasForeignKey("User1Id")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("VoluntariadoConectadoRD.Models.Usuario", "User2")
+                        .WithMany()
+                        .HasForeignKey("User2Id")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("LastMessage");
+
+                    b.Navigation("User1");
+
+                    b.Navigation("User2");
+                });
+
             modelBuilder.Entity("VoluntariadoConectadoRD.Models.Donation", b =>
                 {
                     b.HasOne("VoluntariadoConectadoRD.Models.FinancialReport", "FinancialReport")
                         .WithMany("Donaciones")
                         .HasForeignKey("FinancialReportId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("VoluntariadoConectadoRD.Models.Organizacion", "Organizacion")
+                        .WithMany("Donations")
+                        .HasForeignKey("OrganizacionId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("FinancialReport");
+
+                    b.Navigation("Organizacion");
                 });
 
             modelBuilder.Entity("VoluntariadoConectadoRD.Models.Expense", b =>
@@ -785,6 +1209,56 @@ namespace VoluntariadoConectadoRD.Migrations
                     b.Navigation("Organizacion");
                 });
 
+            modelBuilder.Entity("VoluntariadoConectadoRD.Models.Message", b =>
+                {
+                    b.HasOne("VoluntariadoConectadoRD.Models.Conversation", null)
+                        .WithMany("Messages")
+                        .HasForeignKey("ConversationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("VoluntariadoConectadoRD.Models.Usuario", "Recipient")
+                        .WithMany()
+                        .HasForeignKey("RecipientId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("VoluntariadoConectadoRD.Models.Message", "ReplyToMessage")
+                        .WithMany("Replies")
+                        .HasForeignKey("ReplyToMessageId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("VoluntariadoConectadoRD.Models.Usuario", "Sender")
+                        .WithMany()
+                        .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Recipient");
+
+                    b.Navigation("ReplyToMessage");
+
+                    b.Navigation("Sender");
+                });
+
+            modelBuilder.Entity("VoluntariadoConectadoRD.Models.Notification", b =>
+                {
+                    b.HasOne("VoluntariadoConectadoRD.Models.Usuario", "Recipient")
+                        .WithMany()
+                        .HasForeignKey("RecipientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("VoluntariadoConectadoRD.Models.Usuario", "Sender")
+                        .WithMany()
+                        .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Recipient");
+
+                    b.Navigation("Sender");
+                });
+
             modelBuilder.Entity("VoluntariadoConectadoRD.Models.Organizacion", b =>
                 {
                     b.HasOne("VoluntariadoConectadoRD.Models.Usuario", "Usuario")
@@ -794,6 +1268,35 @@ namespace VoluntariadoConectadoRD.Migrations
                         .IsRequired();
 
                     b.Navigation("Usuario");
+                });
+
+            modelBuilder.Entity("VoluntariadoConectadoRD.Models.PayPalTransaction", b =>
+                {
+                    b.HasOne("VoluntariadoConectadoRD.Models.Donation", "Donation")
+                        .WithMany()
+                        .HasForeignKey("DonationId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("VoluntariadoConectadoRD.Models.Organizacion", "Organizacion")
+                        .WithMany()
+                        .HasForeignKey("OrganizacionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Donation");
+
+                    b.Navigation("Organizacion");
+                });
+
+            modelBuilder.Entity("VoluntariadoConectadoRD.Models.UserOnlineStatus", b =>
+                {
+                    b.HasOne("VoluntariadoConectadoRD.Models.Usuario", "User")
+                        .WithOne()
+                        .HasForeignKey("VoluntariadoConectadoRD.Models.UserOnlineStatus", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("VoluntariadoConectadoRD.Models.UsuarioBadge", b =>
@@ -809,6 +1312,10 @@ namespace VoluntariadoConectadoRD.Migrations
                         .HasForeignKey("UsuarioId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("VoluntariadoConectadoRD.Models.Usuario", null)
+                        .WithMany("UsuarioBadges")
+                        .HasForeignKey("UsuarioId1");
 
                     b.Navigation("Badge");
 
@@ -894,6 +1401,10 @@ namespace VoluntariadoConectadoRD.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("VoluntariadoConectadoRD.Models.VolunteerOpportunity", null)
+                        .WithMany("VolunteerApplications")
+                        .HasForeignKey("VolunteerOpportunityId");
+
                     b.Navigation("Opportunity");
 
                     b.Navigation("Usuario");
@@ -915,6 +1426,11 @@ namespace VoluntariadoConectadoRD.Migrations
                     b.Navigation("UsuarioBadges");
                 });
 
+            modelBuilder.Entity("VoluntariadoConectadoRD.Models.Conversation", b =>
+                {
+                    b.Navigation("Messages");
+                });
+
             modelBuilder.Entity("VoluntariadoConectadoRD.Models.FinancialReport", b =>
                 {
                     b.Navigation("Donaciones");
@@ -922,8 +1438,15 @@ namespace VoluntariadoConectadoRD.Migrations
                     b.Navigation("Gastos");
                 });
 
+            modelBuilder.Entity("VoluntariadoConectadoRD.Models.Message", b =>
+                {
+                    b.Navigation("Replies");
+                });
+
             modelBuilder.Entity("VoluntariadoConectadoRD.Models.Organizacion", b =>
                 {
+                    b.Navigation("Donations");
+
                     b.Navigation("Opportunities");
                 });
 
@@ -939,11 +1462,15 @@ namespace VoluntariadoConectadoRD.Migrations
                     b.Navigation("Organizacion");
 
                     b.Navigation("ResenasRecibidas");
+
+                    b.Navigation("UsuarioBadges");
                 });
 
             modelBuilder.Entity("VoluntariadoConectadoRD.Models.VolunteerOpportunity", b =>
                 {
                     b.Navigation("Aplicaciones");
+
+                    b.Navigation("VolunteerApplications");
                 });
 #pragma warning restore 612, 618
         }

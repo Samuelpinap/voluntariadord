@@ -21,6 +21,9 @@ namespace VoluntariadoConectadoRD.Controllers
             _logger = logger;
         }
 
+        /// <summary>
+        /// Obtener el perfil de un usuario
+        /// </summary>
         [HttpGet("user/{userId}")]
         public async Task<ActionResult<ApiResponseDto<UserProfileDto>>> GetUserProfile(int userId)
         {
@@ -56,7 +59,11 @@ namespace VoluntariadoConectadoRD.Controllers
             }
         }
 
+        /// <summary>
+        /// Obtener el perfil de una organización
+        /// </summary>
         [HttpGet("organization/{orgId}")]
+        [AllowAnonymous]
         public async Task<ActionResult<ApiResponseDto<OrganizationProfileDto>>> GetOrganizationProfile(int orgId)
         {
             try
@@ -91,6 +98,9 @@ namespace VoluntariadoConectadoRD.Controllers
             }
         }
 
+        /// <summary>
+        /// Actualizar el perfil de un usuario
+        /// </summary>
         [HttpPut("user")]
         public async Task<ActionResult<ApiResponseDto<UserProfileDto>>> UpdateUserProfile([FromBody] UpdateUserProfileDto updateDto)
         {
@@ -132,6 +142,9 @@ namespace VoluntariadoConectadoRD.Controllers
             }
         }
 
+        /// <summary>
+        /// Actualizar el perfil de una organización
+        /// </summary>
         [HttpPut("organization")]
         public async Task<ActionResult<ApiResponseDto<OrganizationProfileDto>>> UpdateOrganizationProfile([FromBody] UpdateOrganizationProfileDto updateDto)
         {
@@ -168,6 +181,9 @@ namespace VoluntariadoConectadoRD.Controllers
             }
         }
 
+        /// <summary>
+        /// Obtener el porcentaje de completitud del perfil de un usuario
+        /// </summary>
         [HttpGet("user/completion/{userId}")]
         public async Task<ActionResult<ApiResponseDto<ProfileCompletionDto>>> GetUserProfileCompletion(int userId)
         {
@@ -193,6 +209,9 @@ namespace VoluntariadoConectadoRD.Controllers
             }
         }
 
+        /// <summary>
+        /// Obtener el porcentaje de completitud del perfil de una organización
+        /// </summary>
         [HttpGet("organization/completion/{orgId}")]
         public async Task<ActionResult<ApiResponseDto<ProfileCompletionDto>>> GetOrganizationProfileCompletion(int orgId)
         {

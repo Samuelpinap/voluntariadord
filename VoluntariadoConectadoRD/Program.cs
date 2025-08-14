@@ -7,6 +7,9 @@ using System.Text;
 using VoluntariadoConectadoRD.Data;
 using VoluntariadoConectadoRD.Services;
 using VoluntariadoConectadoRD.Interfaces;
+using VoluntariadoConectadoRD.Hubs;
+using Microsoft.AspNetCore.RateLimiting;
+using System.Threading.RateLimiting;
 
 namespace VoluntariadoConectadoRD
 {
@@ -18,15 +21,68 @@ namespace VoluntariadoConectadoRD
 
             // Add services to the container.
             
-            // Configure CORS
+            // Configure CORS - More secure for production
             builder.Services.AddCors(options =>
             {
-                options.AddDefaultPolicy(builder =>
+                options.AddDefaultPolicy(corsBuilder =>
                 {
-                    builder.AllowAnyOrigin()
-                           .AllowAnyMethod()
-                           .AllowAnyHeader();
+                    if (builder.Environment.IsDevelopment())
+                    {
+                        corsBuilder.WithOrigins("http://localhost:5009", "https://localhost:7264")
+                                  .AllowAnyMethod()
+                                  .AllowAnyHeader()
+                                  .AllowCredentials();
+                    }
+                    else
+                    {
+                        corsBuilder.WithOrigins("https://voluntariado-conectado.azurewebsites.net", 
+                                               "https://www.voluntariadoconectado.rd")
+                                  .AllowAnyMethod()
+                                  .AllowAnyHeader()
+                                  .AllowCredentials();
+                    }
                 });
+            });
+
+            // Configure Rate Limiting
+            builder.Services.AddRateLimiter(options =>
+            {
+                // Global rate limit
+                options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
+                    RateLimitPartition.GetFixedWindowLimiter(
+                        partitionKey: httpContext.User.Identity?.Name ?? httpContext.Request.Headers.Host.ToString(),
+                        factory: partition => new FixedWindowRateLimiterOptions
+                        {
+                            AutoReplenishment = true,
+                            PermitLimit = 100,
+                            Window = TimeSpan.FromMinutes(1)
+                        }));
+
+                // Auth endpoint specific rate limit
+                options.AddFixedWindowLimiter(policyName: "AuthPolicy", options =>
+                {
+                    options.PermitLimit = 5;
+                    options.Window = TimeSpan.FromMinutes(1);
+                    options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+                    options.QueueLimit = 2;
+                });
+
+                options.OnRejected = async (context, token) =>
+                {
+                    context.HttpContext.Response.StatusCode = 429;
+                    if (context.Lease.TryGetMetadata(MetadataName.RetryAfter, out var retryAfter))
+                    {
+                        await context.HttpContext.Response.WriteAsync(
+                            $"Too many requests. Please try again after {retryAfter.TotalMinutes} minute(s).", 
+                            cancellationToken: token);
+                    }
+                    else
+                    {
+                        await context.HttpContext.Response.WriteAsync(
+                            "Too many requests. Please try again later.", 
+                            cancellationToken: token);
+                    }
+                };
             });
             
             // Configure Entity Framework with SQLite
@@ -73,8 +129,27 @@ namespace VoluntariadoConectadoRD
             builder.Services.AddScoped<IImageUploadService, VoluntariadoConectadoRd.Services.ImageUploadService>();
             builder.Services.AddScoped<IVolunteerService, VolunteerService>();
             builder.Services.AddScoped<IDashboardService, DashboardService>();
+            builder.Services.AddScoped<ITransparencyService, TransparencyService>();
+            builder.Services.AddScoped<IEmailService, EmailService>();
+            builder.Services.AddScoped<ISearchService, SearchService>();
+            builder.Services.AddScoped<INotificationService, NotificationService>();
+            builder.Services.AddScoped<IMessageService, MessageService>();
+            builder.Services.AddScoped<IBadgeService, BadgeService>();
+            builder.Services.AddScoped<ISkillService, SkillService>();
+            builder.Services.AddScoped<IPayPalService, PayPalService>();
+            
+            // Add HttpClient for PayPal API calls
+            builder.Services.AddHttpClient<IPayPalService, PayPalService>();
 
-            builder.Services.AddControllers();
+            builder.Services.AddControllers()
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+                    options.JsonSerializerOptions.WriteIndented = builder.Environment.IsDevelopment();
+                });
+            
+            // Add SignalR
+            builder.Services.AddSignalR();
             
             // Configure Swagger with JWT support
             builder.Services.AddEndpointsApiExplorer();
@@ -86,6 +161,11 @@ namespace VoluntariadoConectadoRD
                     Version = "v1",
                     Description = "API para la plataforma de voluntariado en República Dominicana"
                 });
+
+                // Include XML comments
+                var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                c.IncludeXmlComments(xmlPath);
 
                 // Add JWT authentication to Swagger
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -146,6 +226,9 @@ namespace VoluntariadoConectadoRD
 
             app.UseHttpsRedirection();
             
+            // Enable rate limiting
+            app.UseRateLimiter();
+            
             // Enable CORS
             app.UseCors();
             
@@ -157,6 +240,9 @@ namespace VoluntariadoConectadoRD
             app.UseAuthorization();
 
             app.MapControllers();
+            
+            // Map SignalR hub
+            app.MapHub<NotificationHub>("/notificationHub");
 
             // Seed database in development environment
             if (app.Environment.IsDevelopment())

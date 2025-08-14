@@ -10,11 +10,13 @@ namespace VoluntariadoConectadoRD.Services
     {
         private readonly DbContextApplication _context;
         private readonly ILogger<OpportunitiesService> _logger;
+        private readonly IBadgeService _badgeService;
 
-        public OpportunityService(DbContextApplication context, ILogger<OpportunitiesService> logger)
+        public OpportunityService(DbContextApplication context, ILogger<OpportunitiesService> logger, IBadgeService badgeService)
         {
             _context = context;
             _logger = logger;
+            _badgeService = badgeService;
         }
 
         public async Task<IEnumerable<OpportunityListDto>> GetAllOpportunitiesAsync(
@@ -359,11 +361,26 @@ namespace VoluntariadoConectadoRD.Services
             if (application == null)
                 return false;
 
+            var oldStatus = application.Estatus;
             application.Estatus = status;
             application.FechaRespuesta = DateTime.UtcNow;
             application.NotasOrganizacion = notes;
 
             await _context.SaveChangesAsync();
+
+            // Check for automatic badges when marking as completed
+            if (status == ApplicationStatus.Completado && oldStatus != ApplicationStatus.Completado)
+            {
+                try
+                {
+                    await _badgeService.CheckAndAwardAutomaticBadgesAsync(application.VolunteerId);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Error checking automatic badges for user {UserId} after completing activity", application.VolunteerId);
+                    // Don't fail the status update if badge checking fails
+                }
+            }
 
             return true;
         }

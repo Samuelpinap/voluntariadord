@@ -6,6 +6,7 @@ using VoluntariadoConectadoRD.Models.DTOs;
 using VoluntariadoConectadoRD.Models;
 using VoluntariadoConectadoRD.Interfaces;
 using VoluntariadoConectadoRD.Data;
+using VoluntariadoConectadoRD.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace VoluntariadoConectadoRD.Controllers
@@ -17,12 +18,14 @@ namespace VoluntariadoConectadoRD.Controllers
 {
     private readonly ILogger<VoluntariadoController> _logger;
     private readonly IOpportunityService _opportunityService;
+    private readonly ISearchService _searchService;
     private readonly DbContextApplication _context;
 
-    public VoluntariadoController(ILogger<VoluntariadoController> logger, IOpportunityService opportunityService, DbContextApplication context)
+    public VoluntariadoController(ILogger<VoluntariadoController> logger, IOpportunityService opportunityService, ISearchService searchService, DbContextApplication context)
     {
         _logger = logger;
         _opportunityService = opportunityService;
+        _searchService = searchService;
         _context = context;
     }
 
@@ -521,7 +524,7 @@ namespace VoluntariadoConectadoRD.Controllers
 
             // Calculate new communities from recent organizations
             var newCommunities = await _context.Organizaciones
-                .CountAsync(o => o.FechaRegistro >= threeMonthsAgo && o.Estatus == OrganizacionStatus.Activa);
+                .CountAsync(o => o.FechaCreacion >= threeMonthsAgo && o.Estatus == OrganizacionStatus.Activa);
 
             // Calculate real monthly donation data from completed volunteer hours
             var monthlyDonations = new List<MonthlyDonationDto>();
@@ -766,6 +769,157 @@ namespace VoluntariadoConectadoRD.Controllers
         {
             _logger.LogError(ex, "Error getting organization events");
             return StatusCode(500, new ApiResponseDto<IEnumerable<OrganizationEventDto>>
+            {
+                Success = false,
+                Message = "Error interno del servidor"
+            });
+        }
+    }
+
+    // SEARCH ENDPOINTS
+
+    /// <summary>
+    /// Search opportunities with advanced filtering
+    /// </summary>
+    [HttpPost("search/opportunities")]
+    [AllowAnonymous]
+    public async Task<ActionResult<ApiResponseDto<SearchResultDto<VolunteerOpportunity>>>> SearchOpportunities([FromBody] OpportunitySearchDto searchDto)
+    {
+        try
+        {
+            var result = await _searchService.SearchOpportunitiesAsync(searchDto);
+            return Ok(new ApiResponseDto<SearchResultDto<VolunteerOpportunity>>
+            {
+                Success = true,
+                Message = "Búsqueda de oportunidades completada",
+                Data = result
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error searching opportunities");
+            return StatusCode(500, new ApiResponseDto<SearchResultDto<VolunteerOpportunity>>
+            {
+                Success = false,
+                Message = "Error interno del servidor"
+            });
+        }
+    }
+
+    /// <summary>
+    /// Search volunteers with advanced filtering - Admin/Organization only
+    /// </summary>
+    [HttpPost("search/volunteers")]
+    [OrganizacionOrAdmin]
+    public async Task<ActionResult<ApiResponseDto<SearchResultDto<Usuario>>>> SearchVolunteers([FromBody] VolunteerSearchDto searchDto)
+    {
+        try
+        {
+            var result = await _searchService.SearchVolunteersAsync(searchDto);
+            return Ok(new ApiResponseDto<SearchResultDto<Usuario>>
+            {
+                Success = true,
+                Message = "Búsqueda de voluntarios completada",
+                Data = result
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error searching volunteers");
+            return StatusCode(500, new ApiResponseDto<SearchResultDto<Usuario>>
+            {
+                Success = false,
+                Message = "Error interno del servidor"
+            });
+        }
+    }
+
+    /// <summary>
+    /// Search organizations with advanced filtering
+    /// </summary>
+    [HttpPost("search/organizations")]
+    [AllowAnonymous]
+    public async Task<ActionResult<ApiResponseDto<SearchResultDto<Organizacion>>>> SearchOrganizations([FromBody] OrganizationSearchDto searchDto)
+    {
+        try
+        {
+            var result = await _searchService.SearchOrganizationsAsync(searchDto);
+            return Ok(new ApiResponseDto<SearchResultDto<Organizacion>>
+            {
+                Success = true,
+                Message = "Búsqueda de organizaciones completada",
+                Data = result
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error searching organizations");
+            return StatusCode(500, new ApiResponseDto<SearchResultDto<Organizacion>>
+            {
+                Success = false,
+                Message = "Error interno del servidor"
+            });
+        }
+    }
+
+    /// <summary>
+    /// Quick search across all entity types - returns suggestions for autocomplete
+    /// </summary>
+    [HttpPost("search/quick")]
+    [AllowAnonymous]
+    public async Task<ActionResult<ApiResponseDto<QuickSearchResultDto>>> QuickSearch([FromBody] QuickSearchDto searchDto)
+    {
+        try
+        {
+            var result = await _searchService.QuickSearchAsync(searchDto);
+            return Ok(new ApiResponseDto<QuickSearchResultDto>
+            {
+                Success = true,
+                Message = "Búsqueda rápida completada",
+                Data = result
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error performing quick search");
+            return StatusCode(500, new ApiResponseDto<QuickSearchResultDto>
+            {
+                Success = false,
+                Message = "Error interno del servidor"
+            });
+        }
+    }
+
+    /// <summary>
+    /// Get available filters for search forms
+    /// </summary>
+    [HttpGet("search/filters/{type}")]
+    [AllowAnonymous]
+    public async Task<ActionResult<ApiResponseDto<SearchFilters>>> GetSearchFilters(string type)
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(type) || !new[] { "opportunities", "volunteers", "organizations" }.Contains(type.ToLower()))
+            {
+                return BadRequest(new ApiResponseDto<SearchFilters>
+                {
+                    Success = false,
+                    Message = "Tipo de filtro inválido. Use: opportunities, volunteers, organizations"
+                });
+            }
+
+            var filters = await _searchService.GetSearchFiltersAsync(type);
+            return Ok(new ApiResponseDto<SearchFilters>
+            {
+                Success = true,
+                Message = $"Filtros para {type} obtenidos",
+                Data = filters
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting search filters for type: {Type}", type);
+            return StatusCode(500, new ApiResponseDto<SearchFilters>
             {
                 Success = false,
                 Message = "Error interno del servidor"

@@ -64,10 +64,20 @@ namespace VoluntariadoConectadoRD.Models
         
         public bool PerfilCompleto { get; set; } = false;
 
+        // Additional properties for compatibility
+        [StringLength(100)]
+        public string? Ubicacion { get; set; }
+        
+        public int Estado { get; set; } = 1; // For compatibility with older code
+        
+        [StringLength(500)]
+        public string? ImagenUrl { get; set; } // Alias for ProfileImageUrl
+
         // Navigation property
         public Organizacion? Organizacion { get; set; }
         public ICollection<UsuarioResena> ResenasRecibidas { get; set; } = new List<UsuarioResena>();
         public ICollection<UsuarioBadge> Badges { get; set; } = new List<UsuarioBadge>();
+        public ICollection<UsuarioBadge> UsuarioBadges { get; set; } = new List<UsuarioBadge>(); // Alias for compatibility
 
         public Usuario()
         {
